@@ -60,7 +60,7 @@ function deleteJSONs() {
 }
 
 function main(){
-	title "Deploying Machine 2 Machine Economy demo..."
+	title "Deploying Certificates Blockchain demo..."
 	subtitle "Deploying ganache ethereum node..."
 	cd ./token
 	#deleteJSONs
