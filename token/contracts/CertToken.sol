@@ -3,23 +3,23 @@ pragma solidity ^0.4.13;
 contract CertToken {
     
     struct Entity {
-        bytes32 name;           // Entity's name
+        string name;           // Entity's name
     }
 
     struct User {
-        bytes32 name;           // Owner's name
-        bytes32 surnames;       // Owner's surnames
-        bytes32 nid;            // Owner's national identity document
+        string name;           // Owner's name
+        string surnames;       // Owner's surnames
+        string nid;            // Owner's national identity document
     }
     
     struct Certificate {
         address owner;          // Public address of the certificate's owner
         address issuer;         // Public address of the entity who issues the certificate
-        bytes32 certName;       // Name of the certificate issued
+        string certName;       // Name of the certificate issued
         address[] whiteList;    // List of authorized entities to check certificate
     }
 
-    address public addr1;
+    address public newIssuer;
     uint public nounce;
 
     mapping(bytes32 => Certificate) public certs;  // This creates an array with all the certificates
@@ -39,11 +39,10 @@ contract CertToken {
     /********************************************************************************************/
     function CertToken() public {
         nounce = 0;
+        newIssuer = msg.sender;
+        
+        
     }
-
-
-
-
 
     /************************************Getters and Setters*************************************/
     /********************************************************************************************
@@ -52,17 +51,16 @@ contract CertToken {
     newOwner        Address of new certificate's owner
     newCertName     Name of the certificate
     /********************************************************************************************/
-    function setCert(address newOwner, bytes32 newCertName) public returns (bytes32) {
-        bytes32 unique = keccak256(newOwner, nounce++);
+    function setCert(address _newOwner, string _newCertName) public returns (bytes32) {
+        bytes32 unique = keccak256(_newOwner, nounce++);
 
-        certs[unique].owner = newOwner;
-        certs[unique].issuer = msg.sender;
-        certs[unique].certName = newCertName;
+        certs[unique].owner = _newOwner;
+        certs[unique].issuer = newIssuer;
+        certs[unique].certName = _newCertName;
         //certs[unique].whiteList[0] = newOwner;
         
         return unique;
     }
-
 
 
 
