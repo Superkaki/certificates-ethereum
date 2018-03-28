@@ -2,21 +2,22 @@ pragma solidity ^0.4.13;
 
 contract CertToken {
     
-    struct Entity {
-        string name;           // Entity's name
-    }
-
-    struct User {
-        string name;           // Owner's name
-        string surnames;       // Owner's surnames
-        string nid;            // Owner's national identity document
-    }
-    
     struct Certificate {
         address owner;          // Public address of the certificate's owner
         address issuer;         // Public address of the entity who issues the certificate
-        string certName;       // Name of the certificate issued
+        bytes32 certName;       // Name of the certificate issued
         address[] whiteList;    // List of authorized entities to check certificate
+        mapping(address => Entity) whiteListStruct;
+    }
+
+    struct Entity {
+        bytes32 name;           // Entity's name
+    }
+
+    struct User {
+        bytes32 name;           // Owner's name
+        bytes32 surnames;       // Owner's surnames
+        bytes32 nid;            // Owner's national identity document
     }
 
     address public newIssuer;
@@ -51,13 +52,13 @@ contract CertToken {
     newOwner        Address of new certificate's owner
     newCertName     Name of the certificate
     /********************************************************************************************/
-    function setCert(address _newOwner, string _newCertName) public returns (bytes32) {
-        bytes32 unique = keccak256(_newOwner, nounce++);
+    function setCert(address _newOwner, bytes32 _newCertName) public returns (bytes32) {
+        bytes32 unique = keccak256(nounce++);
 
         certs[unique].owner = _newOwner;
         certs[unique].issuer = newIssuer;
         certs[unique].certName = _newCertName;
-        //certs[unique].whiteList[0] = newOwner;
+        certs[unique].whiteList.push(_newOwner);
         
         return unique;
     }
@@ -73,9 +74,28 @@ contract CertToken {
     /********************************************************************************************/
     function checkCert(bytes32 unique) public view returns (bool) {
         if (certs[unique].issuer != 0 ) {
-            return true;
+            require(certs[unique].whiteListStruct[msg.sender].name != "");
+            //require(isSenderAllowed(unique));
         }
         return false;
+    }
+
+    /*
+    function isSenderAllowed(bytes32 unique) public view returns (bool isAllowed) {
+        
+        for (uint i = 0; i < certs[unique].whiteList.lenght; i++) {
+            if (certs[unique].whiteList[i] != msg.sender) {
+                isAllowed = false;
+            } else {
+                isAllowed = true;                
+            }
+        }
+        return isAllowed;
+    }
+    */
+
+    function setEntityToWhiteList(bytes32 unique,address _newEntity) public {
+        certs[unique].whiteList.push(_newEntity);
     }
 
 }
