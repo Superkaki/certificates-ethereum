@@ -8,7 +8,6 @@ contract CertToken {
         bytes32 certName;       // Name of the certificate issued
         address[] whiteList;    // List of authorized entities to check the certificate
         mapping(address => Entity) whiteListStruct;
-        uint256 nAllowed;       // Number of authorized entities
     }
 
     struct Entity {
@@ -28,7 +27,7 @@ contract CertToken {
 
     mapping(address => User) public owners;
     mapping(address => Entity) public entities;
-     
+    
     /********************************************Events******************************************/
 
 
@@ -91,14 +90,12 @@ contract CertToken {
     /********************************************************************************************/
     function isSenderAllowed(uint256 unique) public view returns (bool isAllowed) {
         
-        for (uint i = 0; i < certs[unique].nAllowed; i++) {
-            if (certs[unique].whiteList[i] != msg.sender) {
-                isAllowed = false;
-            } else {
-                isAllowed = true;                
+        for (uint256 i = 0; i < certs[unique].whiteList.length; i++) {
+            if (certs[unique].whiteList[i] == msg.sender) {
+                return(true);
             }
         }
-        return isAllowed;
+        return (false);
     }
     
     /********************************************************************************************
@@ -107,11 +104,34 @@ contract CertToken {
     unique          Address of the certificate is gonna check
     _newEntity      Address of the entity is gonna be added to the list
     /********************************************************************************************/
-    function setEntityToWhiteList(uint256 unique, address _newEntity) public {
+    function setEntityToWhiteList(uint256 unique, address _newEntity) public returns (bool success){
         if(msg.sender == certs[unique].owner || msg.sender == certs[unique].issuer) {
             certs[unique].whiteList.push(_newEntity);
-            certs[unique].nAllowed++;
+            return true;
         }
+        return false;
     }
+
+    /********************************************************************************************
+    Remove an entity from the whiteList
+
+    unique          Address of the certificate is gonna check
+    entity      Address of the entity is gonna be added to the list
+    /********************************************************************************************
+    function removeEntityFromWhiteList(uint256 unique, address entity) public returns (bool success) {
+        if(msg.sender == certs[unique].owner || msg.sender == certs[unique].issuer || entity != certs[unique].issuer || entity != certs[unique].owner) {
+            for (uint256 i = 0; i < certs[unique].whiteList.length; i++) {
+                if (certs[unique].whiteList[i] == entity) {                     // Check if entity is in the list
+                    for(uint256 j = i; j < certs[unique].whiteList.length-1; j++) {     // Remove from the array
+                        certs[unique].whiteList[j] == certs[unique].whiteList[j+1];     //TODO: falla en esta linea
+                    }
+                    delete certs[unique].whiteList[certs[unique].whiteList.length-1];
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    */
 
 }
