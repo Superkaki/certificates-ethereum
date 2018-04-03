@@ -8,6 +8,7 @@ contract CertToken {
         bytes32 certName;       // Name of the certificate issued
         address[] whiteList;    // List of authorized entities to check the certificate
         mapping(address => Entity) whiteListStruct;
+        bool stilValid;
     }
 
     struct Entity {
@@ -58,6 +59,7 @@ contract CertToken {
         certs[id].owner = _newOwner;                // Addidng information
         certs[id].issuer = newIssuer;
         certs[id].certName = _newCertName;
+        certs[id].stilValid = true;
         setEntityToWhiteList(id, _newOwner);        // The owner is allowed to check his own certificate
         setEntityToWhiteList(id, msg.sender);       // The issuer is allowed to check the certificate
         
@@ -77,6 +79,7 @@ contract CertToken {
     function checkCert(uint256 unique) public view returns (bool success) {
         if (certs[unique].issuer != 0 ) {
             require(isSenderAllowed(unique));
+            require(certs[unique].stilValid);
             return true;
         } else {
             return false;
@@ -116,7 +119,7 @@ contract CertToken {
     Remove an entity from the whiteList
 
     unique          Address of the certificate is gonna check
-    entity      Address of the entity is gonna be added to the list
+    entity          Address of the entity is gonna be added to the list
     /********************************************************************************************
     function removeEntityFromWhiteList(uint256 unique, address entity) public returns (bool success) {
         if(msg.sender == certs[unique].owner || msg.sender == certs[unique].issuer || entity != certs[unique].issuer || entity != certs[unique].owner) {
@@ -134,4 +137,16 @@ contract CertToken {
     }
     */
 
+    /********************************************************************************************
+    Remove a certificate
+
+    unique          Address of the certificate is gonna check
+    /********************************************************************************************/
+    function removeCertificate(uint256 unique) public returns (bool success) {
+        if(msg.sender == certs[unique].owner || msg.sender == certs[unique].issuer) {
+            certs[unique].stilValid = false;
+            return true;
+        }
+        return false;
+    }
 }
