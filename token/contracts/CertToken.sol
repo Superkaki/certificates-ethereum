@@ -6,9 +6,9 @@ contract CertToken {
         address owner;          // Public address of the certificate's owner
         address issuer;         // Public address of the entity who issues the certificate
         bytes32 certName;       // Name of the certificate issued
-        address[] whiteList;    // List of authorized entities to check certificate
+        address[] whiteList;    // List of authorized entities to check the certificate
         mapping(address => Entity) whiteListStruct;
-        uint256 nAllowed;
+        uint256 nAllowed;       // Number of authorized entities
     }
 
     struct Entity {
@@ -52,18 +52,19 @@ contract CertToken {
     newOwner        Address of new certificate's owner
     newCertName     Name of the certificate
     /********************************************************************************************/
-    function setCert(address _newOwner, bytes32 _newCertName) public returns (uint256) {
-        //bytes32 unique = keccak256(nounce++);
-        uint256 id = nounce++;
+    function setCert(address _newOwner, bytes32 _newCertName) public returns (uint256 id) {
+        //bytes32 unique = keccak256(nounce++);     // TODO: In the future the id will be a hash, not a uint256
+        id = nounce++;
 
-        certs[id].owner = _newOwner;
+        certs[id].owner = _newOwner;                // Addidng information
         certs[id].issuer = newIssuer;
         certs[id].certName = _newCertName;
-        setEntityToWhiteList(id, _newOwner);        //the owner is allowed to check his own certificate
-        setEntityToWhiteList(id, msg.sender);       //the issuer is allowed to check the certificate
+        setEntityToWhiteList(id, _newOwner);        // The owner is allowed to check his own certificate
+        setEntityToWhiteList(id, msg.sender);       // The issuer is allowed to check the certificate
         
         return id;
     }
+
 
 
 
@@ -72,11 +73,10 @@ contract CertToken {
     /********************************************************************************************
     Check whether a certificate exist
 
-    certHash        Address of the certificate is gonna check
+    unique        Address of the certificate is gonna check
     /********************************************************************************************/
-    function checkCert(uint256 unique) public view returns (bool) {
+    function checkCert(uint256 unique) public view returns (bool success) {
         if (certs[unique].issuer != 0 ) {
-            //require(certs[unique].whiteListStruct[msg.sender].name != "");
             require(isSenderAllowed(unique));
             return true;
         } else {
@@ -84,7 +84,11 @@ contract CertToken {
         }
     }
 
-    
+    /********************************************************************************************
+    Check whether the sender is allowed to check a certificate existence
+
+    unique        Address of the certificate is gonna check
+    /********************************************************************************************/
     function isSenderAllowed(uint256 unique) public view returns (bool isAllowed) {
         
         for (uint i = 0; i < certs[unique].nAllowed; i++) {
@@ -97,7 +101,12 @@ contract CertToken {
         return isAllowed;
     }
     
+    /********************************************************************************************
+    Add an entity to the whiteList
 
+    unique          Address of the certificate is gonna check
+    _newEntity      Address of the entity is gonna be added to the list
+    /********************************************************************************************/
     function setEntityToWhiteList(uint256 unique, address _newEntity) public {
         if(msg.sender == certs[unique].owner || msg.sender == certs[unique].issuer) {
             certs[unique].whiteList.push(_newEntity);
