@@ -64,14 +64,14 @@ function main(){
 	subtitle "Deploying ganache ethereum node..."
 	cd ./token
 	#deleteJSONs
-	#log "Deploying ganache..."
-	#bash ./2_deploy_explorer.sh &
+	log "Deploying ganache..."
+	bash ./2_deploy_explorer.sh &
 	log "Deploying smart contract"
 	bash ./3_deploy_smart_contract.sh
-	log "Running log window"
-	gnome-terminal -x truffle develop --log
-	log "Running console"
-	truffle develop
+	#log "Running log window"
+	#gnome-terminal -x truffle develop --log
+	#log "Running console"
+	#truffle develop
 	###### Prueba: CertToken.deployed().then(function(instance){return instance.setCert();});
 	#subtitle "Deploying http server..."
 	#cd ../http_server

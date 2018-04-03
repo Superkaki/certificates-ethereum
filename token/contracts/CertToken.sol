@@ -8,6 +8,7 @@ contract CertToken {
         bytes32 certName;       // Name of the certificate issued
         address[] whiteList;    // List of authorized entities to check certificate
         mapping(address => Entity) whiteListStruct;
+        uint256 nAllowed;
     }
 
     struct Entity {
@@ -23,7 +24,7 @@ contract CertToken {
     address public newIssuer;
     uint public nounce;
 
-    mapping(bytes32 => Certificate) public certs;  // This creates an array with all the certificates
+    mapping(uint256 => Certificate) public certs;  // This creates an array with all the certificates
 
     mapping(address => User) public owners;
     mapping(address => Entity) public entities;
@@ -42,7 +43,6 @@ contract CertToken {
         nounce = 0;
         newIssuer = msg.sender;
         
-        
     }
 
     /************************************Getters and Setters*************************************/
@@ -52,15 +52,17 @@ contract CertToken {
     newOwner        Address of new certificate's owner
     newCertName     Name of the certificate
     /********************************************************************************************/
-    function setCert(address _newOwner, bytes32 _newCertName) public returns (bytes32) {
-        bytes32 unique = keccak256(nounce++);
+    function setCert(address _newOwner, bytes32 _newCertName) public returns (uint256) {
+        //bytes32 unique = keccak256(nounce++);
+        uint256 id = nounce++;
 
-        certs[unique].owner = _newOwner;
-        certs[unique].issuer = newIssuer;
-        certs[unique].certName = _newCertName;
-        certs[unique].whiteList.push(_newOwner);
+        certs[id].owner = _newOwner;
+        certs[id].issuer = newIssuer;
+        certs[id].certName = _newCertName;
+        setEntityToWhiteList(id, _newOwner);        //the owner is allowed to check his own certificate
+        setEntityToWhiteList(id, msg.sender);       //the issuer is allowed to check the certificate
         
-        return unique;
+        return id;
     }
 
 
@@ -72,18 +74,20 @@ contract CertToken {
 
     certHash        Address of the certificate is gonna check
     /********************************************************************************************/
-    function checkCert(bytes32 unique) public view returns (bool) {
+    function checkCert(uint256 unique) public view returns (bool) {
         if (certs[unique].issuer != 0 ) {
-            require(certs[unique].whiteListStruct[msg.sender].name != "");
-            //require(isSenderAllowed(unique));
+            //require(certs[unique].whiteListStruct[msg.sender].name != "");
+            require(isSenderAllowed(unique));
+            return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
-    /*
-    function isSenderAllowed(bytes32 unique) public view returns (bool isAllowed) {
+    
+    function isSenderAllowed(uint256 unique) public view returns (bool isAllowed) {
         
-        for (uint i = 0; i < certs[unique].whiteList.lenght; i++) {
+        for (uint i = 0; i < certs[unique].nAllowed; i++) {
             if (certs[unique].whiteList[i] != msg.sender) {
                 isAllowed = false;
             } else {
@@ -92,10 +96,13 @@ contract CertToken {
         }
         return isAllowed;
     }
-    */
+    
 
-    function setEntityToWhiteList(bytes32 unique,address _newEntity) public {
-        certs[unique].whiteList.push(_newEntity);
+    function setEntityToWhiteList(uint256 unique, address _newEntity) public {
+        if(msg.sender == certs[unique].owner || msg.sender == certs[unique].issuer) {
+            certs[unique].whiteList.push(_newEntity);
+            certs[unique].nAllowed++;
+        }
     }
 
 }
