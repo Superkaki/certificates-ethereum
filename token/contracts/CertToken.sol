@@ -1,14 +1,15 @@
 pragma solidity ^0.4.13;
 
 contract CertToken {
-
+    
     struct Certificate {
         address owner;          // Public address of the certificate's owner (user or entity)
         address issuer;         // Public address of the entity who issues the certificate
         bytes32 certName;       // Name of the certificate issued
         address[] whiteList;    // List of authorized entities to check the certificate
         mapping(address => Entity) whiteListStruct;
-        bool stilValid;
+        uint expirationDate;
+        bool isStilValid;
     }
 
     struct Entity {
@@ -22,7 +23,7 @@ contract CertToken {
     }
 
     struct AccessLog {
-        //Date
+        uint date;              // Timestamp of the access
         address user;           // Address of the user who applies for the verification
         uint256 certificate;    // Hash of the certificate which was verified
     }
@@ -104,7 +105,7 @@ contract CertToken {
         return (users[add].name, users[add].nid);
     }
 
-    //TODO: Get entitie's and user's addres by then names if it's possible
+    //TODO: Get entity's and user's address by then names if it's possible
 
 
 
@@ -118,14 +119,15 @@ contract CertToken {
     _to             Address of new certificate's owner
     certName        Name of the new certificate
     /********************************************************************************************/
-    function newCert(address _to, bytes32 _certName) public returns (uint256 id) {
+    function newCert(address _to, bytes32 _certName, uint duration) public returns (uint256 id) {
         //bytes32 unique = keccak256(nounce++);     // TODO: In the future the id will be a hash, not a uint256
         id = nounce++;
 
         certs[id].owner = _to;                      // Addidng information
         certs[id].issuer = newIssuer;
         certs[id].certName = _certName;
-        certs[id].stilValid = true;
+        certs[id].expirationDate = now + duration;
+        certs[id].isStilValid = true;
         setEntityToWhiteList(id, _to);              // The owner is allowed to check his own certificate
         setEntityToWhiteList(id, msg.sender);       // The issuer is allowed to check the certificate
         
@@ -138,20 +140,20 @@ contract CertToken {
     unique        Address of the certificate is gonna check
     /********************************************************************************************/
     function checkCert(uint256 unique) public returns (bool success) {
-        if (certs[unique].issuer != 0 ) {
+        if (certs[unique].issuer != 0) {                // Check if certificate exist
+            insertHistory(unique);                      // Regist the appication
             require(isSenderAllowed(unique));
-            insertHistory(unique);
-            require(certs[unique].stilValid);
+            checkExpiration(unique);
+            require(certs[unique].isStilValid);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /********************************************************************************************
     Check whether the sender is allowed to check a certificate existence
 
-    unique        Address of the certificate is gonna check
+    unique        Address of the certificate is gonna be checked
     /********************************************************************************************/
     function isSenderAllowed(uint256 unique) public view returns (bool isAllowed) {
         
@@ -161,6 +163,19 @@ contract CertToken {
             }
         }
         return (false);
+    }
+
+    /********************************************************************************************
+    Check if the certificate is expired
+
+    unique        Address of the certificate is gonna be checked
+    /********************************************************************************************/
+    function checkExpiration(uint256 unique) public returns (bool isValid) {
+        if (certs[unique].expirationDate < now) {
+            certs[unique].isStilValid = false;
+            return false;
+        }
+        return true;
     }
     
     /********************************************************************************************
@@ -184,6 +199,7 @@ contract CertToken {
     /********************************************************************************************/
     function insertHistory(uint256 unique) public returns (bool success) {
         history.push(AccessLog({
+            date: now,
             user: msg.sender,
             certificate: unique
         }));
@@ -219,7 +235,7 @@ contract CertToken {
     /********************************************************************************************/
     function removeCertificate(uint256 unique) public returns (bool success) {
         if(msg.sender == certs[unique].owner || msg.sender == certs[unique].issuer) {
-            certs[unique].stilValid = false;
+            certs[unique].isStilValid = false;
             return true;
         }
         return false;
