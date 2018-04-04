@@ -49,6 +49,13 @@ contract CertToken {
 
     /************************************Getters and Setters*************************************/
     /********************************************************************************************
+    Get my own address
+    /********************************************************************************************/
+    function getMyAddress() constant public returns (address) {
+        return msg.sender;
+    }
+
+    /********************************************************************************************
     Create a new entity
 
     add             Addres of the new entity
@@ -88,6 +95,8 @@ contract CertToken {
         return (users[add].name, users[add].nid);
     }
 
+    //TODO: Get entitie's and user's addres by then names if it's possible
+
 
 
 
@@ -104,11 +113,11 @@ contract CertToken {
         //bytes32 unique = keccak256(nounce++);     // TODO: In the future the id will be a hash, not a uint256
         id = nounce++;
 
-        certs[id].owner = _to;                // Addidng information
+        certs[id].owner = _to;                      // Addidng information
         certs[id].issuer = newIssuer;
         certs[id].certName = _certName;
         certs[id].stilValid = true;
-        setEntityToWhiteList(id, _to);        // The owner is allowed to check his own certificate
+        setEntityToWhiteList(id, _to);              // The owner is allowed to check his own certificate
         setEntityToWhiteList(id, msg.sender);       // The issuer is allowed to check the certificate
         
         return id;
@@ -150,7 +159,7 @@ contract CertToken {
     unique          Address of the certificate is gonna check
     _newEntity      Address of the entity is gonna be added to the list
     /********************************************************************************************/
-    function setEntityToWhiteList(uint256 unique, address _newEntity) public returns (bool success){
+    function setEntityToWhiteList(uint256 unique, address _newEntity) public returns (bool success) {
         if(msg.sender == certs[unique].owner || msg.sender == certs[unique].issuer) {
             certs[unique].whiteList.push(_newEntity);
             return true;
