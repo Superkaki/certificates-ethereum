@@ -1,7 +1,7 @@
 pragma solidity ^0.4.13;
 
 contract CertToken {
-    
+
     struct Certificate {
         address owner;          // Public address of the certificate's owner (user or entity)
         address issuer;         // Public address of the entity who issues the certificate
@@ -21,6 +21,13 @@ contract CertToken {
         bytes32 nid;            // Owner's national identity document
     }
 
+    struct AccessLog {
+        //Date
+        address user;           // Address of the user who applies for the verification
+        uint256 certificate;    // Hash of the certificate which was verified
+    }
+
+    AccessLog[] public history;
     address public newIssuer;
     uint public nounce;
 
@@ -28,6 +35,8 @@ contract CertToken {
 
     mapping(address => User) public users;
     mapping(address => Entity) public entities;
+    
+    
     
     /********************************************Events******************************************/
 
@@ -128,9 +137,10 @@ contract CertToken {
 
     unique        Address of the certificate is gonna check
     /********************************************************************************************/
-    function checkCert(uint256 unique) public view returns (bool success) {
+    function checkCert(uint256 unique) public returns (bool success) {
         if (certs[unique].issuer != 0 ) {
             require(isSenderAllowed(unique));
+            insertHistory(unique);
             require(certs[unique].stilValid);
             return true;
         } else {
@@ -165,6 +175,19 @@ contract CertToken {
             return true;
         }
         return false;
+    }
+
+    /********************************************************************************************
+    Insert a new access log in the history registration
+
+    unique          Address of the certificate is gonna regist
+    /********************************************************************************************/
+    function insertHistory(uint256 unique) public returns (bool success) {
+        history.push(AccessLog({
+            user: msg.sender,
+            certificate: unique
+        }));
+        return true;
     }
 
     /********************************************************************************************
