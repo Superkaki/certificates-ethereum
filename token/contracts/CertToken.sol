@@ -5,7 +5,7 @@ contract CertToken {
     struct Certificate {
         address owner;          // Public address of the certificate's owner (user or entity)
         address issuer;         // Public address of the entity who issues the certificate
-        bytes32 certName;       // Name of the certificate issued
+        string certName;        // Name of the certificate issued
         address[] whiteList;    // List of authorized entities to check the certificate
         mapping(address => Entity) whiteListStruct;
         uint expirationDate;
@@ -17,9 +17,9 @@ contract CertToken {
     }
 
     struct User {
-        bytes32 name;           // Owner's name
+        bytes15 name;           // Owner's name
         //bytes32 surnames;       // Owner's surnames
-        bytes32 nid;            // Owner's national identity document
+        bytes9 nid;             // Owner's national identity document
     }
 
     struct AccessLog {
@@ -29,7 +29,6 @@ contract CertToken {
     }
 
     AccessLog[] public history;
-    address public newIssuer;
     uint public nounce;
 
     mapping(bytes32 => Certificate) public certs;  // This creates an array with all the certificates
@@ -51,7 +50,6 @@ contract CertToken {
     /********************************************************************************************/
     function CertToken() public {
         nounce = 0;
-        newIssuer = msg.sender;
         
     }
 
@@ -82,7 +80,7 @@ contract CertToken {
     userName        Name of the new user
     userNid         New user's National Identity Card number
     /********************************************************************************************/
-    function setUser(address add, bytes32 userName, bytes32 userNid) public {
+    function setUser(address add, bytes15 userName, bytes9 userNid) public {
         users[add].name = userName;
         users[add].nid = userNid;
     }
@@ -119,11 +117,11 @@ contract CertToken {
     _to             Address of new certificate's owner
     certName        Name of the new certificate
     /********************************************************************************************/
-    function newCert(address _to, bytes32 _certName, uint duration) public returns (bytes32 unique) {
+    function newCert(address _to, string _certName, uint duration) public returns (bytes32 unique) {
         unique = keccak256(nounce++);
 
         certs[unique].owner = _to;                      // Addidng information
-        certs[unique].issuer = newIssuer;
+        certs[unique].issuer = msg.sender;
         certs[unique].certName = _certName;
         certs[unique].expirationDate = now + duration;
         certs[unique].isStilValid = true;
