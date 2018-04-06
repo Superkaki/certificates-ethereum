@@ -25,14 +25,14 @@ contract CertToken {
     struct AccessLog {
         uint date;              // Timestamp of the access
         address user;           // Address of the user who applies for the verification
-        uint256 certificate;    // Hash of the certificate which was verified
+        bytes32 certificate;    // Hash of the certificate which was verified
     }
 
     AccessLog[] public history;
     address public newIssuer;
     uint public nounce;
 
-    mapping(uint256 => Certificate) public certs;  // This creates an array with all the certificates
+    mapping(bytes32 => Certificate) public certs;  // This creates an array with all the certificates
 
     mapping(address => User) public users;
     mapping(address => Entity) public entities;
@@ -119,19 +119,18 @@ contract CertToken {
     _to             Address of new certificate's owner
     certName        Name of the new certificate
     /********************************************************************************************/
-    function newCert(address _to, bytes32 _certName, uint duration) public returns (uint256 id) {
-        //bytes32 unique = keccak256(nounce++);     // TODO: In the future the id will be a hash, not a uint256
-        id = nounce++;
+    function newCert(address _to, bytes32 _certName, uint duration) public returns (bytes32 unique) {
+        unique = keccak256(nounce++);
 
-        certs[id].owner = _to;                      // Addidng information
-        certs[id].issuer = newIssuer;
-        certs[id].certName = _certName;
-        certs[id].expirationDate = now + duration;
-        certs[id].isStilValid = true;
-        setEntityToWhiteList(id, _to);              // The owner is allowed to check his own certificate
-        setEntityToWhiteList(id, msg.sender);       // The issuer is allowed to check the certificate
+        certs[unique].owner = _to;                      // Addidng information
+        certs[unique].issuer = newIssuer;
+        certs[unique].certName = _certName;
+        certs[unique].expirationDate = now + duration;
+        certs[unique].isStilValid = true;
+        setEntityToWhiteList(unique, _to);              // The owner is allowed to check his own certificate
+        setEntityToWhiteList(unique, msg.sender);       // The issuer is allowed to check the certificate
         
-        return id;
+        return unique;
     }
     
     /********************************************************************************************
@@ -139,7 +138,7 @@ contract CertToken {
 
     unique        Address of the certificate is gonna check
     /********************************************************************************************/
-    function checkCert(uint256 unique) public returns (bool success) {
+    function checkCert(bytes32 unique) public returns (bool success) {
         if (certs[unique].issuer != 0) {                // Check if certificate exist
             insertHistory(unique);                      // Regist the appication
             require(isSenderAllowed(unique));
@@ -155,7 +154,7 @@ contract CertToken {
 
     unique        Address of the certificate is gonna be checked
     /********************************************************************************************/
-    function isSenderAllowed(uint256 unique) public view returns (bool isAllowed) {
+    function isSenderAllowed(bytes32 unique) public view returns (bool isAllowed) {
         
         for (uint256 i = 0; i < certs[unique].whiteList.length; i++) {
             if (certs[unique].whiteList[i] == msg.sender) {
@@ -170,7 +169,7 @@ contract CertToken {
 
     unique        Address of the certificate is gonna be checked
     /********************************************************************************************/
-    function checkExpiration(uint256 unique) public returns (bool isValid) {
+    function checkExpiration(bytes32 unique) public returns (bool isValid) {
         if (certs[unique].expirationDate < now) {
             certs[unique].isStilValid = false;
             return false;
@@ -184,7 +183,7 @@ contract CertToken {
     unique          Address of the certificate is gonna check
     _newEntity      Address of the entity is gonna be added to the list
     /********************************************************************************************/
-    function setEntityToWhiteList(uint256 unique, address _newEntity) public returns (bool success) {
+    function setEntityToWhiteList(bytes32 unique, address _newEntity) public returns (bool success) {
         if(msg.sender == certs[unique].owner || msg.sender == certs[unique].issuer) {
             certs[unique].whiteList.push(_newEntity);
             return true;
@@ -197,7 +196,7 @@ contract CertToken {
 
     unique          Address of the certificate is gonna regist
     /********************************************************************************************/
-    function insertHistory(uint256 unique) public returns (bool success) {
+    function insertHistory(bytes32 unique) public returns (bool success) {
         history.push(AccessLog({
             date: now,
             user: msg.sender,
@@ -212,7 +211,7 @@ contract CertToken {
     unique          Address of the certificate is gonna check
     entity          Address of the entity is gonna be added to the list
     /********************************************************************************************
-    function removeEntityFromWhiteList(uint256 unique, address entity) public returns (bool success) {
+    function removeEntityFromWhiteList(bytes32 unique, address entity) public returns (bool success) {
         if(msg.sender == certs[unique].owner || msg.sender == certs[unique].issuer || entity != certs[unique].issuer || entity != certs[unique].owner) {
             for (uint256 i = 0; i < certs[unique].whiteList.length; i++) {
                 if (certs[unique].whiteList[i] == entity) {                     // Check if entity is in the list
@@ -233,7 +232,7 @@ contract CertToken {
 
     unique          Address of the certificate is gonna check
     /********************************************************************************************/
-    function removeCertificate(uint256 unique) public returns (bool success) {
+    function removeCertificate(bytes32 unique) public returns (bool success) {
         if(msg.sender == certs[unique].owner || msg.sender == certs[unique].issuer) {
             certs[unique].isStilValid = false;
             return true;
