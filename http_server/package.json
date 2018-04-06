@@ -1,0 +1,61 @@
+{
+  "name": "certificates_demo",
+  "version": "0.0.0",
+  "description": "certificates web demo",
+  "author": "inaki seco <inaki.seco@opendeusto.es>",
+  "private": true,
+  "main": "./bin/www",
+  "repository": {
+    "type": "git"
+  },
+  "keywords": [
+    "express",
+    "webpack",
+    "node"
+  ],
+  "scripts": {
+    "start": "nodemon ./bin/www"
+  },
+  "dependencies": {
+    "body-parser": "~1.18.2",
+    "bower": "^1.8.2",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "dotenv": "^4.0.0",
+    "errorhandler": "^1.5.0",
+    "express": "~4.15.5",
+    "express-minify-html": "^0.11.6",
+    "gulp-concat": "^2.6.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^3.0.0",
+    "i18n": "^0.8.3",
+    "jade": "~1.11.0",
+    "jsonwebtoken": "^8.1.0",
+    "mongodb": "^2.2.33",
+    "mongoose": "^4.13.6",
+    "morgan": "~1.9.0",
+    "mustache": "^2.3.0",
+    "mustache-express": "^1.2.5",
+    "nodemon": "^1.14.11",
+    "serve-favicon": "~2.4.5",
+    "stache": "^0.1.0"
+  },
+  "engines": {
+    "node": ">= 4.0.0",
+    "npm": ">= 3.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ],
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^4.0.0",
+    "gulp-cache": "^1.0.1",
+    "gulp-clean-css": "^3.9.0",
+    "gulp-imagemin": "^4.0.0",
+    "gulp-minify-css": "^1.2.4",
+    "gulp-sass": "^3.1.0"
+  }
+}
