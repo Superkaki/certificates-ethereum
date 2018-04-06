@@ -1,4 +1,3 @@
-token/build/contracts/Migrations.json
-token/build/contracts/CertToken.json
+token/build/contracts/*
 node_modules/
 package-lock.json
