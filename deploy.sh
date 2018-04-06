@@ -59,19 +59,35 @@ function deleteJSONs() {
 	rm build/contracts/CertToken.json	
 }
 
+function check_and_install_missing() {
+	title "1. check and install"
+	
+
+}
+
 function main(){
-	title "Deploying Machine 2 Machine Economy demo..."
+	title "Deploying Certificates Blockchain demo..."
 	subtitle "Deploying ganache ethereum node..."
 	cd ./token
 	#deleteJSONs
+
 	log "Deploying ganache..."
 	bash ./2_deploy_explorer.sh &
 	log "Deploying smart contract"
 	bash ./3_deploy_smart_contract.sh
+	
+	#log "Running log window"
+	#check_and_install_missing
+	#gnome-terminal -x truffle develop --log
+	#log "Running console"
+	#truffle develop
+	###### Prueba: CertToken.deployed().then(function(instance){return instance.setCert();});
+	
 	#subtitle "Deploying http server..."
 	#cd ../http_server
 	#log "Deploying webserver..."
 	#bash ./dev.sh &
+	
 	#subtitle "Deploying websocket server..."
 	#cd ../ws_server
 	#log "Deploying websocket server..."
