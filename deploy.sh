@@ -71,10 +71,10 @@ function main(){
 	cd ./token
 	#deleteJSONs
 
-	log "Deploying ganache..."
-	bash ./2_deploy_explorer.sh &
-	log "Deploying smart contract"
-	bash ./3_deploy_smart_contract.sh
+	#log "Deploying ganache..."
+	#bash ./2_deploy_explorer.sh &
+	#log "Deploying smart contract"
+	#bash ./3_deploy_smart_contract.sh
 	
 	#log "Running log window"
 	#check_and_install_missing
@@ -83,10 +83,10 @@ function main(){
 	#truffle develop
 	###### Prueba: CertToken.deployed().then(function(instance){return instance.setCert();});
 	
-	#subtitle "Deploying http server..."
-	#cd ../http_server
-	#log "Deploying webserver..."
-	#bash ./dev.sh &
+	subtitle "Deploying http server..."
+	cd ../http_server
+	log "Deploying webserver..."
+	bash ./dev.sh
 	
 	#subtitle "Deploying websocket server..."
 	#cd ../ws_server

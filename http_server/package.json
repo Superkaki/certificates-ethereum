@@ -14,7 +14,7 @@
     "node"
   ],
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "nodemon ./bin/www -e js,json,mustache"
   },
   "dependencies": {
     "body-parser": "~1.18.2",
