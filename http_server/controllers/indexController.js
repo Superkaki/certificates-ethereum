@@ -11,7 +11,8 @@ exports.index = (req, res, next) => {
       ui_subtitle: res.__('soon_title'),
       ui_description: res.__('soon_subtitle'),
       ui_soon: res.__('soon_text'),
-      profile: "/profile"
+      profile: "/profile",
+      login: "/login"
     }
   );
 }
@@ -25,7 +26,9 @@ exports.profile = (req, res, next) => {
       ui_title: res.__('title'),
       ui_subtitle: res.__('soon_title'),
       ui_description: res.__('soon_subtitle'),
-      ui_soon: res.__('soon_text')
+      ui_soon: res.__('soon_text'),
+      index: "/",
+      login: "/login"
     }
   );
 }
@@ -39,7 +42,9 @@ exports.login = (req, res, next) => {
       ui_title: res.__('title'),
       ui_subtitle: res.__('soon_title'),
       ui_description: res.__('soon_subtitle'),
-      ui_soon: res.__('soon_text')
+      ui_soon: res.__('soon_text'),
+      index: "/",
+      profile: "/profile"
     }
   );
 }
