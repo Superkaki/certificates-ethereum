@@ -10,5 +10,6 @@ const indexController = require('../controllers/indexController');
 router.get('/', indexController.index);
 router.get('/profile', indexController.profile);
 router.get('/login', indexController.login);
+router.get('/presentation', indexController.presentation);
 
 module.exports = router;
