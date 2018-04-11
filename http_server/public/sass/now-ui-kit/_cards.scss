@@ -12,7 +12,7 @@
         min-height: 190px;
     }
 
-    &[data-background-color="orange"]{
+    &[data-background-color="green"]{
         background-color: $primary-color;
     }
 
@@ -28,7 +28,7 @@
         background-color: $info-color;
     }
 
-    &[data-background-color="green"]{
+    &[data-background-color="success"]{
         background-color: $success-color;
     }
 }

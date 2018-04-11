@@ -212,7 +212,7 @@
          top: 36%;
          left: 44%;
         font-size: 65px;
-        color: #f96332;
+        color: #267926;
         padding: 1px;
     }
 
@@ -298,6 +298,9 @@
 }
 [data-background-color="black"]{
     background-color: $black-color;
+}
+[data-background-color="green"]{
+    background-color: $green-bg;
 }
 
 [data-background-color]{

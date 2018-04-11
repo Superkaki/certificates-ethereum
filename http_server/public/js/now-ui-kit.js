@@ -22,7 +22,7 @@ var transparentDemo = true;
 var fixedTop = false;
 
 var navbar_initialized,
-    backgroundOrange = false,
+    backgroundGreen = false,
     toggle_initialized = false;
 
 $(document).ready(function() {
