@@ -1,0 +1,31 @@
+{
+  "name": "m2m_websocket",
+  "version": "0.0.0",
+  "description": "m2m websocket service",
+  "author": "inaki seco <inaki.seco@opendeusto.es>",
+  "private": true,
+  "repository": {
+    "type": "git"
+  },
+  "keywords": [
+    "m2m",
+    "websocket",
+    "ws"
+  ],
+  "scripts": {
+    "start": "nodemon ./src/server.js -e js,json"
+  },
+  "dependencies": {
+    "bufferutil": "^3.0.3",
+    "express": "^4.16.2",
+    "jsonwebtoken": "^8.1.0",
+    "mongoose": "^4.13.5",
+    "nodemon": "^1.14.9",
+    "request": "^2.83.0",
+    "socket.io": "^2.0.4",
+    "truffle-contract": "^3.0.1",
+    "utf-8-validate": "^3.0.4",
+    "web3": "^1.0.0-beta.27",
+    "ws": "^3.3.2"
+  }
+}
