@@ -21,6 +21,15 @@
                     <li class="nav-item">
                         <a class="nav-link" data-toggle="tab" href="#accessHistory" role="tab">Registro de accesos</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#certificateManager" role="tab">Gestionar certificado</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#createCertificate" role="tab">Crear certificado</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#checkCertificate" role="tab">Comprobar certificado</a>
+                    </li>
                 </ul>
                 <div class="card-body">
                     <!-- Tab panes -->
@@ -32,8 +41,9 @@
                                         <th>Issuer Address</th>
                                         <th>Type</th>
                                         <th>Title</th>
-                                        <th>Issuing Day</th>
-                                        <th>Expiration Day</th>
+                                        <th>Issued</th>
+                                        <th>Expiration</th>
+                                        <th>Valid</th>                                        
                                     </tr>
                                     <tr>
                                         <td>0x627306090abaB3A6e1400e9345bC60c78a8BEf57</td>
@@ -41,6 +51,11 @@
                                         <td>Grado en Ingeniería en Tecnologías de Telecomunicación</td>
                                         <td>20/04/2015</td>
                                         <td>20/04/2018</td>
+                                        <td>
+                                            <button class="btn btn-success btn-icon btn-round">
+                                                <i class="now-ui-icons ui-1_check"></i>
+                                            </button>
+                                        </td>
                                     </tr>
                                 </thead>
                                 <tbody id="logbody"/>
@@ -64,6 +79,62 @@
                                 </thead>
                                 <tbody id="logbody"/>
                             </table>
+                        </div>
+                        <div class="tab-pane" id="certificateManager" role="tabpanel">
+                            <p>Add address to white list</p>
+                            <div class="row justify-content-center">
+                                <div class="col-sm-6 col-lg-5">
+                                    <div class="form-group">
+                                        <input type="text" value="" placeholder="Tittle Hash" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-lg-5">
+                                    <div class="form-group">
+                                        <input type="text" value="" placeholder="Address" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row justify-content-center">
+                                <button class="btn btn-primary btn-round" type="button">Add</button>    
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="createCertificate" role="tabpanel">
+                            </br>
+                            <div class="row justify-content-center">
+                                <div class="col-sm-6 col-lg-5">
+                                    <div class="form-group">
+                                        <input type="text" value="" placeholder="Owner Address" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-lg-5">
+                                    <div class="form-group">
+                                        <input type="text" value="" placeholder="Type" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row justify-content-center">   
+                                <div class="col-sm-6 col-lg-10">
+                                    <div class="form-group">
+                                        <input type="text" value="" placeholder="Title Name" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row justify-content-center">
+                                <button class="btn btn-primary btn-round" type="button">Send</button>    
+                            </div>   
+                        </div>
+                        <div class="tab-pane" id="checkCertificate" role="tabpanel">
+                            </br>
+                            <div class="row justify-content-center">
+                                <div class="col-sm-6 col-lg-5">
+                                    <div class="form-group">
+                                        <input type="text" value="" placeholder="Certificate Hash" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row justify-content-center">
+                                <button class="btn btn-primary btn-round" type="button">Check</button>    
+                            </div>
                         </div>
                     </div>
                 </div>
