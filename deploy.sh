@@ -83,15 +83,15 @@ function main(){
 	#truffle develop
 	###### Prueba: CertToken.deployed().then(function(instance){return instance.setCert();});
 	
-	subtitle "Deploying http server..."
-	cd ../http_server
-	log "Deploying webserver..."
-	bash ./dev.sh
+	#subtitle "Deploying http server..."
+	#cd ../http_server
+	#log "Deploying webserver..."
+	#bash ./dev.sh
 	
-	#subtitle "Deploying websocket server..."
-	#cd ../ws_server
-	#log "Deploying websocket server..."
-	#bash ./deployWS.sh
+	subtitle "Deploying websocket server..."
+	cd ../ws_server
+	log "Deploying websocket server..."
+	bash ./deployWS.sh
 }
 
 main
