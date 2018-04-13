@@ -103,16 +103,6 @@ document.getElementById('submitcar').addEventListener('submit', function(evt){
     registerNewCarArrival(data);
 })
 
-document.getElementById('btnCheck').addEventListener(
-  test( "Request", function() {
-
-    readChargingPointData();
-
-    var rpc0 = new JSON_RPC.Request("myMethod", [1, 2, 3]);
-
-  })
-)
-
 //minutes value change listener
 document.getElementById('minutos').addEventListener(
   'change',
