@@ -98,9 +98,10 @@
                                 <button class="btn btn-primary btn-round" type="button">Add</button>    
                             </div>
                         </div>
+
                         <div class="tab-pane" id="createCertificate" role="tabpanel">
                             </br>
-                            <div class="row justify-content-center">
+                            <div id="newCert" class="row justify-content-center">
                                 <div class="col-sm-6 col-lg-5">
                                     <div class="form-group">
                                         <input id="to" type="text" value="" placeholder="Owner Address" class="form-control" />
@@ -108,7 +109,7 @@
                                 </div>
                                 <div class="col-sm-6 col-lg-5">
                                     <div class="form-group">
-                                        <input id="duration" type="text" value="" placeholder="Duration" class="form-control" />
+                                        <input id="duration" type="text" value="" placeholder="Duration (seconds)" class="form-control" />
                                     </div>
                                 </div>
                             </div>
@@ -120,21 +121,24 @@
                                 </div>
                             </div>
                             <div class="row justify-content-center">
-                                <button id="newCert" class="btn btn-primary btn-round" type="button">Send</button>    
+                                <button id="btnSend" class="btn btn-primary btn-round" type="button">Send</button>    
                             </div>   
                         </div>
-                        <div class="tab-pane active" id="checkCertificate" role="tabpanel">
+
+                        <div id="checkCertificate" class="tab-pane active" role="tabpanel">
                             </br>
-                            <div class="row justify-content-center">
-                                <div class="col-sm-6 col-lg-5">
-                                    <div class="form-group">
-                                        <input type="text" id="certHash" value="" placeholder="Certificate Hash" class="form-control" />
+                            <form id="checkCertificate" enctype='application/json'>
+                                <div class="row justify-content-center">
+                                    <div class="col-sm-6 col-lg-5">
+                                        <div class="form-group">
+                                            <input type="text" id="certHash" value="" placeholder="Certificate Hash" class="form-control" />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row justify-content-center">
-                                <button id="btnCheck" class="btn btn-fill btn-primary btn-round" type="button">Check</button>    
-                            </div>
+                                <div class="row justify-content-center">
+                                    <button id="btnCheck" class="btn btn-primary btn-round" type="button">Check</button>    
+                                </div> 
+                            </form>        
                         </div>
                     </div>
                 </div>
