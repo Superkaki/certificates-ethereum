@@ -58,6 +58,9 @@ class CertificateProtocol extends proto.Protocol {
 		  console.log("Contract deployed!");
 		  that.tokenManager = instance;
 		  console.log("Creating instance")
+		  return that.tokenManager.newCert.call(inakiAddress,"sdfgvre",1000, {from: inakiAddress, gas:3000000});
+		}).then(function(result) {
+		  console.log("New certificate hash " + result);
 //		  return that.tokenManager.balanceOf.call(inakiAddress);
 //		}).then(function(result) {
 //		  console.log("Balance of charger account is " + result);
@@ -85,21 +88,40 @@ class CertificateProtocol extends proto.Protocol {
 				let that = this;
 				let data = jsonData.params;
     			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.checkCert(data.certHash).then(function(rslt) {
+				this.tokenManager.checkCert(data.certHash, {from: inakiAddress, gas:3000000}).then(function(rslt) {
 					if(rslt){
                         let response = that.responseHolder();
 						response.result = [rslt];
-						console.log("Making minute price response: " + response)
+						console.log("Making certificate checking response: " + response)
 						that.sendResponse(response);
 					}
 					else{
 						console.log("Balance error: "+rslt)
 					}
-				}).catch(function(err) {
-				  // Easily catch all errors along the whole execution.
-				  console.log("FULL ERROR! " + err);
-				});
-    			break;
+				}).catch((err) => {
+					console.log("Something happens during transaction: " + err);
+				});				
+    			break
+			}
+
+			case "newCert":{
+				let that = this;
+				let data = jsonData.params;
+    			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
+				this.tokenManager.newCert(data.to, data.certName, data.duration).then(function(rslt) {
+					if(rslt){
+                        let response = that.responseHolder();
+						response.result = [rslt];
+						console.log("Making new certificate response: " + response)
+						that.sendResponse(response);
+					}
+					else{
+						console.log("Balance error: "+rslt)
+					}
+				}).catch((err) => {
+					console.log("Something happens during transaction: " + err);
+				});				
+    			break
 			}
 /*            
             case "read_charging_point":{

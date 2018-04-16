@@ -14,8 +14,8 @@ function onOpen(evt)
 {
 
   writeToLog("Websocket opened!");
-  getLatestTokenStatus();
-  readMinutePrice("true");
+  //getLatestTokenStatus();
+  //readMinutePrice("true");
   //startTimerDemo();
 }
 
@@ -105,6 +105,9 @@ document.getElementById('submitcar').addEventListener('submit', function(evt){
 })
 */
 
+
+/*******************************************************************************/
+
 //submit form listener
 document.getElementById('btnCheck').addEventListener('submit', function(evt){
   evt.preventDefault();
@@ -116,6 +119,44 @@ document.getElementById('btnCheck').addEventListener('submit', function(evt){
   }
   checkCert(data);
 })
+
+//read latest minute price from the blockchain
+function checkCert(data){
+  //  let serializedData = JSON.stringify(msg);
+  var serializedData = new JSON_RPC.Request("checkCert", data);
+  console.log("Making certificate checking request: " + serializedData)
+  doSend(serializedData);  
+}
+
+
+//submit form listener
+document.getElementById('newCert').addEventListener('submit', function(evt){
+  evt.preventDefault();
+  console.log("manual request detected!")
+  let to = $("#to")[0].value;
+  let duration = $("#duration")[0].value;
+  let certName = $("#certName")[0].value;
+  //read form data
+  let data = {
+    "to": to,
+    "duration": duration,
+    "certName": certName
+  }
+  newCert(data);
+})
+
+//read latest minute price from the blockchain
+function newCert(data){
+  //  let serializedData = JSON.stringify(msg);
+  var serializedData = new JSON_RPC.Request("newCert", data);
+  console.log("Making new certificate request: " + serializedData)
+  doSend(serializedData);  
+}
+
+
+/*******************************************************************************/
+
+
 
 //minutes value change listener
 document.getElementById('minutos').addEventListener(
@@ -152,14 +193,6 @@ function readCarData(){
     payload: undefined
   };
   let serializedData = JSON.stringify(msg);
-  doSend(serializedData);
-}
-
-//read latest minute price from the blockchain
-function checkCert(data){
-//  let serializedData = JSON.stringify(msg);
-  console.log("Making minute price request: " + serializedData)
-  var serializedData = new JSON_RPC.Request("checkCert", data);
   doSend(serializedData);
 }
 
