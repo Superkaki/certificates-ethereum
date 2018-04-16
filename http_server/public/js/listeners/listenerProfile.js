@@ -28,9 +28,12 @@ function onMessage(evt)
 {
   if(evt && evt.data){
     let jsonData = JSON.parse(evt.data);
+    writeToLog("3");
     if(jsonData && jsonData.params && jsonData.method){
+      writeToLog("4");
       processMessageProtocol(jsonData);
     }
+    writeToLog("5");
   }
   //websocket.close();
 }
@@ -109,7 +112,7 @@ document.getElementById('submitcar').addEventListener('submit', function(evt){
 /*******************************************************************************/
 
 //submit form listener
-document.getElementById('btnCheck').addEventListener('submit', function(evt){
+document.getElementById('checkCertificate').addEventListener('btnCheck', function(evt){
   evt.preventDefault();
   console.log("manual request detected!")
   let certHash = $("#certHash")[0].value;
@@ -130,7 +133,7 @@ function checkCert(data){
 
 
 //submit form listener
-document.getElementById('newCert').addEventListener('submit', function(evt){
+document.getElementById('newCert').addEventListener('btnSend', function(evt){
   evt.preventDefault();
   console.log("manual request detected!")
   let to = $("#to")[0].value;
@@ -157,7 +160,7 @@ function newCert(data){
 /*******************************************************************************/
 
 
-
+/*
 //minutes value change listener
 document.getElementById('minutos').addEventListener(
   'change',
@@ -209,7 +212,6 @@ function readMinutePrice(are_minutes_changed){
   console.log("Making minute price request: "+serializedData)
   doSend(serializedData);
 }
-
 
 //message protocol handler
 function processMessageProtocol(json){
@@ -307,3 +309,5 @@ function addLogRow(data){
     table.innerHTML = table.innerHTML+ rowdata;
   }
 }
+
+*/
