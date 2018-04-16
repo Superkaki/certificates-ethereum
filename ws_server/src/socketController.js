@@ -69,7 +69,7 @@ class SocketController {
         let thisSocket = this;
 
         console.log("Starting WebSocket...");
-
+        
         this._websocketServer.on('open', function open() {
             thisSocket.open();
         });

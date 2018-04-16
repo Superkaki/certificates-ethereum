@@ -28,7 +28,7 @@ function onMessage(evt)
 {
   if(evt && evt.data){
     let jsonData = JSON.parse(evt.data);
-    if(jsonData && jsonData.payload && jsonData.action){
+    if(jsonData && jsonData.params && jsonData.method){
       processMessageProtocol(jsonData);
     }
   }
@@ -84,6 +84,7 @@ function startTimerDemo(){
   }, 3000);
 }
 
+/*
 //submit form listener
 document.getElementById('submitcar').addEventListener('submit', function(evt){
     evt.preventDefault();
@@ -101,6 +102,19 @@ document.getElementById('submitcar').addEventListener('submit', function(evt){
       "info": (selectedOption == 'true')
     }
     registerNewCarArrival(data);
+})
+*/
+
+//submit form listener
+document.getElementById('btnCheck').addEventListener('submit', function(evt){
+  evt.preventDefault();
+  console.log("manual request detected!")
+  let certHash = $("#certHash")[0].value;
+  //read form data
+  let data = {
+    "certHash": certHash
+  }
+  checkCert(data);
 })
 
 //minutes value change listener
@@ -142,6 +156,14 @@ function readCarData(){
 }
 
 //read latest minute price from the blockchain
+function checkCert(data){
+//  let serializedData = JSON.stringify(msg);
+  console.log("Making minute price request: " + serializedData)
+  var serializedData = new JSON_RPC.Request("checkCert", data);
+  doSend(serializedData);
+}
+
+//read latest minute price from the blockchain
 function readMinutePrice(are_minutes_changed){
   let data = {
     "areMinutesChanged": (are_minutes_changed == 'true')
@@ -162,7 +184,7 @@ function processMessageProtocol(json){
     console.log(json)
   }
   if(json){
-    switch(json.action){
+    switch(json.method){
       case "charger_info_response":
         processChargerResponse(json.payload);
         break;
