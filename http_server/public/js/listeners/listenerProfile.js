@@ -28,12 +28,9 @@ function onMessage(evt)
 {
   if(evt && evt.data){
     let jsonData = JSON.parse(evt.data);
-    writeToLog("3");
     if(jsonData && jsonData.params && jsonData.method){
-      writeToLog("4");
       processMessageProtocol(jsonData);
     }
-    writeToLog("5");
   }
   //websocket.close();
 }
@@ -87,31 +84,10 @@ function startTimerDemo(){
   }, 3000);
 }
 
-/*
-//submit form listener
-document.getElementById('submitcar').addEventListener('submit', function(evt){
-    evt.preventDefault();
-    console.log("manual request detected!")
-    let matricula = $("#matricula")[0].value;
-    let minutos = $("#minutos")[0].value;
-    let token = $("#token")[0].value;
-    let info = $("#info")[0];
-    var selectedOption = info.options[info.selectedIndex].value;
-    //read form data
-    let data = {
-      "matricula": matricula,
-      "minutos": parseInt(minutos),
-      "token": parseInt(token),
-      "info": (selectedOption == 'true')
-    }
-    registerNewCarArrival(data);
-})
-*/
 
-
-/*******************************************************************************/
-
-//submit form listener
+/********************************************************************************************
+Listener for check certificate button
+/********************************************************************************************/
 document.getElementById('btnCheck').addEventListener('click', function(evt){
   evt.preventDefault();
   console.log("Certificate checking request detected!")
@@ -123,97 +99,88 @@ document.getElementById('btnCheck').addEventListener('click', function(evt){
   checkCert(data);
 })
 
-//read latest minute price from the blockchain
+/********************************************************************************************
+Parse check certificate to json and send it
+/********************************************************************************************/
 function checkCert(data){
-  //  let serializedData = JSON.stringify(msg);
-  let certHash = $("#certHash")[0].value;
-  var serializedData = new JSON_RPC.Request("checkCert", [certHash]);
-  console.log(serializedData)
+  let msg = {
+    jsonrpc: '2.0',
+    method: 'checkCert',
+    params: data,
+    id: '1'
+  };
+  let serializedData = JSON.stringify(msg);
   console.log("Making certificate checking request: " + serializedData)
   doSend(serializedData);  
 }
 
-
-//submit form listener
+/********************************************************************************************
+Listener for new certificate button
+/********************************************************************************************/
 document.getElementById('btnSend').addEventListener('click', function(evt){
   evt.preventDefault();
   console.log("New cert request detected!")
-  let to = $("#to")[0].value;
+  let owner = $("#owner")[0].value;
   let duration = $("#duration")[0].value;
   let certName = $("#certName")[0].value;
   //read form data
   let data = {
-    "to": to,
+    "owner": owner,
     "duration": duration,
     "certName": certName
   }
   newCert(data);
 })
 
-//read latest minute price from the blockchain
+/********************************************************************************************
+Parse new certificate to json and send it
+/********************************************************************************************/
 function newCert(data){
-  //  let serializedData = JSON.stringify(msg);
-  var serializedData = new JSON_RPC.Request("newCert", data);
+  let msg = {
+    jsonrpc: '2.0',
+    method: 'newCert',
+    params: data,
+    id: '2'
+  };
+  let serializedData = JSON.stringify(msg);
   console.log("Making new certificate request: " + serializedData)
   doSend(serializedData);  
 }
 
+/********************************************************************************************
+Listener for new entity to white list button
+/********************************************************************************************/
+document.getElementById('btnAdd').addEventListener('click', function(evt){
+  evt.preventDefault();
+  console.log("Add entity to white list request detected!")
+  let whiteList = $("#whiteList")[0].value;
+  let allowed = $("#allowed")[0].value;
+  //read form data
+  let data = {
+    "whiteList": whiteList,
+    "allowed": allowed
+  }
+  addEntityToWhiteList(data);
+})
+
+/********************************************************************************************
+Parse new entity to white list to json and send it
+/********************************************************************************************/
+function addEntityToWhiteList(data){
+  let msg = {
+    jsonrpc: '2.0',
+    method: 'setEntityToWhiteList',
+    params: data,
+    id: '3'
+  };
+  let serializedData = JSON.stringify(msg);
+  console.log("Making new entity to white list request: " + serializedData)
+  doSend(serializedData);  
+}
 
 /*******************************************************************************/
 
-
 /*
-//minutes value change listener
-document.getElementById('minutos').addEventListener(
-  'change',
-  function(){
-    readMinutePrice("true");
-  },
-  false
-);
-
-//tokens value change listener
-document.getElementById('token').addEventListener(
-  'change',
-  function(){
-    readMinutePrice("false");
-  },
-  false
-);
-
-//read latest charching point data from blockchain
-function readChargingPointData(){
-  let msg = {
-    action: 'read_charging_point',
-    payload: undefined
-  };
-  let serializedData = JSON.stringify(msg);
-  doSend(serializedData);
-}
-
-//read latest car data from blockchain
-function readCarData(){
-  let msg = {
-    action: 'read_car_data',
-    payload: undefined
-  };
-  let serializedData = JSON.stringify(msg);
-  doSend(serializedData);
-}
-
-//read latest minute price from the blockchain
-function readMinutePrice(are_minutes_changed){
-  let data = {
-    "areMinutesChanged": (are_minutes_changed == 'true')
-  }
-  let msg = {
-    action: 'read_minute_price',
-    payload: data
-  };
-  let serializedData = JSON.stringify(msg);
-  console.log("Making minute price request: "+serializedData)
-  doSend(serializedData);
-}
 
 //message protocol handler
 function processMessageProtocol(json){
