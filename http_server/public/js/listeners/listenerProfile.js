@@ -112,9 +112,9 @@ document.getElementById('submitcar').addEventListener('submit', function(evt){
 /*******************************************************************************/
 
 //submit form listener
-document.getElementById('checkCertificate').addEventListener('btnCheck', function(evt){
+document.getElementById('btnCheck').addEventListener('click', function(evt){
   evt.preventDefault();
-  console.log("manual request detected!")
+  console.log("Certificate checking request detected!")
   let certHash = $("#certHash")[0].value;
   //read form data
   let data = {
@@ -126,16 +126,18 @@ document.getElementById('checkCertificate').addEventListener('btnCheck', functio
 //read latest minute price from the blockchain
 function checkCert(data){
   //  let serializedData = JSON.stringify(msg);
-  var serializedData = new JSON_RPC.Request("checkCert", data);
+  let certHash = $("#certHash")[0].value;
+  var serializedData = new JSON_RPC.Request("checkCert", [certHash]);
+  console.log(serializedData)
   console.log("Making certificate checking request: " + serializedData)
   doSend(serializedData);  
 }
 
 
 //submit form listener
-document.getElementById('newCert').addEventListener('btnSend', function(evt){
+document.getElementById('btnSend').addEventListener('click', function(evt){
   evt.preventDefault();
-  console.log("manual request detected!")
+  console.log("New cert request detected!")
   let to = $("#to")[0].value;
   let duration = $("#duration")[0].value;
   let certName = $("#certName")[0].value;
