@@ -12,16 +12,27 @@ class Protocol {
     	this._client = wsClient;
 
     	if(!this.isValidMessage(jsonData)){
+			let data = jsonData.params;
 			let response = this.responseHolder();
-			response.payload="Invalid message";
+			response.jsonrpc = "2.0";
+			response.id = data.id;
+		    response.error = {
+				code: "32600",
+				message: "Invalid message"
+			}
 			this.sendResponse(response);
 			return;
     	}
 
-    	switch(jsonData.action){
+    	switch(jsonData.method){
     		case "ping":{
-    			let response = this.responseHolder();
-    			response.payload="pong";
+				let data = jsonData.params;
+				let response = this.responseHolder();
+				response.jsonrpc = "2.0";
+				response.id = data.id;
+				response.result = {
+					result: "pong"
+				}
     			this.sendResponse(response);
     			break
     		}
@@ -47,20 +58,23 @@ class Protocol {
 
     responseHolder(){
     	let msg = {
-	        action: undefined,
-	        payload: undefined
+	        jsonrpc: undefined,
+			id: undefined,
+			result: undefined
 	      };
 	    return msg;
     }
 
     sendResponse(response){
     	if(this._client && response){
-    		this._client.send(JSON.stringify(response))
-    	}
+			let serializedData = JSON.stringify(response);
+			console.log("RESPONSE: " + serializedData);
+			websocket.send(serializedData);
+		}
     }
 
     isValidMessage(message){
-    	return message!=undefined && message.action != undefined;
+    	return message!=undefined && message.method != undefined;
     }
 }
 

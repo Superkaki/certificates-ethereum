@@ -38,7 +38,7 @@ Parse message yo json and send it
 /********************************************************************************************/
 function doSend(message) {
   let serializedData = JSON.stringify(message);
-  writeToLog("SENT: " + serializedData);
+  writeToLog("REQUEST: " + serializedData);
   websocket.send(serializedData);
 }
 
@@ -55,8 +55,8 @@ function startTimerDemo(){
   //start test timer por ping/pong
   setInterval(function(){
     let test = {
-      action: 'ping',
-      payload: undefined
+      method: 'ping',
+      action: undefined
     };
     doSend(test);
   }, 3000);
@@ -70,9 +70,11 @@ document.getElementById('btnCheck').addEventListener('click', function(evt){
   evt.preventDefault();
   console.log("Certificate checking request detected!")
   let certHash = $("#certHash")[0].value;
+  let address = $("#address")[0].value;
   //read form data
   let data = {
-    "certHash": certHash
+    "certHash": certHash,
+    "address": address
   }
   checkCert(data);
 })
@@ -100,11 +102,13 @@ document.getElementById('btnSend').addEventListener('click', function(evt){
   let owner = $("#owner")[0].value;
   let duration = $("#duration")[0].value;
   let certName = $("#certName")[0].value;
+  let address = $("#address")[0].value;
   //read form data
   let data = {
     "owner": owner,
     "duration": duration,
-    "certName": certName
+    "certName": certName,
+    "address": address
   }
   newCert(data);
 })
@@ -131,10 +135,12 @@ document.getElementById('btnAdd').addEventListener('click', function(evt){
   console.log("Add entity to white list request detected!")
   let whiteList = $("#whiteList")[0].value;
   let allowed = $("#allowed")[0].value;
+  let address = $("#address")[0].value;
   //read form data
   let data = {
     "whiteList": whiteList,
-    "allowed": allowed
+    "allowed": allowed,
+    "address": address
   }
   addEntityToWhiteList(data);
 })

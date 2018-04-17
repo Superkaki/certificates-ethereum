@@ -58,15 +58,6 @@ class CertificateProtocol extends proto.Protocol {
 		  console.log("Contract deployed!");
 		  that.tokenManager = instance;
 		  console.log("Creating instance")
-		  return that.tokenManager.newCert.call(inakiAddress,"sdfgvre",1000, {from: inakiAddress, gas:3000000});
-		}).then(function(result) {
-		  console.log("New certificate hash " + result);
-//		  return that.tokenManager.balanceOf.call(inakiAddress);
-//		}).then(function(result) {
-//		  console.log("Balance of charger account is " + result);
-//		  return that.tokenManager.balanceOf.call(deustoAddress);
-//		}).then(function(result) {
-//		  console.log("Balance of car account is " + result);
 		}).catch(function(err) {
 		  console.log("FULL ERROR! " + err);       	  // Easily catch all errors along the whole execution.
 		});
@@ -77,8 +68,14 @@ class CertificateProtocol extends proto.Protocol {
 		this._client = wsClient;
 
     	if(!this.isValidMessage(jsonData)){
+			let data = jsonData.params;
 			let response = this.responseHolder();
-			response.result="Invalid message";
+			response.jsonrpc = "2.0";
+			response.id = data.id;
+		    response.error = {
+				code: "32600",
+				message: "Invalid message"
+			}
 			this.sendResponse(response);
 			return;
     	}
@@ -88,11 +85,11 @@ class CertificateProtocol extends proto.Protocol {
 				let that = this;
 				let data = jsonData.params;
     			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.checkCert(data.certHash, {from: inakiAddress, gas:3000000}).then(function(rslt) {
+				this.tokenManager.checkCert.call(data.certHash, {from: inakiAddress, gas:3000000}).then(function(rslt) {
 					if(rslt){
                         let response = that.responseHolder();
 						response.result = [rslt];
-						console.log("Making certificate checking response: " + response)
+						console.log("Making certificate checking response")
 						that.sendResponse(response);
 					}
 					else{
@@ -107,12 +104,36 @@ class CertificateProtocol extends proto.Protocol {
 			case "newCert":{
 				let that = this;
 				let data = jsonData.params;
-    			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.newCert(data.to, data.certName, data.duration).then(function(rslt) {
+				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
+				this.tokenManager.newCert.call(data.owner, data.certName, data.duration, {from: deustoAddress, gas:3000000}).then(function(rslt) {
 					if(rslt){
                         let response = that.responseHolder();
 						response.result = [rslt];
-						console.log("Making new certificate response: " + response)
+						console.log("Making new certificate response")
+						that.sendResponse(response);
+					}
+					else{
+						console.log("Balance error: "+rslt)
+					}
+				}).catch((err) => {
+					console.log("Something happens during transaction: " + err);
+				});				
+    			break
+			}
+
+			case "setEntityToWhiteList":{
+				let that = this;
+				let data = jsonData.params;
+    			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
+				this.tokenManager.setEntityToWhiteList.call(data.whiteList, data.allowed, {from: inakiAddress, gas:3000000}).then(function(rslt) {
+					if(rslt){
+						let response = that.responseHolder();
+						response.jsonrpc = "2.0";
+						response.id = data.id;
+		    			response.result = {
+							success: rslt
+						}
+						console.log("Making entity to white list response")
 						that.sendResponse(response);
 					}
 					else{
