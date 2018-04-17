@@ -1,8 +1,7 @@
 let wsUri = "ws://localhost:8080/";
 let debug = true;
 
-function init()
-{
+function init() {
   websocket = new WebSocket(wsUri);
   websocket.onopen = function(evt) { onOpen(evt) };
   websocket.onclose = function(evt) { onClose(evt) };
@@ -10,22 +9,17 @@ function init()
   websocket.onerror = function(evt) { onError(evt) };
 }
 
-function onOpen(evt)
-{
+function onOpen(evt) {
 
   writeToLog("Websocket opened!");
-  //getLatestTokenStatus();
-  //readMinutePrice("true");
   //startTimerDemo();
 }
 
-function onClose(evt)
-{
+function onClose(evt) {
   writeToLog("DISCONNECTED");
 }
 
-function onMessage(evt)
-{
+function onMessage(evt) {
   if(evt && evt.data){
     let jsonData = JSON.parse(evt.data);
     if(jsonData && jsonData.params && jsonData.method){
@@ -35,19 +29,20 @@ function onMessage(evt)
   //websocket.close();
 }
 
-function onError(evt)
-{
+function onError(evt) {
   writeToLog(evt.data);
 }
 
-function doSend(message)
-{
-  writeToLog("SENT: " + message);
-  websocket.send(message);
+/********************************************************************************************
+Parse message yo json and send it
+/********************************************************************************************/
+function doSend(message) {
+  let serializedData = JSON.stringify(message);
+  writeToLog("SENT: " + serializedData);
+  websocket.send(serializedData);
 }
 
-function writeToLog(message)
-{
+function writeToLog(message) {
   console.log("Message: "+message)
 }
 
@@ -56,23 +51,6 @@ window.addEventListener("load", init, false);
 
 ///domain specific functions
 
-function getLatestTokenStatus(){
-  readChargingPointData();
-  readCarData();
-}
-
-function registerNewCarArrival(data){
-  let msg = {
-    action: 'new_arrival',
-    payload: data
-  };
-  let serializedData = JSON.stringify(msg);
-  if(debug){
-    alert(serializedData);
-  }
-  doSend(serializedData);
-}
-
 function startTimerDemo(){
   //start test timer por ping/pong
   setInterval(function(){
@@ -80,7 +58,7 @@ function startTimerDemo(){
       action: 'ping',
       payload: undefined
     };
-    doSend(JSON.stringify(test));
+    doSend(test);
   }, 3000);
 }
 
@@ -109,9 +87,8 @@ function checkCert(data){
     params: data,
     id: '1'
   };
-  let serializedData = JSON.stringify(msg);
-  console.log("Making certificate checking request: " + serializedData)
-  doSend(serializedData);  
+  console.log("Making certificate checking request")
+  doSend(msg);  
 }
 
 /********************************************************************************************
@@ -142,9 +119,8 @@ function newCert(data){
     params: data,
     id: '2'
   };
-  let serializedData = JSON.stringify(msg);
-  console.log("Making new certificate request: " + serializedData)
-  doSend(serializedData);  
+  console.log("Making new certificate request")
+  doSend(msg);  
 }
 
 /********************************************************************************************
@@ -173,9 +149,8 @@ function addEntityToWhiteList(data){
     params: data,
     id: '3'
   };
-  let serializedData = JSON.stringify(msg);
-  console.log("Making new entity to white list request: " + serializedData)
-  doSend(serializedData);  
+  console.log("Making new entity to white list request" )
+  doSend(msg);  
 }
 
 /*******************************************************************************/
