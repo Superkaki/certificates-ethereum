@@ -105,12 +105,14 @@ document.getElementById('btnSend').addEventListener('click', function(evt){
   console.log("New cert request detected!")
   let owner = $("#owner")[0].value;
   let duration = $("#duration")[0].value;
+  let certType = $("#certType")[0].value;
   let certName = $("#certName")[0].value;
   let address = $("#address")[0].value;
   //read form data
   let data = {
     "owner": owner,
     "duration": duration,
+    "certType": certType,
     "certName": certName,
     "address": address
   }
@@ -175,42 +177,14 @@ function processMessageProtocol(json){
   if(json){
     switch(json.id){
       case "1":
-        //processNewCertResponse(json.params);
+        processCheckCertResponse(json.result);
         break;
       case "2":
-        processNewCertResponse(json.params);
+        processNewCertResponse(json.result);
         break;
       case "3":
-        //processNewCertResponse(json.params);
+        processEntityToWhiteListResponse(json.result);
         break;
-      /*
-      case "charger_info_response":
-        processChargerResponse(json.payload);
-        break;
-      case "car_data_response":
-        processCarStatusResponse(json.payload);
-        break;
-      case "new_arrival_response":
-        processArrivalResponse(json.payload);
-        //update token values
-        getLatestTokenStatus();
-        break;
-      case "new_reward_response":
-        processRewardResponse(json.payload);
-        //update token values
-        getLatestTokenStatus();
-        break;
-      case "minute_price_response":
-        if(json.payload.areMinutesChanged) {
-          let minutes = document.getElementById('minutos').value;
-          $("#token")[0].value = minutes * json.payload.minute_price;
-          break;
-        } else {
-          let token = document.getElementById('token').value;
-          $("#minutos")[0].value = token / json.payload.minute_price;
-          break;
-        }
-      */
       default:
         console.log(json.params);
     }
@@ -221,9 +195,57 @@ function processMessageProtocol(json){
 /********************************************************************************************/
 /********************************************************************************************/
 
-function processNewCertResponse() {
-  console.log("New cert added to the list");
+function processCheckCertResponse(data) {
+  console.log("Cert checked");
+
+  if(data){
+    //XSS vulnerable
+    let rowdata = undefined;
+    let info = data.info;
+    rowdata = "<tr>\
+    <td>"+"Date"+"</td>\
+    <td>"+"Time"+"</td>\
+    <td>"+info.certHash+"</td>\
+    <td>"+"user"+"</td>\
+    </tr>";
+
+    rowdata = rowdata.replace("\
+    ", "");
+
+    let table = $("#logHistory")[0];
+    table.innerHTML = table.innerHTML + rowdata;
+  }
 }
+
+function processNewCertResponse(data) {
+  console.log("New cert added");
+
+  if(data){
+    //XSS vulnerable
+    let rowdata = undefined;
+    let info = data.info;
+    rowdata = "<tr>\
+    <td id='toolong'>"+data.certHash+"</td>\
+    <td id='toolong'>"+"Issuer"+"</td>\
+    <td>"+info.certType+"</td>\
+    <td>"+info.certName+"</td>\
+    <td>"+"Today Date"+"</td>\
+    <td>"+"Expiration Date"+"</td>\
+    </tr>";
+
+    rowdata = rowdata.replace("\
+    ", "");
+
+    let table = $("#logCert")[0];
+    table.innerHTML = table.innerHTML + rowdata;
+  }
+}
+
+function processEntityToWhiteListResponse(data) {
+  console.log("New entity allowed");
+}
+
+
 
 /*
 

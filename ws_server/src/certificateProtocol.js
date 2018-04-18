@@ -86,11 +86,14 @@ class CertificateProtocol extends proto.Protocol {
 				let data = jsonData.params;
     			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
 				this.tokenManager.checkCert.call(data.certHash, {from: inakiAddress, gas:3000000}).then(function(rslt) {
-					if(rslt){
+					if(rslt != undefined){
 						let response = that.responseHolder();
 						response.jsonrpc = "2.0";
 						response.id = jsonData.id;
-						response.result = [rslt];
+						response.result = {
+							verify: rslt,
+							info: data
+						}
 						console.log("Making certificate checking response")
 						that.sendResponse(response);
 					}
@@ -98,7 +101,7 @@ class CertificateProtocol extends proto.Protocol {
 						console.log("Balance error: "+rslt)
 					}
 				}).catch((err) => {
-					console.log("checkCert :: Something happens during transaction: " + err);
+					console.log("Something happens checking certificate: " + err);
 				});				
     			break
 			}
@@ -108,11 +111,14 @@ class CertificateProtocol extends proto.Protocol {
 				let data = jsonData.params;
 				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
 				this.tokenManager.newCert.call(data.owner, data.certName, data.duration, {from: deustoAddress, gas:3000000}).then(function(rslt) {
-					if(rslt){
+					if(rslt != undefined){
 						let response = that.responseHolder();
 						response.jsonrpc = "2.0";
 						response.id = jsonData.id;
-						response.result = [rslt];
+						response.result = {
+							certHash: rslt,
+							info: data
+						}
 						console.log("Making new certificate response")
 						that.sendResponse(response);
 					}
@@ -120,7 +126,7 @@ class CertificateProtocol extends proto.Protocol {
 						console.log("Balance error: "+rslt)
 					}
 				}).catch((err) => {
-					console.log("newCert :: Something happens during transaction: " + err);
+					console.log("Something happens creating new certificate: " + err);
 				});				
     			break
 			}
@@ -130,7 +136,7 @@ class CertificateProtocol extends proto.Protocol {
 				let data = jsonData.params;
     			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
 				this.tokenManager.setEntityToWhiteList.call(data.whiteList, data.allowed, {from: inakiAddress, gas:3000000}).then(function(rslt) {
-					if(rslt){
+					if(rslt != undefined){
 						let response = that.responseHolder();
 						response.jsonrpc = "2.0";
 						response.id = jsonData.id;
@@ -144,7 +150,7 @@ class CertificateProtocol extends proto.Protocol {
 						console.log("Balance error: "+rslt)
 					}
 				}).catch((err) => {
-					console.log("Something happens during transaction: " + err);
+					console.log("Something happens adding new entity to white list: " + err);
 				});				
     			break
 			}
