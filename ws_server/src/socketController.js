@@ -27,7 +27,7 @@ class SocketController {
     }
 
     processMessage(ws, message) {
-        console.log('received: %s', message);
+        console.log('REQUEST RECEIVED: %s', message);
         let jsonData = JSON.parse(message);
         this._protocol.parse(ws, jsonData);
 

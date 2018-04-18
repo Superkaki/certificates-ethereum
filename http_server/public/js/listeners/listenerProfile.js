@@ -42,12 +42,12 @@ Parse message yo json and send it
 /********************************************************************************************/
 function doSend(message) {
   let serializedData = JSON.stringify(message);
-  writeToLog("REQUEST: " + serializedData);
+  writeToLog("REQUEST SENDED: " + serializedData);
   websocket.send(serializedData);
 }
 
 function writeToLog(message) {
-  console.log("Message: "+message)
+  console.log(message)
 }
 
 window.addEventListener("load", init, false);
@@ -172,7 +172,7 @@ function addEntityToWhiteList(data){
 //message protocol handler
 function processMessageProtocol(json){
   if(debug){
-    console.log(json)
+    console.log("RESPONSE RECEIVED: " + JSON.stringify(json))
   }
   if(json){
     switch(json.id){
@@ -197,6 +197,25 @@ function processMessageProtocol(json){
 
 function processCheckCertResponse(data) {
   console.log("Cert checked");
+
+  //XSS vulnerable
+  let iconVerify = undefined;
+  let info = data.info;
+  if(data.verification) {
+    iconVerify = "<button class='btn btn-success btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_check'></i> Exist!\
+                  </button>";
+  } else {
+    iconVerify = "<button class='btn btn-danger btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_simple-remove'></i> Does not exist!\
+                  </button>";
+  }
+
+  iconVerify = iconVerify.replace("\
+  ", "");
+
+  let checking = $("#formCheck")[0];
+  checking.innerHTML = checking.innerHTML + iconVerify;
 
   if(data){
     //XSS vulnerable

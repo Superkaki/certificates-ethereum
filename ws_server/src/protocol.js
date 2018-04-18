@@ -59,8 +59,8 @@ class Protocol {
     responseHolder(){
     	let msg = {
 	        jsonrpc: undefined,
-			id: undefined,
-			result: undefined
+			result: undefined,
+			id: undefined
 	      };
 	    return msg;
     }
@@ -68,7 +68,7 @@ class Protocol {
     sendResponse(response){
     	if(this._client && response){
 			let serializedData = JSON.stringify(response);
-			console.log("RESPONSE: " + serializedData);
+			console.log("RESPONSE SENDED: " + serializedData);
 			this._client.send(serializedData);
 		}
     }

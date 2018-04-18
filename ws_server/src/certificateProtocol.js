@@ -64,7 +64,7 @@ class CertificateProtocol extends proto.Protocol {
     }
 
     parse(wsClient, jsonData){
-
+		
 		this._client = wsClient;
 
     	if(!this.isValidMessage(jsonData)){
@@ -91,7 +91,7 @@ class CertificateProtocol extends proto.Protocol {
 						response.jsonrpc = "2.0";
 						response.id = jsonData.id;
 						response.result = {
-							verify: rslt,
+							verification: rslt,
 							info: data
 						}
 						console.log("Making certificate checking response")
