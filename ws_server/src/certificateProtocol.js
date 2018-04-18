@@ -85,14 +85,15 @@ class CertificateProtocol extends proto.Protocol {
 				let that = this;
 				let data = jsonData.params;
     			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.checkCert.call(data.certHash, {from: inakiAddress, gas:3000000}).then(function(rslt) {
+				this.tokenManager.checkCert(data.certHash, {from: inakiAddress, gas:3000000}).then(function(rslt) {
 					if(rslt != undefined){
 						let response = that.responseHolder();
 						response.jsonrpc = "2.0";
 						response.id = jsonData.id;
 						response.result = {
-							verification: rslt,
-							info: data
+							verification: "TODO",
+							info: data,
+							blockInfo: rslt
 						}
 						console.log("Making certificate checking response")
 						that.sendResponse(response);
@@ -110,14 +111,15 @@ class CertificateProtocol extends proto.Protocol {
 				let that = this;
 				let data = jsonData.params;
 				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.newCert.call(data.owner, data.certName, data.duration, {from: deustoAddress, gas:3000000}).then(function(rslt) {
+				this.tokenManager.newCert(data.owner, data.certType, data.certName, data.duration, {from: deustoAddress, gas:3000000}).then(function(rslt) {
 					if(rslt != undefined){
 						let response = that.responseHolder();
 						response.jsonrpc = "2.0";
 						response.id = jsonData.id;
 						response.result = {
-							certHash: rslt,
-							info: data
+							certHash: "TODO",
+							info: data,
+							blockInfo: rslt
 						}
 						console.log("Making new certificate response")
 						that.sendResponse(response);
@@ -135,13 +137,14 @@ class CertificateProtocol extends proto.Protocol {
 				let that = this;
 				let data = jsonData.params;
     			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.setEntityToWhiteList.call(data.whiteList, data.allowed, {from: inakiAddress, gas:3000000}).then(function(rslt) {
+				this.tokenManager.setEntityToWhiteList(data.whiteList, data.allowed, {from: inakiAddress, gas:3000000}).then(function(rslt) {
 					if(rslt != undefined){
 						let response = that.responseHolder();
 						response.jsonrpc = "2.0";
 						response.id = jsonData.id;
 		    			response.result = {
-							success: rslt
+							success: "TODO",
+							blockInfo: rslt
 						}
 						console.log("Making entity to white list response")
 						that.sendResponse(response);
