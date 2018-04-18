@@ -6,8 +6,10 @@ contract CertToken {
         address owner;          // Public address of the certificate's owner (user or entity)
         address issuer;         // Public address of the entity who issues the certificate
         string certName;        // Name of the certificate issued
+        string certType;            // Short description of the certificate
         address[] whiteList;    // List of authorized entities to check the certificate
         mapping(address => Entity) whiteListStruct;
+        uint creationDate;
         uint expirationDate;
         bool isStilValid;
     }
@@ -116,14 +118,17 @@ contract CertToken {
 
     _to             Address of new certificate's owner
     certName        Name of the new certificate
+    duration        Duration of the certificate's validity (seconds)
     /********************************************************************************************/
-    function newCert(address _to, string _certName, uint duration) public returns (bytes32 unique) {
+    function newCert(address _to, string _certType, string _certName, uint duration) public returns (bytes32 unique) {
         unique = keccak256(msg.sender, nounce++, _certName);
 
         certs[unique].owner = _to;                      // Addidng information
         certs[unique].issuer = msg.sender;
+        certs[unique].certType = _certType;
         certs[unique].certName = _certName;
-        certs[unique].expirationDate = now + duration;
+        certs[unique].creationDate = now;
+        certs[unique].expirationDate = certs[unique].creationDate + duration;
         certs[unique].isStilValid = true;
         setEntityToWhiteList(unique, _to);              // The owner is allowed to check his own certificate
         setEntityToWhiteList(unique, msg.sender);       // The issuer is allowed to check the certificate
