@@ -118,7 +118,7 @@ contract CertToken {
     certName        Name of the new certificate
     /********************************************************************************************/
     function newCert(address _to, string _certName, uint duration) public returns (bytes32 unique) {
-        unique = keccak256(msg.sender, nounce++);
+        unique = keccak256(msg.sender, nounce++, _certName);
 
         certs[unique].owner = _to;                      // Addidng information
         certs[unique].issuer = msg.sender;
