@@ -59,12 +59,6 @@ function deleteJSONs() {
 	rm build/contracts/CertToken.json	
 }
 
-function check_and_install_missing() {
-	title "1. check and install"
-	
-
-}
-
 function main(){
 	title "Deploying Certificates Blockchain demo..."
 	subtitle "Deploying ganache ethereum node..."
@@ -77,7 +71,6 @@ function main(){
 	bash ./3_deploy_smart_contract.sh
 	
 	#log "Running log window"
-	#check_and_install_missing
 	#gnome-terminal -x truffle develop --log
 	#log "Running console"
 	#truffle develop
