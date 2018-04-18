@@ -87,7 +87,9 @@ class CertificateProtocol extends proto.Protocol {
     			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
 				this.tokenManager.checkCert.call(data.certHash, {from: inakiAddress, gas:3000000}).then(function(rslt) {
 					if(rslt){
-                        let response = that.responseHolder();
+						let response = that.responseHolder();
+						response.jsonrpc = "2.0";
+						response.id = jsonData.id;
 						response.result = [rslt];
 						console.log("Making certificate checking response")
 						that.sendResponse(response);
@@ -96,7 +98,7 @@ class CertificateProtocol extends proto.Protocol {
 						console.log("Balance error: "+rslt)
 					}
 				}).catch((err) => {
-					console.log("Something happens during transaction: " + err);
+					console.log("checkCert :: Something happens during transaction: " + err);
 				});				
     			break
 			}
@@ -107,7 +109,9 @@ class CertificateProtocol extends proto.Protocol {
 				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
 				this.tokenManager.newCert.call(data.owner, data.certName, data.duration, {from: deustoAddress, gas:3000000}).then(function(rslt) {
 					if(rslt){
-                        let response = that.responseHolder();
+						let response = that.responseHolder();
+						response.jsonrpc = "2.0";
+						response.id = jsonData.id;
 						response.result = [rslt];
 						console.log("Making new certificate response")
 						that.sendResponse(response);
@@ -116,7 +120,7 @@ class CertificateProtocol extends proto.Protocol {
 						console.log("Balance error: "+rslt)
 					}
 				}).catch((err) => {
-					console.log("Something happens during transaction: " + err);
+					console.log("newCert :: Something happens during transaction: " + err);
 				});				
     			break
 			}
@@ -129,7 +133,7 @@ class CertificateProtocol extends proto.Protocol {
 					if(rslt){
 						let response = that.responseHolder();
 						response.jsonrpc = "2.0";
-						response.id = data.id;
+						response.id = jsonData.id;
 		    			response.result = {
 							success: rslt
 						}

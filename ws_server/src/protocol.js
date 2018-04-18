@@ -42,16 +42,16 @@ class Protocol {
 		            { json: true },
 		            (error, response, body) => {
 		                if (error) {
-		                    wsClient.send(error);
+		                    this._client.send(error);
 		                }
 		                else{
-		                    wsClient.send(JSON.stringify(body));
+		                    this._client.send(JSON.stringify(body));
 		                }
 		        });
     			break
     		}
     		default:{
-    			wsClient.send("Hello world");
+    			this._client.send("Hello world");
     		}
     	}
     }
@@ -69,7 +69,7 @@ class Protocol {
     	if(this._client && response){
 			let serializedData = JSON.stringify(response);
 			console.log("RESPONSE: " + serializedData);
-			websocket.send(serializedData);
+			this._client.send(serializedData);
 		}
     }
 

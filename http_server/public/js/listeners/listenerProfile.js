@@ -22,8 +22,12 @@ function onClose(evt) {
 function onMessage(evt) {
   if(evt && evt.data){
     let jsonData = JSON.parse(evt.data);
-    if(jsonData && jsonData.params && jsonData.method){
+    if(jsonData && jsonData.result){
+      console.log(jsonData.id);
       processMessageProtocol(jsonData);
+    }
+    else{
+      console.log(jsonData.id + jsonData.result + jsonData.jsonrpc);
     }
   }
   //websocket.close();
@@ -159,9 +163,9 @@ function addEntityToWhiteList(data){
   doSend(msg);  
 }
 
-/*******************************************************************************/
-
-/*
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
 
 //message protocol handler
 function processMessageProtocol(json){
@@ -169,7 +173,17 @@ function processMessageProtocol(json){
     console.log(json)
   }
   if(json){
-    switch(json.method){
+    switch(json.id){
+      case "1":
+        //processNewCertResponse(json.params);
+        break;
+      case "2":
+        processNewCertResponse(json.params);
+        break;
+      case "3":
+        //processNewCertResponse(json.params);
+        break;
+      /*
       case "charger_info_response":
         processChargerResponse(json.payload);
         break;
@@ -196,11 +210,22 @@ function processMessageProtocol(json){
           $("#minutos")[0].value = token / json.payload.minute_price;
           break;
         }
+      */
       default:
-        console.log(json.payload);
+        console.log(json.params);
     }
   }
 }
+
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+
+function processNewCertResponse() {
+  console.log("New cert added to the list");
+}
+
+/*
 
 function processChargerResponse(json){
   if(json.address){
