@@ -6,7 +6,7 @@ contract CertToken {
         address owner;          // Public address of the certificate's owner (user or entity)
         address issuer;         // Public address of the entity who issues the certificate
         string certName;        // Name of the certificate issued
-        string certType;            // Short description of the certificate
+        string certType;        // Short description of the certificate
         address[] whiteList;    // List of authorized entities to check the certificate
         mapping(address => Entity) whiteListStruct;
         uint creationDate;
@@ -42,7 +42,8 @@ contract CertToken {
     
     /********************************************Events******************************************/
 
-
+    event certHash(bytes32 unique);
+    event checkOk(bool success);
 
 
 
@@ -118,10 +119,11 @@ contract CertToken {
 
     _to             Address of new certificate's owner
     certName        Name of the new certificate
+    certType        NType of the new certificate
     duration        Duration of the certificate's validity (seconds)
     /********************************************************************************************/
-    function newCert(address _to, string _certType, string _certName, uint duration) public returns (bytes32 unique) {
-        unique = keccak256(msg.sender, nounce++, _certName);
+    function newCert(address _to, string _certType, string _certName, uint duration) public returns (bytes32) {
+        bytes32 unique = keccak256(msg.sender, nounce++, _certName);
 
         certs[unique].owner = _to;                      // Addidng information
         certs[unique].issuer = msg.sender;
@@ -133,6 +135,8 @@ contract CertToken {
         setEntityToWhiteList(unique, _to);              // The owner is allowed to check his own certificate
         setEntityToWhiteList(unique, msg.sender);       // The issuer is allowed to check the certificate
         
+        certHash(unique);
+
         return unique;
     }
     
@@ -147,8 +151,10 @@ contract CertToken {
             require(isSenderAllowed(unique));
             checkExpiration(unique);
             require(certs[unique].isStilValid);
+            checkOk(true);
             return true;
         }
+        checkOk(false);
         return false;
     }
 
