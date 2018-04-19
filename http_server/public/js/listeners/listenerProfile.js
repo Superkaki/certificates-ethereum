@@ -23,7 +23,6 @@ function onMessage(evt) {
   if(evt && evt.data){
     let jsonData = JSON.parse(evt.data);
     if(jsonData && jsonData.result){
-      console.log(jsonData.id);
       processMessageProtocol(jsonData);
     }
     else{

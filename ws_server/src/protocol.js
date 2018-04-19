@@ -59,8 +59,8 @@ class Protocol {
     responseHolder(){
     	let msg = {
 	        jsonrpc: undefined,
-			result: undefined,
-			id: undefined
+			id: undefined,
+			result: undefined
 	      };
 	    return msg;
     }

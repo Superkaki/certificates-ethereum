@@ -55,11 +55,11 @@ class CertificateProtocol extends proto.Protocol {
     	let that = this;
     	console.log("Deploy CertificateContract!");
     	CertificateContract.deployed().then(function(instance) {
-		  console.log("Contract deployed!");
-		  that.tokenManager = instance;
-		  console.log("Creating instance")
+		  	console.log("Contract deployed!");
+		  	that.tokenManager = instance;
+		  	console.log("Creating instance")
 		}).catch(function(err) {
-		  console.log("FULL ERROR! " + err);       	  // Easily catch all errors along the whole execution.
+		  	console.log("FULL ERROR! " + err);       	  // Easily catch all errors along the whole execution.
 		});
     }
 
@@ -84,16 +84,16 @@ class CertificateProtocol extends proto.Protocol {
             case "checkCert":{
 				let that = this;
 				let data = jsonData.params;
-    			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
+				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
 				this.tokenManager.checkCert(data.certHash, {from: inakiAddress, gas:3000000}).then(function(rslt) {
+					console.log(rslt);
 					if(rslt != undefined){
 						let response = that.responseHolder();
 						response.jsonrpc = "2.0";
 						response.id = jsonData.id;
 						response.result = {
 							verification: "TODO",
-							info: data,
-							blockInfo: rslt
+							info: data
 						}
 						console.log("Making certificate checking response")
 						that.sendResponse(response);
@@ -112,15 +112,14 @@ class CertificateProtocol extends proto.Protocol {
 				let data = jsonData.params;
 				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
 				this.tokenManager.newCert(data.owner, data.certType, data.certName, data.duration, {from: deustoAddress, gas:3000000}).then(function(rslt) {
+					console.log(rslt);					
 					if(rslt != undefined){
 						let response = that.responseHolder();
 						response.jsonrpc = "2.0";
 						response.id = jsonData.id;
 						response.result = {
 							certHash: "TODO",
-							info: data,
-							blockInfo: rslt
-						}
+							info: data						}
 						console.log("Making new certificate response")
 						that.sendResponse(response);
 					}
@@ -138,14 +137,13 @@ class CertificateProtocol extends proto.Protocol {
 				let data = jsonData.params;
     			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
 				this.tokenManager.setEntityToWhiteList(data.whiteList, data.allowed, {from: inakiAddress, gas:3000000}).then(function(rslt) {
+					console.log(rslt);
 					if(rslt != undefined){
 						let response = that.responseHolder();
 						response.jsonrpc = "2.0";
 						response.id = jsonData.id;
 		    			response.result = {
-							success: "TODO",
-							blockInfo: rslt
-						}
+							success: "TODO"						}
 						console.log("Making entity to white list response")
 						that.sendResponse(response);
 					}
