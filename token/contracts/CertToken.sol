@@ -146,11 +146,11 @@ contract CertToken {
     unique        Address of the certificate is gonna check
     /********************************************************************************************/
     function checkCert(bytes32 unique) public returns (bool success) {
-        if (certs[unique].issuer != 0) {                // Check if certificate exist
-            insertHistory(unique);                      // Regist the appication
-            require(isSenderAllowed(unique));
-            checkExpiration(unique);
-            require(certs[unique].isStilValid);
+        
+        checkExpiration(unique);            // Check if certificate has expired
+                                            // Check if certificate exist
+        if (certs[unique].issuer != 0 && isSenderAllowed(unique) && certs[unique].isStilValid) { 
+            insertHistory(unique);          // Regist the appication
             checkOk(true);
             return true;
         }
