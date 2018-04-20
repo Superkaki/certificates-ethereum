@@ -117,25 +117,36 @@ class CertificateProtocol extends proto.Protocol {
 				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
 				this.tokenManager.newCert(data.owner, data.certType, data.certName, data.duration, {from: deustoAddress, gas:3000000}).then(function(rslt) {
 					console.log(rslt);	
-					let hash = rslt.receipt.logs;
-					console.log("######Event Logs######");
-					console.log(hash);						
+					console.log("######Event Log######");
 					if(rslt != undefined){
 						let response = that.responseHolder();
-						response.jsonrpc = "2.0";
-						response.id = jsonData.id;
-						response.result = {
-							certHash: "TODO",
-							info: data						}
-						console.log("Making new certificate response")
-						that.sendResponse(response);
+						let cerHashEvent = that.tokenManager.certHash({}, {fromBlock: 'latest', toBlock: 'latest'})
+						cerHashEvent.get((error, logs) => {
+							logs.forEach(log => {
+								response.jsonrpc = "2.0";
+								response.id = jsonData.id;
+								response.result = {
+									certHash: log.args.unique,
+									info: data						
+								}
+								console.log("Making new certificate response")
+								that.sendResponse(response);
+							})
+						})
+						
+//						let cerHashEvent = that.tokenManager.certHash({}, {fromBlock: 0, toBlock: 'latest'})
+//						// print all logs from event certHash
+//						cerHashEvent.get((error, logs) => {
+//							logs.forEach(log => console.log(JSON.stringify(log.args)));
+//						})				
+
 					}
 					else{
 						console.log("Balance error: "+rslt)
 					}
 				}).catch((err) => {
 					console.log("Something happens creating new certificate: " + err);
-				});				
+				});	
     			break
 			}
 
@@ -153,7 +164,8 @@ class CertificateProtocol extends proto.Protocol {
 						response.jsonrpc = "2.0";
 						response.id = jsonData.id;
 		    			response.result = {
-							success: "TODO"						}
+							success: "TODO"						
+						}
 						console.log("Making entity to white list response")
 						that.sendResponse(response);
 					}
