@@ -41,9 +41,11 @@ contract CertToken {
     
     
     /********************************************Events******************************************/
-
-    event certHash(bytes32 unique);
-    event checkOk(bool success);
+    /********************************************************************************************
+    Useful for saving information about blocks
+    /********************************************************************************************/
+    event certHash(bytes32 unique,  address sender, string certType, string certName, uint creationDate, uint expirationDate);
+    event checkOk(bytes32 unique, address sender, uint creationDate, bool success);
 
 
 
@@ -135,7 +137,7 @@ contract CertToken {
         setEntityToWhiteList(unique, _to);              // The owner is allowed to check his own certificate
         setEntityToWhiteList(unique, msg.sender);       // The issuer is allowed to check the certificate
         
-        certHash(unique);
+        certHash(unique, msg.sender, _certType, _certName, certs[unique].creationDate, certs[unique].expirationDate);
 
         return unique;
     }
@@ -151,10 +153,10 @@ contract CertToken {
                                             // Check if certificate exist
         if (certs[unique].issuer != 0 && isSenderAllowed(unique) && certs[unique].isStilValid) { 
             insertHistory(unique);          // Regist the appication
-            checkOk(true);
+            checkOk(unique, msg.sender, now, true);
             return true;
         }
-        checkOk(false);
+        checkOk(unique, msg.sender, now, false);
         return false;
     }
 

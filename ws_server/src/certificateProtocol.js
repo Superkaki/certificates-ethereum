@@ -85,21 +85,25 @@ class CertificateProtocol extends proto.Protocol {
 				let that = this;
 				let data = jsonData.params;
 				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.checkCert(data.certHash, {from: inakiAddress, gas:3000000}).then(function(rslt) {
-					console.log(rslt);
-					let hash = rslt.receipt.logs;
-					console.log("######Event Logs######");
-					console.log(hash);
+				this.tokenManager.checkCert(data.certHash, {from: inakiAddress, gas:3000000}).then(function(rslt) {		// TODO: change "from"
+					console.log("###############  Block generated - Info  ###############");	
+					console.log(rslt);		
 					if(rslt != undefined){
 						let response = that.responseHolder();
-						response.jsonrpc = "2.0";
-						response.id = jsonData.id;
-						response.result = {
-							verification: "TODO",
-							info: data
-						}
-						console.log("Making certificate checking response")
-						that.sendResponse(response);
+						let checkOkEvent = that.tokenManager.checkOk({}, {fromBlock: 'latest', toBlock: 'latest'})
+						checkOkEvent.get((error, logs) => {
+							logs.forEach(log => {
+								response.jsonrpc = "2.0";
+								response.id = jsonData.id;
+								response.result = {
+									verification: log.args.success,
+									sender: log.args.sender,
+									creationDate: log.args.creationDate,
+									certHash: log.args.unique
+								}
+								that.sendResponse(response);
+							})
+						})
 					}
 					else{
 						console.log("Balance error: "+rslt)
@@ -116,27 +120,30 @@ class CertificateProtocol extends proto.Protocol {
 				let data = jsonData.params;
 				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
 				this.tokenManager.newCert(data.owner, data.certType, data.certName, data.duration, {from: deustoAddress, gas:3000000}).then(function(rslt) {
-					console.log(rslt);	
-					console.log("######Event Log######");
+					console.log("###############  Block generated - Info  ###############");	
+					console.log(rslt);		
 					if(rslt != undefined){
 						let response = that.responseHolder();
-						let cerHashEvent = that.tokenManager.certHash({}, {fromBlock: 'latest', toBlock: 'latest'})
-						cerHashEvent.get((error, logs) => {
+						let certHashEvent = that.tokenManager.certHash({}, {fromBlock: 'latest', toBlock: 'latest'})
+						certHashEvent.get((error, logs) => {
 							logs.forEach(log => {
 								response.jsonrpc = "2.0";
 								response.id = jsonData.id;
 								response.result = {
 									certHash: log.args.unique,
-									info: data						
+									sender: log.args.sender,
+									certType: log.args.certType,
+									certName: log.args.certName,
+									creationDate: log.args.creationDate,
+									expirationDate: log.args.expirationDate						
 								}
-								console.log("Making new certificate response")
 								that.sendResponse(response);
 							})
 						})
 						
-//						let cerHashEvent = that.tokenManager.certHash({}, {fromBlock: 0, toBlock: 'latest'})
+//						let certHashEvent = that.tokenManager.certHash({}, {fromBlock: 0, toBlock: 'latest'})
 //						// print all logs from event certHash
-//						cerHashEvent.get((error, logs) => {
+//						certHashEvent.get((error, logs) => {
 //							logs.forEach(log => console.log(JSON.stringify(log.args)));
 //						})				
 
@@ -155,11 +162,9 @@ class CertificateProtocol extends proto.Protocol {
 				let data = jsonData.params;
     			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
 				this.tokenManager.setEntityToWhiteList(data.whiteList, data.allowed, {from: inakiAddress, gas:3000000}).then(function(rslt) {
-					console.log(rslt);
-					let hash = rslt.receipt.logs;
-					console.log("######Event Logs######");
-					console.log(hash);
-					if(rslt != undefined){
+						console.log("###############  Block generated - Info  ###############");	
+						console.log(rslt);					
+						if(rslt != undefined){
 						let response = that.responseHolder();
 						response.jsonrpc = "2.0";
 						response.id = jsonData.id;
@@ -177,120 +182,11 @@ class CertificateProtocol extends proto.Protocol {
 				});				
     			break
 			}
-/*            
-            case "read_charging_point":{
-    			let that = this;
-    			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.balanceOf(inakiAddress).then(function(result) {
-					if(result){
-						let response = that.responseHolder();
-						response.action = "charger_info_response";
-		    			response.payload = {
-							available_tokens: result,
-							address: inakiAddress
-						}
-						that.sendResponse(response);
-					}
-					else{
-						console.log("Balance error: "+result)
-					}
-				}).catch(function(err) {
-				  // Easily catch all errors along the whole execution.
-				  console.log("FULL ERROR! " + err);
-				});
-    			break;
-			}
-			case "read_car_data":{
-    			let that = this;
-    			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.balanceOf(deustoAddress).then(function(result) {
-					if(result){
-						let response = that.responseHolder();
-						response.action = "car_data_response";
-		    			response.payload = {
-							available_tokens: result,
-							address: deustoAddress
-						}
-						that.sendResponse(response);
-					}
-				});
-    			break
-			}
-			case "read_minute_price":{
-				let that = this;
-				let data = jsonData.payload;
-				let response = this.responseHolder();
-				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.getMinutePrice().then(function(minutePrice) {
-					if(minutePrice!=undefined){
-						let response = that.responseHolder();
-						response.action = "minute_price_response";
-		    			response.payload = {
-							minute_price: minutePrice,
-							areMinutesChanged: data.areMinutesChanged
-						}
-						that.sendResponse(response);
-					}
-				});
-    			break
-			}
-			case "new_arrival":{
-				//matricula, minutos, token, info
-				let that = this;
-				let data = jsonData.payload;
-				let response = this.responseHolder();
-				console.log("Transfering funds from car to charger...");
-				console.log("Transfer from "+deustoAddress+" to "+inakiAddress+", value "+data.minutes+", info "+data.info)
-				this.tokenManager.transferMinutes(deustoAddress, inakiAddress, data.minutos, data.info, { from: deustoAddress })
-					.then(function(result) {
-						console.log("Transfer was ok");
-						console.log(JSON.stringify(result));
-						//Añadimos la linea recharge a la web
-						response.action = "new_arrival_response";
-						response.payload = {
-							matricula: data.matricula,
-							minutos: data.minutos+" min",
-							token: "-"+data.token + " TT",
-							type: "recharge",
-							timestamp: new Date(),
-						}
-						that.sendResponse(response);
-						
-						if(data.info){		// TODO: En este if tendría que evaluarse "result"
-							//Añadimos la linea reward a la web
-							console.log("this.tokenManager != undefined --> "+(that.tokenManager != undefined));	
-							that.tokenManager.getReward()
-								.then((rewardResponse) => {
-									if(rewardResponse!=undefined){
-										let response = that.responseHolder();
-										response.action = "new_reward_response";
-										response.payload = {
-											matricula: data.matricula,
-											minutos: " - ",
-											reward: rewardResponse + " TT",
-											type: "reward",
-											timestamp: new Date(),
-										}
-										that.sendResponse(response);
-										console.log("Reward transfer was ok");
-									}
-							})
-							.catch((error) => {
-								console.log("Getting the reward failed");
-							});
-						}					
-				})
-				.catch((error) => {
-					console.log("Something happens during transaction");
-				});				
-    			break
-            }          
-*/
     		default:{
     			wsClient.send("Hello world");
     		}
     	}
-    }
+	}
 }
 
 exports.CertificateProtocol = CertificateProtocol;

@@ -221,12 +221,11 @@ function processCheckCertResponse(data) {
   if(data){
     //XSS vulnerable
     let rowdata = undefined;
-    let info = data.info;
     rowdata = "<tr>\
-    <td>"+"Date"+"</td>\
+    <td>"+data.creationDate+"</td>\
     <td>"+"Time"+"</td>\
-    <td>"+info.certHash+"</td>\
-    <td>"+"user"+"</td>\
+    <td>"+data.certHash+"</td>\
+    <td>"+data.sender+"</td>\
     </tr>";
 
     rowdata = rowdata.replace("\
@@ -240,17 +239,34 @@ function processCheckCertResponse(data) {
 function processNewCertResponse(data) {
   console.log("New cert added");
 
+  /*
+  if(data.certHash) {
+    iconSended = "<button class='btn btn-success btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_check'></i> Created!\
+                  </button>";
+  } else {
+    iconSended = "<button class='btn btn-danger btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_simple-remove'></i> Error creating certificate!\
+                  </button>";
+  }
+
+  iconSended = iconSended.replace("\
+  ", "");
+
+  let checking = $("#formCreate")[0];
+  checking.innerHTML = checking.innerHTML + iconSended;
+*/
+
   if(data){
     //XSS vulnerable
     let rowdata = undefined;
-    let info = data.info;
     rowdata = "<tr>\
     <td id='toolong'>"+data.certHash+"</td>\
-    <td id='toolong'>"+"Issuer"+"</td>\
-    <td>"+info.certType+"</td>\
-    <td>"+info.certName+"</td>\
-    <td>"+"Today Date"+"</td>\
-    <td>"+"Expiration Date"+"</td>\
+    <td id='toolong'>"+data.sender+"</td>\
+    <td>"+data.certType+"</td>\
+    <td>"+data.certName+"</td>\
+    <td>"+data.creationDate+"</td>\
+    <td>"+data.expirationDate+"</td>\
     </tr>";
 
     rowdata = rowdata.replace("\
