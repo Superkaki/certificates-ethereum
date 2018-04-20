@@ -224,8 +224,8 @@ function processCheckCertResponse(data) {
     rowdata = "<tr>\
     <td>"+data.creationDate+"</td>\
     <td>"+"Time"+"</td>\
-    <td>"+data.certHash+"</td>\
-    <td>"+data.sender+"</td>\
+    <td id='toolong'>"+data.certHash+"</td>\
+    <td id='toolong'>"+data.sender+"</td>\
     </tr>";
 
     rowdata = rowdata.replace("\
@@ -311,36 +311,6 @@ function processArrivalResponse(json){
 function processRewardResponse(json){
   console.log("new car rewarded!");
   addLogRow(json);
-}
-
-function addLogRow(data){
-  if(data){
-    //XSS vulnerable
-    let rowdata = undefined;
-    if(data.type=="recharge"){
-      rowdata = "<tr style='color:red'>\
-      <td>"+data.matricula+"</td>\
-      <td>"+data.minutos+"</td>\
-      <td>"+data.timestamp+"</td>\
-      <td>"+data.token+"</td>\
-      <td>"+data.type+"</td>\
-      </tr>";
-    }else{
-      rowdata = "<tr style='color:green'>\
-      <td>"+data.matricula+"</td>\
-      <td>"+data.minutos+"</td>\
-      <td>"+data.timestamp+"</td>\
-      <td>"+data.reward+"</td>\
-      <td>"+data.type+"</td>\
-      </tr>";
-    }
-
-    rowdata = rowdata.replace("\
-    ", "");
-
-    let table = $("#logbody")[0];
-    table.innerHTML = table.innerHTML+ rowdata;
-  }
 }
 
 */
