@@ -73,11 +73,11 @@ document.getElementById('btnCheck').addEventListener('click', function(evt){
   evt.preventDefault();
   console.log("Certificate checking request detected!")
   let certHash = $("#certHash")[0].value;
-  let address = $("#address")[0].value;
+  let sender = $("#sender");
   //read form data
   let data = {
     "certHash": certHash,
-    "address": address
+    "sender": sender.text()
   }
   checkCert(data);
 })
@@ -106,14 +106,14 @@ document.getElementById('btnSend').addEventListener('click', function(evt){
   let duration = $("#duration")[0].value;
   let certType = $("#certType")[0].value;
   let certName = $("#certName")[0].value;
-  let address = $("#address")[0].value;
+  let sender = $("#sender");
   //read form data
   let data = {
     "owner": owner,
     "duration": duration,
     "certType": certType,
     "certName": certName,
-    "address": address
+    "sender": sender.text()
   }
   newCert(data);
 })
@@ -140,12 +140,12 @@ document.getElementById('btnAdd').addEventListener('click', function(evt){
   console.log("Add entity to white list request detected!")
   let whiteList = $("#whiteList")[0].value;
   let allowed = $("#allowed")[0].value;
-  let address = $("#address")[0].value;
+  let sender = $("#sender");
   //read form data
   let data = {
     "whiteList": whiteList,
     "allowed": allowed,
-    "address": address
+    "sender": sender.text()
   }
   addEntityToWhiteList(data);
 })

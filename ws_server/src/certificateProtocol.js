@@ -85,7 +85,7 @@ class CertificateProtocol extends proto.Protocol {
 				let that = this;
 				let data = jsonData.params;
 				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.checkCert(data.certHash, {from: inakiAddress, gas:3000000}).then(function(rslt) {		// TODO: change "from"
+				this.tokenManager.checkCert(data.certHash, {from: data.sender, gas:3000000}).then(function(rslt) {		// TODO: change "from"
 					console.log("###############  Block generated - Info  ###############");	
 					console.log(rslt);		
 					if(rslt != undefined){
@@ -119,7 +119,7 @@ class CertificateProtocol extends proto.Protocol {
 				let that = this;
 				let data = jsonData.params;
 				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.newCert(data.owner, data.certType, data.certName, data.duration, {from: deustoAddress, gas:3000000}).then(function(rslt) {
+				this.tokenManager.newCert(data.owner, data.certType, data.certName, data.duration, {from: data.sender, gas:3000000}).then(function(rslt) {
 					console.log("###############  Block generated - Info  ###############");	
 					console.log(rslt);		
 					if(rslt != undefined){
@@ -161,7 +161,7 @@ class CertificateProtocol extends proto.Protocol {
 				let that = this;
 				let data = jsonData.params;
     			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.setEntityToWhiteList(data.whiteList, data.allowed, {from: inakiAddress, gas:3000000}).then(function(rslt) {
+				this.tokenManager.setEntityToWhiteList(data.whiteList, data.allowed, {from: data.sender, gas:3000000}).then(function(rslt) {
 						console.log("###############  Block generated - Info  ###############");	
 						console.log(rslt);					
 						if(rslt != undefined){
