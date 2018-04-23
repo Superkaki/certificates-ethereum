@@ -12,6 +12,7 @@ function init() {
 function onOpen(evt) {
 
   writeToLog("Websocket opened!");
+  getStatus();
   //startTimerDemo();
 }
 
@@ -65,13 +66,38 @@ function startTimerDemo(){
   }, 3000);
 }
 
+/********************************************************************************************
+Get status from a user
+/********************************************************************************************/
+function getStatus() {
+  console.log("Loading user data");
+  getCertificatesRecord();
+//  getCheckingHistory();   // TODO
+}
+
+/********************************************************************************************
+Get the record of certificates owned by a user
+/********************************************************************************************/
+function getCertificatesRecord() {
+  let sender = $("#sender");
+  let data = {
+    "sender": sender.text()
+  }
+  let msg = {
+    jsonrpc: '2.0',
+    id: '0.0',
+    method: 'getCertList',
+    params: data
+  };
+  doSend(msg); 
+}
 
 /********************************************************************************************
 Listener for check certificate button
 /********************************************************************************************/
 document.getElementById('btnCheck').addEventListener('click', function(evt){
   evt.preventDefault();
-  console.log("Certificate checking request detected!")
+  console.log("Certificate checking request detected!");
   let certHash = $("#certHash")[0].value;
   let sender = $("#sender");
   //read form data
@@ -88,9 +114,9 @@ Parse check certificate to json and send it
 function checkCert(data){
   let msg = {
     jsonrpc: '2.0',
+    id: '1',
     method: 'checkCert',
-    params: data,
-    id: '1'
+    params: data
   };
   console.log("Making certificate checking request")
   doSend(msg);  
@@ -124,9 +150,9 @@ Parse new certificate to json and send it
 function newCert(data){
   let msg = {
     jsonrpc: '2.0',
+    id: '2',
     method: 'newCert',
-    params: data,
-    id: '2'
+    params: data
   };
   console.log("Making new certificate request")
   doSend(msg);  
@@ -156,9 +182,9 @@ Parse new entity to white list to json and send it
 function addEntityToWhiteList(data){
   let msg = {
     jsonrpc: '2.0',
+    id: '3',
     method: 'setEntityToWhiteList',
     params: data,
-    id: '3'
   };
   console.log("Making new entity to white list request" )
   doSend(msg);  
@@ -176,6 +202,9 @@ function processMessageProtocol(json){
   }
   if(json){
     switch(json.id){
+      case "0.1":
+        processCertificatesRecord(json.result);
+        break;
       case "1":
         processCheckCertResponse(json.result);
         break;
@@ -195,6 +224,28 @@ function processMessageProtocol(json){
 /********************************************************************************************/
 /***********************************   Response actions   ***********************************/
 /********************************************************************************************/
+
+function processCertificatesRecord(data) {
+  if(data){
+    //XSS vulnerable
+    let rowdata = undefined;
+    rowdata = "<tr>\
+    <td id='toolong'>"+data.certHash+"</td>\
+    <td id='toolong'>"+data.issuer+"</td>\
+    <td>"+data.certType+"</td>\
+    <td>"+data.certName+"</td>\
+    <td>"+data.creationDate+"</td>\
+    <td>"+data.expirationDate+"</td>\
+    </tr>";
+
+    rowdata = rowdata.replace("\
+    ", "");
+
+    let table = $("#logCert")[0];
+    table.innerHTML = table.innerHTML + rowdata;
+  }
+}
+
 
 function processCheckCertResponse(data) {
   console.log("Cert checked");

@@ -35,7 +35,7 @@ CertificateContract.currentProvider.sendAsync = function () {
 //END workaround
 
 let inakiAddress = ("0x627306090abaB3A6e1400e9345bC60c78a8BEf57")
-let deustoAddress = ("0xf17f52151EbEF6C7334FAD080c5704D77216b732")
+let jackAddress = ("0xf17f52151EbEF6C7334FAD080c5704D77216b732")
 
 let tokenManager;
 
@@ -55,9 +55,15 @@ class CertificateProtocol extends proto.Protocol {
     	let that = this;
     	console.log("Deploy CertificateContract!");
     	CertificateContract.deployed().then(function(instance) {
-		  	console.log("Contract deployed!");
-		  	that.tokenManager = instance;
-		  	console.log("Creating instance")
+			console.log("Contract deployed!");
+			that.tokenManager = instance;
+			console.log("Creating instance")
+			return that.tokenManager.setUser(inakiAddress, "Inaki Seco", "77777777A", {from: inakiAddress, gas:3000000});
+		}).then(function(result) {
+			console.log("User Inaki creation block: " + JSON.stringify(result));
+	    	return that.tokenManager.setUser(jackAddress, "Jack Sparrow", "66666666B", {from: jackAddress, gas:3000000});
+	    }).then(function(result) {
+	    	console.log("User Jack creation block: " + JSON.stringify(result));
 		}).catch(function(err) {
 		  	console.log("FULL ERROR! " + err);       	  // Easily catch all errors along the whole execution.
 		});
@@ -81,6 +87,57 @@ class CertificateProtocol extends proto.Protocol {
     	}
 
     	switch(jsonData.method){
+            case "getCertList":{
+				let that = this;
+				let data = jsonData.params;
+				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
+				this.tokenManager.getCertList(data.sender, {from: data.sender, gas:3000000}).then(function(rslt) {
+					console.log("###############  Block generated - Info  ###############");	
+					console.log(rslt);		
+					if(rslt != undefined){
+						for (var i = 0; i < rslt.length; i++) {
+							that.tokenManager.getCertByHash(rslt[i], {from: data.sender, gas:3000000}).then(function(certInfo) {
+								let response = that.responseHolder();
+								response.jsonrpc = "2.0";
+								response.id = "0.1";
+								response.result = {
+									certHash: certInfo[0],
+									issuer: certInfo[1], 
+									certType: certInfo[2], 
+									certName: certInfo[3],
+									creationDate: certInfo[4],
+									expirationDate: certInfo[5],
+									isStilValid: certInfo[6]
+								}
+								that.sendResponse(response);
+							}).catch((err) => {
+								console.log("Something happens getting a certificate: " + err);
+								//TODO: that.sendResponse(error)
+							});
+						}
+
+						//let certList = that.tokenManager.certList({}, {fromBlock: 'latest', toBlock: 'latest'})
+						//certList.get((error, logs) => {
+						//	logs.forEach(log => {
+						//		response.jsonrpc = "2.0";
+						//		response.id = jsonData.id;
+						//		response.result = {
+						//			certificateList: log.args.ownCerts
+						//		}
+						//		that.sendResponse(response);
+						//	})
+						//})
+					}
+					else{
+						console.log("Balance error: "+rslt)
+					}
+				}).catch((err) => {
+					console.log("Something happens getting certificate list: " + err);
+					//TODO: that.sendResponse(error)
+				});				
+    			break
+			}
+
             case "checkCert":{
 				let that = this;
 				let data = jsonData.params;
@@ -124,8 +181,8 @@ class CertificateProtocol extends proto.Protocol {
 					console.log(rslt);		
 					if(rslt != undefined){
 						let response = that.responseHolder();
-						let certHashEvent = that.tokenManager.certHash({}, {fromBlock: 'latest', toBlock: 'latest'})
-						certHashEvent.get((error, logs) => {
+						let newCertEvent = that.tokenManager.newCertCreated({}, {fromBlock: 'latest', toBlock: 'latest'})
+						newCertEvent.get((error, logs) => {
 							logs.forEach(log => {
 								response.jsonrpc = "2.0";
 								response.id = jsonData.id;
@@ -141,9 +198,9 @@ class CertificateProtocol extends proto.Protocol {
 							})
 						})
 						
-//						let certHashEvent = that.tokenManager.certHash({}, {fromBlock: 0, toBlock: 'latest'})
-//						// print all logs from event certHash
-//						certHashEvent.get((error, logs) => {
+//						let newCertEvent = that.tokenManager.newCertCreated({}, {fromBlock: 0, toBlock: 'latest'})
+//						// print all logs from event newCertCreated
+//						newCertEvent.get((error, logs) => {
 //							logs.forEach(log => console.log(JSON.stringify(log.args)));
 //						})				
 

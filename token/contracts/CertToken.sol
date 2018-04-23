@@ -22,6 +22,7 @@ contract CertToken {
         bytes15 name;           // Owner's name
         //bytes32 surnames;       // Owner's surnames
         bytes9 nid;             // Owner's national identity document
+        bytes32[] ownCerts;     // List of certificates owned by that user
     }
 
     struct AccessLog {
@@ -44,7 +45,8 @@ contract CertToken {
     /********************************************************************************************
     Useful for saving information about blocks
     /********************************************************************************************/
-    event certHash(bytes32 unique,  address sender, string certType, string certName, uint creationDate, uint expirationDate);
+    // event certList(bytes32[] unique);
+    event newCertCreated(bytes32 unique,  address sender, string certType, string certName, uint creationDate, uint expirationDate);
     event checkOk(bytes32 unique, address sender, uint creationDate, bool success);
 
 
@@ -85,9 +87,31 @@ contract CertToken {
     userName        Name of the new user
     userNid         New user's National Identity Card number
     /********************************************************************************************/
-    function setUser(address add, bytes15 userName, bytes9 userNid) public {
+    function setUser(address add, bytes15 userName, bytes9 userNid) public returns (bool success) {
         users[add].name = userName;
         users[add].nid = userNid;
+        return (true);
+    }
+
+    /********************************************************************************************
+    Get the list of certificates owned by a user
+    /********************************************************************************************/
+    function getCertList(address add) public view returns (bytes32[] unique) {
+        // certList(users[add].ownCerts);
+        return (users[add].ownCerts);
+    }
+
+    /********************************************************************************************
+    Get a certificate by knowing its hash
+    /********************************************************************************************/
+    function getCertByHash(bytes32 unique) public view returns (bytes32, address, string, string, uint, uint, bool) {
+        return (unique,
+        certs[unique].issuer, 
+        certs[unique].certType, 
+        certs[unique].certName,
+        certs[unique].creationDate,
+        certs[unique].expirationDate,
+        certs[unique].isStilValid);
     }
 
     /********************************************************************************************
@@ -127,6 +151,7 @@ contract CertToken {
     function newCert(address _to, string _certType, string _certName, uint duration) public returns (bytes32) {
         bytes32 unique = keccak256(msg.sender, nounce++, _certName);
 
+        users[_to].ownCerts.push(unique);
         certs[unique].owner = _to;                      // Addidng information
         certs[unique].issuer = msg.sender;
         certs[unique].certType = _certType;
@@ -137,7 +162,7 @@ contract CertToken {
         setEntityToWhiteList(unique, _to);              // The owner is allowed to check his own certificate
         setEntityToWhiteList(unique, msg.sender);       // The issuer is allowed to check the certificate
         
-        certHash(unique, msg.sender, _certType, _certName, certs[unique].creationDate, certs[unique].expirationDate);
+        newCertCreated(unique, msg.sender, _certType, _certName, certs[unique].creationDate, certs[unique].expirationDate);
 
         return unique;
     }
