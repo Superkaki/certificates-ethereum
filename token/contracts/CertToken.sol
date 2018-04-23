@@ -105,6 +105,9 @@ contract CertToken {
     Get a certificate by knowing its hash
     /********************************************************************************************/
     function getCertByHash(bytes32 unique) public view returns (bytes32, address, string, string, uint, uint, bool) {
+        if(certs[unique].isStilValid) {
+            checkExpiration(unique);            // Check if certificate has expired
+        }
         return (unique,
         certs[unique].issuer, 
         certs[unique].certType, 

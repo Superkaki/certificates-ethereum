@@ -115,7 +115,7 @@ class CertificateProtocol extends proto.Protocol {
 								//TODO: that.sendResponse(error)
 							});
 						}
-
+																																				
 						//let certList = that.tokenManager.certList({}, {fromBlock: 'latest', toBlock: 'latest'})
 						//certList.get((error, logs) => {
 						//	logs.forEach(log => {
