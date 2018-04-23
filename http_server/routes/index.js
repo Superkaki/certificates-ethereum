@@ -9,6 +9,7 @@ const indexController = require('../controllers/indexController');
 /* GET home page. */
 router.get('/', indexController.index);
 router.get('/profile', indexController.profile);
+router.get('/profile1', indexController.profile1);
 router.get('/login', indexController.login);
 router.get('/presentation', indexController.presentation);
 
