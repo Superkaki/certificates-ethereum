@@ -234,8 +234,8 @@ function processCertificatesRecord(data) {
     <td id='toolong'>"+data.issuer+"</td>\
     <td>"+data.certType+"</td>\
     <td>"+data.certName+"</td>\
-    <td>"+data.creationDate+"</td>\
-    <td>"+data.expirationDate+"</td>\
+    <td>"+epochToTime(data.creationDate)+"</td>\
+    <td>"+epochToTime(data.expirationDate)+"</td>\
     </tr>";
 
     rowdata = rowdata.replace("\
@@ -273,7 +273,7 @@ function processCheckCertResponse(data) {
     //XSS vulnerable
     let rowdata = undefined;
     rowdata = "<tr>\
-    <td>"+data.creationDate+"</td>\
+    <td>"+epochToTime(data.creationDate)+"</td>\
     <td>"+"Time"+"</td>\
     <td id='toolong'>"+data.certHash+"</td>\
     <td id='toolong'>"+data.sender+"</td>\
@@ -311,13 +311,18 @@ function processNewCertResponse(data) {
   if(data){
     //XSS vulnerable
     let rowdata = undefined;
+    iconValid = "<button class='btn btn-success btn-icon btn-round'>\
+        <i class='now-ui-icons ui-1_check'></i>\
+    </button>";
+
     rowdata = "<tr>\
     <td id='toolong'>"+data.certHash+"</td>\
     <td id='toolong'>"+data.sender+"</td>\
     <td>"+data.certType+"</td>\
     <td>"+data.certName+"</td>\
-    <td>"+data.creationDate+"</td>\
-    <td>"+data.expirationDate+"</td>\
+    <td>"+epochToTime(data.creationDate)+"</td>\
+    <td>"+epochToTime(data.expirationDate)+"</td>\
+    <td>"+iconValid+"</td>\
     </tr>";
 
     rowdata = rowdata.replace("\
@@ -333,6 +338,14 @@ function processEntityToWhiteListResponse(data) {
 }
 
 
+/********************************************************************************************/
+/***********************************   Other functions   ************************************/
+/********************************************************************************************/
+
+function epochToTime(epoch) {
+  var myDate = new Date( epoch *1000);
+  return(myDate.toLocaleString());
+}
 
 /*
 
