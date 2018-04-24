@@ -6,8 +6,10 @@ contract CertToken {
         address owner;          // Public address of the certificate's owner (user or entity)
         address issuer;         // Public address of the entity who issues the certificate
         string certName;        // Name of the certificate issued
+        string certType;        // Short description of the certificate
         address[] whiteList;    // List of authorized entities to check the certificate
         mapping(address => Entity) whiteListStruct;
+        uint creationDate;
         uint expirationDate;
         bool isStilValid;
     }
@@ -20,6 +22,7 @@ contract CertToken {
         bytes15 name;           // Owner's name
         //bytes32 surnames;       // Owner's surnames
         bytes9 nid;             // Owner's national identity document
+        bytes32[] ownCerts;     // List of certificates owned by that user
     }
 
     struct AccessLog {
@@ -39,8 +42,12 @@ contract CertToken {
     
     
     /********************************************Events******************************************/
-
-
+    /********************************************************************************************
+    Useful for saving information about blocks
+    /********************************************************************************************/
+    // event certList(bytes32[] unique);
+    event newCertCreated(bytes32 unique,  address sender, string certType, string certName, uint creationDate, uint expirationDate);
+    event checkOk(bytes32 unique, address sender, uint creationDate, bool success);
 
 
 
@@ -80,9 +87,34 @@ contract CertToken {
     userName        Name of the new user
     userNid         New user's National Identity Card number
     /********************************************************************************************/
-    function setUser(address add, bytes15 userName, bytes9 userNid) public {
+    function setUser(address add, bytes15 userName, bytes9 userNid) public returns (bool success) {
         users[add].name = userName;
         users[add].nid = userNid;
+        return (true);
+    }
+
+    /********************************************************************************************
+    Get the list of certificates owned by a user
+    /********************************************************************************************/
+    function getCertList(address add) public view returns (bytes32[] unique) {
+        // certList(users[add].ownCerts);
+        return (users[add].ownCerts);
+    }
+
+    /********************************************************************************************
+    Get a certificate by knowing its hash
+    /********************************************************************************************/
+    function getCertByHash(bytes32 unique) public view returns (bytes32, address, string, string, uint, uint, bool) {
+        if(certs[unique].isStilValid) {
+            checkExpiration(unique);            // Check if certificate has expired
+        }
+        return (unique,
+        certs[unique].issuer, 
+        certs[unique].certType, 
+        certs[unique].certName,
+        certs[unique].creationDate,
+        certs[unique].expirationDate,
+        certs[unique].isStilValid);
     }
 
     /********************************************************************************************
@@ -116,18 +148,25 @@ contract CertToken {
 
     _to             Address of new certificate's owner
     certName        Name of the new certificate
+    certType        NType of the new certificate
+    duration        Duration of the certificate's validity (seconds)
     /********************************************************************************************/
-    function newCert(address _to, string _certName, uint duration) public returns (bytes32 unique) {
-        unique = keccak256(nounce++);
+    function newCert(address _to, string _certType, string _certName, uint duration) public returns (bytes32) {
+        bytes32 unique = keccak256(msg.sender, nounce++, _certName);
 
+        users[_to].ownCerts.push(unique);
         certs[unique].owner = _to;                      // Addidng information
         certs[unique].issuer = msg.sender;
+        certs[unique].certType = _certType;
         certs[unique].certName = _certName;
-        certs[unique].expirationDate = now + duration;
+        certs[unique].creationDate = now;
+        certs[unique].expirationDate = certs[unique].creationDate + duration;
         certs[unique].isStilValid = true;
         setEntityToWhiteList(unique, _to);              // The owner is allowed to check his own certificate
         setEntityToWhiteList(unique, msg.sender);       // The issuer is allowed to check the certificate
         
+        newCertCreated(unique, msg.sender, _certType, _certName, certs[unique].creationDate, certs[unique].expirationDate);
+
         return unique;
     }
     
@@ -137,13 +176,15 @@ contract CertToken {
     unique        Address of the certificate is gonna check
     /********************************************************************************************/
     function checkCert(bytes32 unique) public returns (bool success) {
-        if (certs[unique].issuer != 0) {                // Check if certificate exist
-            insertHistory(unique);                      // Regist the appication
-            require(isSenderAllowed(unique));
-            checkExpiration(unique);
-            require(certs[unique].isStilValid);
+        
+        checkExpiration(unique);            // Check if certificate has expired
+                                            // Check if certificate exist
+        if (certs[unique].issuer != 0 && isSenderAllowed(unique) && certs[unique].isStilValid) { 
+            insertHistory(unique);          // Regist the appication
+            checkOk(unique, msg.sender, now, true);
             return true;
         }
+        checkOk(unique, msg.sender, now, false);
         return false;
     }
 

@@ -11,15 +11,12 @@
         </div>
     </body>
     {{> partials/scripts}}
-    
     <script type="text/javascript">
         $(document).ready(function() {
             // the body of this function is in js/now-ui-kit.js
             nowuiKit.initSliders();
         });
-
         function scrollToDownload() {
-
             if ($('.section-download').length != 0) {
                 $("html, body").animate({
                     scrollTop: $('.section-download').offset().top

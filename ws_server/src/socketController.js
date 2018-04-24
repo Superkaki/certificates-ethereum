@@ -23,11 +23,11 @@ class SocketController {
 
     processNewConnection(ws) {
         console.log('client connected');
-        this.send(ws, '{"payload":"client connected"}');
+        this.send(ws, '{"params":"client connected"}');
     }
 
     processMessage(ws, message) {
-        console.log('received: %s', message);
+        console.log('REQUEST RECEIVED: %s', message);
         let jsonData = JSON.parse(message);
         this._protocol.parse(ws, jsonData);
 
@@ -69,7 +69,7 @@ class SocketController {
         let thisSocket = this;
 
         console.log("Starting WebSocket...");
-
+        
         this._websocketServer.on('open', function open() {
             thisSocket.open();
         });
