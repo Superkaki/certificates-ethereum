@@ -8,17 +8,13 @@ contract CertToken {
         string certName;        // Name of the certificate issued
         string certType;        // Short description of the certificate
         address[] whiteList;    // List of authorized entities to check the certificate
-        mapping(address => Entity) whiteListStruct;
         uint creationDate;
         uint expirationDate;
         bool isStilValid;
     }
 
-    struct Entity {
-        bytes32 name;           // Entity's name
-    }
-
     struct User {
+        //bytes10 type;           // Type of user: Entity or Individual
         bytes15 name;           // Owner's name
         //bytes32 surnames;       // Owner's surnames
         bytes9 nid;             // Owner's national identity document
@@ -37,7 +33,7 @@ contract CertToken {
     mapping(bytes32 => Certificate) public certs;  // This creates an array with all the certificates
 
     mapping(address => User) public users;
-    mapping(address => Entity) public entities;
+    //mapping(address => Entity) public entities;
     
     
     
@@ -76,9 +72,9 @@ contract CertToken {
     add             Addres of the new entity
     entityName      Name of the new entity
     /********************************************************************************************/
-    function setEntity(address add, bytes32 entityName) public {
-        entities[add].name = entityName;
-    }
+//    function setEntity(address add, bytes32 entityName) public {
+//        entities[add].name = entityName;
+//    }
 
     /********************************************************************************************
     Create a new user
@@ -122,9 +118,9 @@ contract CertToken {
 
     add             Address of the entity to be searched
     /********************************************************************************************/
-    function getEntityByAddress(address add) constant public returns (bytes32) {
-        return entities[add].name;
-    }
+//    function getEntityByAddress(address add) constant public returns (bytes32) {
+//        return entities[add].name;
+//    }
 
     /********************************************************************************************
     Get the info of a user by his address
