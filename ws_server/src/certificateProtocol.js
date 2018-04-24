@@ -230,7 +230,7 @@ class CertificateProtocol extends proto.Protocol {
 						response.jsonrpc = "2.0";
 						response.id = jsonData.id;
 		    			response.result = {
-							success: "TODO"						
+							success: rslt						
 						}
 						console.log("Making entity to white list response")
 						that.sendResponse(response);
@@ -246,7 +246,7 @@ class CertificateProtocol extends proto.Protocol {
     		default:{
     			wsClient.send("Hello world");
     		}
-    	}
+		}		
 	}
 }
 
