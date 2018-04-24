@@ -12,6 +12,7 @@ exports.index = (req, res, next) => {
       ui_description: res.__('soon_subtitle'),
       ui_soon: res.__('soon_text'),
       profile: "/profile",
+      profile1: "/profile1",
       login: "/login",
       presentation: "/presentation"
     }
