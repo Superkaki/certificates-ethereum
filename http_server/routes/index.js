@@ -10,6 +10,7 @@ const indexController = require('../controllers/indexController');
 router.get('/', indexController.index);
 router.get('/profile', indexController.profile);
 router.get('/profile1', indexController.profile1);
+router.get('/profile2', indexController.profile2);
 router.get('/login', indexController.login);
 router.get('/presentation', indexController.presentation);
 
