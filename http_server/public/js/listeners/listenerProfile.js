@@ -72,7 +72,7 @@ Get status from a user
 function getStatus() {
   console.log("Loading user data");
   getCertificatesRecord();
-//  getCheckingHistory();   // TODO
+  getCheckingHistory();
 }
 
 /********************************************************************************************
@@ -87,6 +87,23 @@ function getCertificatesRecord() {
     jsonrpc: '2.0',
     id: '0.0',
     method: 'getCertList',
+    params: data
+  };
+  doSend(msg); 
+}
+
+/********************************************************************************************
+Get the record of certificates owned by a user
+/********************************************************************************************/
+function getCheckingHistory() {
+  let sender = $("#sender");
+  let data = {
+    "sender": sender.text()
+  }
+  let msg = {
+    jsonrpc: '2.0',
+    id: '0.0',
+    method: 'getAccessLogList',
     params: data
   };
   doSend(msg); 
@@ -205,6 +222,9 @@ function processMessageProtocol(json){
       case "0.1":
         processCertificatesRecord(json.result);
         break;
+      case "0.2":
+        processAccessLogRecord(json.result);
+        break; 
       case "1":
         processCheckCertResponse(json.result);
         break;
@@ -246,6 +266,34 @@ function processCertificatesRecord(data) {
     <td>"+epochToTime(data.creationDate)+"</td>\
     <td>"+epochToTime(data.expirationDate)+"</td>\
     <td>"+iconValid+"</td>\
+    </tr>";
+
+    rowdata = rowdata.replace("\
+    ", "");
+
+    let table = $("#logCert")[0];
+    table.innerHTML = table.innerHTML + rowdata;
+  }
+}
+
+function processAccessLogRecord(data) {
+  if(data){
+    //XSS vulnerable
+    let rowdata = undefined;
+    if(data.hadSuccess) {
+      iconHadSuccess = "<button class='btn btn-success btn-icon btn-round'>\
+                      <i class='now-ui-icons ui-1_check'></i>\
+                  </button>";
+    } else {
+      iconHadSuccess = "<button class='btn btn-danger btn-icon btn-round'>\
+                      <i class='now-ui-icons ui-1_simple-remove'></i>\
+                  </button>";
+    }
+    rowdata = "<tr>\
+    <td>"+epochDate(data.creationDate)+"</td>\
+    <td>"+epochTime(data.creationDate)+"</td>\
+    <td id='toolong'>"+data.user+"</td>\
+    <td id='toolong'>"+data.certHash+"</td>\
     </tr>";
 
     rowdata = rowdata.replace("\

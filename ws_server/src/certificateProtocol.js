@@ -145,6 +145,42 @@ class CertificateProtocol extends proto.Protocol {
     			break
 			}
 
+			case "getAccessLogList":{
+				let that = this;
+				let data = jsonData.params;
+				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
+				this.tokenManager.getAccessLogList(data.sender, {from: data.sender, gas:3000000}).then(function(rslt) {
+					printResult(rslt);
+					if(rslt != undefined){
+						for (var i = 0; i < rslt.length; i++) {
+							that.tokenManager.getAccessLogByHash(rslt[i], {from: data.sender, gas:3000000}).then(function(accessLogInfo) {
+								let response = that.responseHolder();
+								response.jsonrpc = "2.0";
+								response.id = "0.2";
+								response.result = {
+									accessLogHash: accessLogInfo[0],
+									creationDate: accessLogInfo[1],
+									user: accessLogInfo[2],
+									certHash: accessLogInfo[3],
+									hadSuccess: true
+								}
+								that.sendResponse(response);
+							}).catch((err) => {
+								console.log("Something happens getting a certificate: " + err);
+								//TODO: that.sendResponse(error)
+							});
+						}
+					}
+					else{
+						console.log("Balance error: "+rslt)
+					}
+				}).catch((err) => {
+					console.log("Something happens getting certificate list: " + err);
+					//TODO: that.sendResponse(error)
+				});				
+    			break
+			}
+
             case "checkCert":{
 				let that = this;
 				let data = jsonData.params;
@@ -162,7 +198,7 @@ class CertificateProtocol extends proto.Protocol {
 									verification: log.args.success,
 									sender: log.args.sender,
 									creationDate: log.args.creationDate,
-									certHash: log.args.unique
+									certHash: log.args.certUnique
 								}
 								that.sendResponse(response);
 							})
@@ -192,7 +228,7 @@ class CertificateProtocol extends proto.Protocol {
 								response.jsonrpc = "2.0";
 								response.id = jsonData.id;
 								response.result = {
-									certHash: log.args.unique,
+									certHash: log.args.certUnique,
 									sender: log.args.sender,
 									certType: log.args.certType,
 									certName: log.args.certName,
