@@ -245,6 +245,9 @@ function processMessageProtocol(json){
 /***********************************   Response actions   ***********************************/
 /********************************************************************************************/
 
+/********************************************************************************************
+Show all the certificates from a user
+/********************************************************************************************/
 function processCertificatesRecord(data) {
   if(data){
     //XSS vulnerable
@@ -276,6 +279,9 @@ function processCertificatesRecord(data) {
   }
 }
 
+/********************************************************************************************
+Show all the checkings from a user's certificates
+/********************************************************************************************/
 function processAccessLogRecord(data) {
   if(data){
     //XSS vulnerable
@@ -292,8 +298,8 @@ function processAccessLogRecord(data) {
     rowdata = "<tr>\
     <td>"+epochDate(data.creationDate)+"</td>\
     <td>"+epochTime(data.creationDate)+"</td>\
-    <td id='toolong'>"+data.user+"</td>\
     <td id='toolong'>"+data.certHash+"</td>\
+    <td id='toolong'>"+data.user+"</td>\
     </tr>";
 
     rowdata = rowdata.replace("\
@@ -304,7 +310,10 @@ function processAccessLogRecord(data) {
   }
 }
 
-
+/********************************************************************************************
+Show success icon
+Insert a new certificate checking into the record
+/********************************************************************************************/
 function processCheckCertResponse(data) {
   console.log("Cert checked");
 
@@ -320,12 +329,10 @@ function processCheckCertResponse(data) {
                       <i class='now-ui-icons ui-1_simple-remove'></i> Does not exist!\
                   </button>";
   }
-
   iconVerify = iconVerify.replace("\
   ", "");
-
   let checking = $("#formCheck")[0];
-  checking.innerHTML = checking.innerHTML + iconVerify;
+  checking.innerHTML = iconVerify;
 
   if(data){
     //XSS vulnerable
@@ -345,10 +352,13 @@ function processCheckCertResponse(data) {
   }
 }
 
+/********************************************************************************************
+Show success icon
+Insert a new certificate creation into the record
+/********************************************************************************************/
 function processNewCertResponse(data) {
   console.log("New cert added");
 
-  /*
   if(data.certHash) {
     iconSended = "<button class='btn btn-success btn-round' type='button'>\
                       <i class='now-ui-icons ui-1_check'></i> Created!\
@@ -358,20 +368,17 @@ function processNewCertResponse(data) {
                       <i class='now-ui-icons ui-1_simple-remove'></i> Error creating certificate!\
                   </button>";
   }
-
   iconSended = iconSended.replace("\
   ", "");
-
-  let checking = $("#formCreate")[0];
-  checking.innerHTML = checking.innerHTML + iconSended;
-*/
+  let creating = $("#formSend")[0];
+  creating.innerHTML = iconSended;
 
   if(data){
     //XSS vulnerable
     let rowdata = undefined;
     iconValid = "<button class='btn btn-success btn-icon btn-round'>\
-        <i class='now-ui-icons ui-1_check'></i>\
-    </button>";
+                    <i class='now-ui-icons ui-1_check'></i>\
+                </button>";
 
     rowdata = "<tr>\
     <td id='toolong'>"+data.certHash+"</td>\
@@ -391,8 +398,20 @@ function processNewCertResponse(data) {
   }
 }
 
+/********************************************************************************************
+Show success icon
+/********************************************************************************************/
 function processEntityToWhiteListResponse(data) {
   console.log("New entity allowed");
+
+  iconAdded = "<button class='btn btn-success btn-round' type='button'>\
+                    <i class='now-ui-icons ui-1_check'></i> Added!\
+                </button>";
+  iconAdded = iconAdded.replace("\
+  ", "");
+  let creating = $("#formAdd")[0];
+  creating.innerHTML = iconAdded;
+
 }
 
 
