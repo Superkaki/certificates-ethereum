@@ -263,8 +263,8 @@ function processCertificatesRecord(data) {
     <td id='toolong'>"+data.issuer+"</td>\
     <td>"+data.certType+"</td>\
     <td>"+data.certName+"</td>\
-    <td>"+epochToTime(data.creationDate)+"</td>\
-    <td>"+epochToTime(data.expirationDate)+"</td>\
+    <td>"+epochToDateTime(data.creationDate)+"</td>\
+    <td>"+epochToDateTime(data.expirationDate)+"</td>\
     <td>"+iconValid+"</td>\
     </tr>";
 
@@ -282,12 +282,12 @@ function processAccessLogRecord(data) {
     let rowdata = undefined;
     if(data.hadSuccess) {
       iconHadSuccess = "<button class='btn btn-success btn-icon btn-round'>\
-                      <i class='now-ui-icons ui-1_check'></i>\
-                  </button>";
+                            <i class='now-ui-icons ui-1_check'></i>\
+                        </button>";
     } else {
       iconHadSuccess = "<button class='btn btn-danger btn-icon btn-round'>\
-                      <i class='now-ui-icons ui-1_simple-remove'></i>\
-                  </button>";
+                            <i class='now-ui-icons ui-1_simple-remove'></i>\
+                        </button>";
     }
     rowdata = "<tr>\
     <td>"+epochDate(data.creationDate)+"</td>\
@@ -299,7 +299,7 @@ function processAccessLogRecord(data) {
     rowdata = rowdata.replace("\
     ", "");
 
-    let table = $("#logCert")[0];
+    let table = $("#logHistory")[0];
     table.innerHTML = table.innerHTML + rowdata;
   }
 }
@@ -378,8 +378,8 @@ function processNewCertResponse(data) {
     <td id='toolong'>"+data.sender+"</td>\
     <td>"+data.certType+"</td>\
     <td>"+data.certName+"</td>\
-    <td>"+epochToTime(data.creationDate)+"</td>\
-    <td>"+epochToTime(data.expirationDate)+"</td>\
+    <td>"+epochToDateTime(data.creationDate)+"</td>\
+    <td>"+epochToDateTime(data.expirationDate)+"</td>\
     <td>"+iconValid+"</td>\
     </tr>";
 
@@ -400,7 +400,7 @@ function processEntityToWhiteListResponse(data) {
 /***********************************   Other functions   ************************************/
 /********************************************************************************************/
 
-function epochToTime(epoch) {
+function epochToDateTime(epoch) {
   var myDate = new Date( epoch *1000);
   return(myDate.toLocaleString());
 }
@@ -411,7 +411,7 @@ function epochDate(epoch) {
 }
 
 function epochTime(epoch) {
-  var myDate = new Date( 1524555566 *1000);
+  var myDate = new Date( epoch *1000);
   return myDate.toLocaleTimeString();
 }
 
