@@ -106,7 +106,7 @@ class CertificateProtocol extends proto.Protocol {
 							that.tokenManager.getCertByHash(rslt[i], {from: data.sender, gas:3000000}).then(function(certInfo) {
 								let response = that.responseHolder();
 								response.jsonrpc = "2.0";
-								response.id = "0.1";
+								response.id = jsonData.id;
 								response.result = {
 									certHash: certInfo[0],
 									issuer: certInfo[1], 
@@ -156,7 +156,7 @@ class CertificateProtocol extends proto.Protocol {
 							that.tokenManager.getAccessLogByHash(rslt[i], {from: data.sender, gas:3000000}).then(function(accessLogInfo) {
 								let response = that.responseHolder();
 								response.jsonrpc = "2.0";
-								response.id = "0.2";
+								response.id = jsonData.id;
 								response.result = {
 									accessLogHash: accessLogInfo[0],
 									creationDate: accessLogInfo[1],

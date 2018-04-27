@@ -85,7 +85,7 @@ function getCertificatesRecord() {
   }
   let msg = {
     jsonrpc: '2.0',
-    id: '0.0',
+    id: '0.1',
     method: 'getCertList',
     params: data
   };
@@ -102,7 +102,7 @@ function getCheckingHistory() {
   }
   let msg = {
     jsonrpc: '2.0',
-    id: '0.0',
+    id: '0.2',
     method: 'getAccessLogList',
     params: data
   };
