@@ -101,6 +101,9 @@ class SocketController {
             ws.on('close', function(ws) {
                 thisSocket.close(ws);
             });
+
+            ws.on('error', () => console.log('Error encountered!!'));
+
         });
 
         //implement heartbeat listener/timer
