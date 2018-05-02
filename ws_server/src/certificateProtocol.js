@@ -223,6 +223,9 @@ class CertificateProtocol extends proto.Protocol {
 						response.id = jsonData.id;
 						response.result = {
 							certHash: certInfo[0],
+							issuer: certInfo[1], 
+							certType: certInfo[2], 
+							certName: certInfo[3],
 							creationDate: certInfo[4],
 							sender: data.sender,
 							isStilValid: certInfo[6]

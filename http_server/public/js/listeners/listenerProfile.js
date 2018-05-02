@@ -367,25 +367,19 @@ Insert a new certificate checking into the record
 /********************************************************************************************/
 function processCheckCertResponse(data) {
   console.log("Cert checked");
-
-  //XSS vulnerable
+  
   let iconVerify = undefined;
-  let info = data.info;
-  if(data.isStilValid) {
-    iconVerify = "<button class='btn btn-success btn-round' type='button'>\
-                      <i class='now-ui-icons ui-1_check'></i> Exist!\
+  if(data.creationDate != "0"){
+    if(data.isStilValid) {
+      iconVerify = "<button class='btn btn-success btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_check'></i> Valid!\
                   </button>";
-  } else {
-    iconVerify = "<button class='btn btn-danger btn-round' type='button'>\
-                      <i class='now-ui-icons ui-1_simple-remove'></i> Does not exist!\
+    } else {
+      iconVerify = "<button class='btn btn-danger btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_simple-remove'></i> Not Valid!\
                   </button>";
-  }
-  iconVerify = iconVerify.replace("\
-  ", "");
-  let checking = $("#formCheck")[0];
-  checking.innerHTML = iconVerify;
+    }
 
-  if(data){
     //XSS vulnerable
     let rowdata = undefined;
     rowdata = "<tr>\
@@ -394,12 +388,26 @@ function processCheckCertResponse(data) {
     <td id='toolong'>"+data.certHash+"</td>\
     <td id='toolong'>"+data.sender+"</td>\
     </tr>";
-
-    rowdata = rowdata.replace("\
-    ", "");
-
+    rowdata = rowdata.replace("", "");
     let table = $("#logHistory")[0];
-    table.innerHTML = table.innerHTML + rowdata;
+    table.innerHTML = rowdata;
+
+    rowdata = "<h6 class='title'>Creation Date: " + epochToDateTime(data.creationDate) + "</h6>\
+    <h6 class='title'>Issuer: " + data.issuer + "</h6>\
+    <h6 class='title'>Type: " + data.certType + "</h6>\
+    <h6 class='title'>Title: " + data.certName + "</h6>\
+    <h6 class='title'>Valid: " + iconVerify + "</h6>";
+    rowdata = rowdata.replace("", "");
+    let info = $("#certInfo")[0];
+    info.innerHTML = rowdata;
+  
+  } else {
+    iconVerify = "<button class='btn btn-danger btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_simple-remove'></i> Does not exist!\
+                  </button>";
+    iconVerify = iconVerify.replace("", "");
+    let checking = $("#formCheck")[0];
+    checking.innerHTML = iconVerify;
   }
 }
 
