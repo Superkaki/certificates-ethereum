@@ -75,7 +75,7 @@ class CertificateProtocol extends proto.Protocol {
 		}).catch(function(err) {
 		  	console.log("FULL ERROR! " + err);       	  // Easily catch all errors along the whole execution.
 		});
-    }
+	}
 
     parse(wsClient, jsonData){
 		
@@ -92,9 +92,37 @@ class CertificateProtocol extends proto.Protocol {
 			}
 			this.sendResponse(response);
 			return;
-    	}
-
+		}
+		
     	switch(jsonData.method){
+			case "test": {
+				let that = this;
+				let data = jsonData.params;
+				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
+				console.log("###############  Runing test  ###############");
+				this.tokenManager.newCert(jackAddress, "Titulo marítimo", "Capitán", 300,
+				{from: deustoAddress, gas:3000000}).then(function(rslt) {
+					console.log("");
+					console.log("Creating new cert");
+					console.log(JSON.stringify(rslt));
+				});
+				this.tokenManager.newCert(deustoAddress, "Titulo nobiliario", "Barón Rojo", 300,
+				{from: jackAddress, gas:3000000}).then(function(rslt) {
+					console.log("");
+					console.log("Creating new cert");
+					console.log(JSON.stringify(rslt));
+				});
+				this.tokenManager.newCert(inakiAddress, "Convenio Prácticas", "Prácticas Tecnalia Junio17", 300,
+				{from: deustoAddress, gas:3000000}).then(function(rslt) {
+					console.log("");
+					console.log("Creating new cert");
+					console.log(JSON.stringify(rslt));
+				});
+
+				console.log("TEST OK");
+				break;
+			}
+
             case "getCertList":{
 				let that = this;
 				let data = jsonData.params;
@@ -103,6 +131,7 @@ class CertificateProtocol extends proto.Protocol {
 					printResult(rslt);
 					if(rslt != undefined){
 						for (var i = 0; i < rslt.length; i++) {
+							that.tokenManager.checkExpiration(rslt[i], {from: data.sender, gas:3000000});
 							that.tokenManager.getCertByHash(rslt[i], {from: data.sender, gas:3000000}).then(function(certInfo) {
 								let response = that.responseHolder();
 								response.jsonrpc = "2.0";
@@ -279,6 +308,32 @@ class CertificateProtocol extends proto.Protocol {
 				});				
     			break
 			}
+
+			case "removeCertificate":{
+				let that = this;
+				let data = jsonData.params;
+    			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
+				this.tokenManager.removeCertificate(data.certHash, {from: data.sender, gas:3000000}).then(function(rslt) {
+						printResult(rslt);
+						if(rslt != undefined){
+						let response = that.responseHolder();
+						response.jsonrpc = "2.0";
+						response.id = jsonData.id;
+		    			response.result = {
+							success: rslt						
+						}
+						console.log("Making entity to white list response")
+						that.sendResponse(response);
+					}
+					else{
+						console.log("Balance error: "+rslt)
+					}
+				}).catch((err) => {
+					console.log("Something happens adding new entity to white list: " + err);
+				});				
+    			break
+			}
+
     		default:{
     			wsClient.send("Hello world");
     		}

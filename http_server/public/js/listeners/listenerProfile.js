@@ -76,6 +76,23 @@ function getStatus() {
 }
 
 /********************************************************************************************
+Listener for testing button
+/********************************************************************************************/
+document.getElementById('btnTest').addEventListener('click', function(evt){
+  evt.preventDefault();
+  console.log("Testing network");
+  
+  let msg = {
+    jsonrpc: '2.0',
+    id: '0',
+    method: 'test',
+    params: {}
+  };
+  console.log("Making test request request")
+  doSend(msg); 
+})
+
+/********************************************************************************************
 Get the record of certificates owned by a user
 /********************************************************************************************/
 function getCertificatesRecord() {
@@ -207,6 +224,34 @@ function addEntityToWhiteList(data){
   doSend(msg);  
 }
 
+///********************************************************************************************
+//Listener for new entity to white list button
+///********************************************************************************************/
+//document.getElementById('btnRemove').addEventListener('click', function(evt){
+//  evt.preventDefault();
+//  console.log("Remove certificate request detected!")
+//  let certHash = $("#toolong")[0].value;
+//  //read form data
+//  let data = {
+//    "certHash": certHash
+//  }
+//  removeCertificate(data);
+//})
+//
+///********************************************************************************************
+//Parse new entity to white list to json and send it
+///********************************************************************************************/
+//function removeCertificate(data){
+//  let msg = {
+//    jsonrpc: '2.0',
+//    id: '4',
+//    method: 'removeCertificate',
+//    params: data,
+//  };
+//  console.log("Making remove certificate request" )
+//  doSend(msg);  
+//}
+
 
 /********************************************************************************************/
 /*****************************   Response message procesation   *****************************/
@@ -234,6 +279,9 @@ function processMessageProtocol(json){
       case "3":
         processEntityToWhiteListResponse(json.result);
         break;
+      case "4":
+        processRemoveCertificateResponse(json.result);
+        break;
       default:
         console.log(json.params);
     }
@@ -256,10 +304,12 @@ function processCertificatesRecord(data) {
       iconValid = "<button class='btn btn-success btn-icon btn-round'>\
                       <i class='now-ui-icons ui-1_check'></i>\
                   </button>";
+      iconRemove = "<button id='btnRemove' class='btn btn-warning btn-round'>Remove</button>";
     } else {
       iconValid = "<button class='btn btn-danger btn-icon btn-round'>\
                       <i class='now-ui-icons ui-1_simple-remove'></i>\
                   </button>";
+      iconRemove = "";
     }
     rowdata = "<tr>\
     <td id='toolong'>"+data.certHash+"</td>\
@@ -268,7 +318,8 @@ function processCertificatesRecord(data) {
     <td>"+data.certName+"</td>\
     <td>"+epochToDateTime(data.creationDate)+"</td>\
     <td>"+epochToDateTime(data.expirationDate)+"</td>\
-    <td>"+iconValid+"</td>\
+    <td id='iconValid'>"+iconValid+"</td>\
+    <!--td id='iconRemove'>"+iconRemove+"</td-->\
     </tr>";
 
     rowdata = rowdata.replace("\
@@ -412,6 +463,27 @@ function processEntityToWhiteListResponse(data) {
   let creating = $("#formAdd")[0];
   creating.innerHTML = iconAdded;
 
+}
+
+/********************************************************************************************
+Show success icon
+/********************************************************************************************/
+function processRemoveCertificateResponse(data) {
+  console.log("Certificate removed");
+
+  iconVerify = "<button class='btn btn-danger btn-round' type='button'>\
+                  <i class='now-ui-icons ui-1_simple-remove'></i>\
+              </button>";
+  iconVerify = iconVerify.replace("\
+  ", "");
+  let creating = $("#iconValid")[0];
+  creating.innerHTML = iconVerify;
+
+  iconRemove = "<button id='btnRemove' class='btn btn-danger btn-round'>Removed!</button>";
+  iconRemove = iconRemove.replace("\
+  ", "");
+  let creating = $("#iconRemove")[0];
+  creating.innerHTML = iconRemove;
 }
 
 
