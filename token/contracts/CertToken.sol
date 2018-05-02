@@ -44,7 +44,7 @@ contract CertToken {
     /********************************************************************************************/
     // event certList(bytes32[] certUnique);
     event newCertCreated(bytes32 certUnique,  address sender, string certType, string certName, uint creationDate, uint expirationDate);
-    event checkOk(bytes32 certUnique, address sender, uint creationDate, bool success);
+    // event checkOk(bytes32 certUnique, address sender, uint creationDate, bool success);
 
 
 
@@ -188,16 +188,11 @@ contract CertToken {
 
     certUnique        Address of the certificate is gonna check
     /********************************************************************************************/
-    function checkCert(bytes32 certUnique) public returns (bool success) {
-        
-        checkExpiration(certUnique);            // Check if certificate has expired
-                                            // Check if certificate exist
-        if (certs[certUnique].issuer != 0 && isSenderAllowed(certUnique) && certs[certUnique].isStilValid) { 
-            insertHistory(certUnique);          // Regist the appication
-            checkOk(certUnique, msg.sender, now, true);
+    function checkCert(bytes32 certUnique) public view returns (bool success) {
+        // Check if certificate exist
+        if (isSenderAllowed(certUnique) && certs[certUnique].isStilValid) {
             return true;
         }
-        checkOk(certUnique, msg.sender, now, false);
         return false;
     }
 
@@ -207,7 +202,6 @@ contract CertToken {
     certUnique        Address of the certificate is gonna be checked
     /********************************************************************************************/
     function isSenderAllowed(bytes32 certUnique) public view returns (bool isAllowed) {
-        
         for (uint256 i = 0; i < certs[certUnique].whiteList.length; i++) {
             if (certs[certUnique].whiteList[i] == msg.sender) {
                 return(true);

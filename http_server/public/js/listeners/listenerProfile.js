@@ -371,7 +371,7 @@ function processCheckCertResponse(data) {
   //XSS vulnerable
   let iconVerify = undefined;
   let info = data.info;
-  if(data.verification) {
+  if(data.isStilValid) {
     iconVerify = "<button class='btn btn-success btn-round' type='button'>\
                       <i class='now-ui-icons ui-1_check'></i> Exist!\
                   </button>";

@@ -214,28 +214,21 @@ class CertificateProtocol extends proto.Protocol {
 				let that = this;
 				let data = jsonData.params;
 				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
+				this.tokenManager.checkExpiration(data.certHash, {from: data.sender, gas:3000000});
 				this.tokenManager.checkCert(data.certHash, {from: data.sender, gas:3000000}).then(function(rslt) {		// TODO: change "from"
-					printResult(rslt);
-					if(rslt != undefined){
+					that.tokenManager.insertHistory(data.certHash, {from: data.sender, gas:3000000});
+					that.tokenManager.getCertByHash(data.certHash, {from: data.sender, gas:3000000}).then(function(certInfo) {
 						let response = that.responseHolder();
-						let checkOkEvent = that.tokenManager.checkOk({}, {fromBlock: 'latest', toBlock: 'latest'})
-						checkOkEvent.get((error, logs) => {
-							logs.forEach(log => {
-								response.jsonrpc = "2.0";
-								response.id = jsonData.id;
-								response.result = {
-									verification: log.args.success,
-									sender: log.args.sender,
-									creationDate: log.args.creationDate,
-									certHash: log.args.certUnique
-								}
-								that.sendResponse(response);
-							})
-						})
-					}
-					else{
-						console.log("Balance error: "+rslt)
-					}
+						response.jsonrpc = "2.0";
+						response.id = jsonData.id;
+						response.result = {
+							certHash: certInfo[0],
+							creationDate: certInfo[4],
+							sender: data.sender,
+							isStilValid: certInfo[6]
+						}
+						that.sendResponse(response);
+					});
 				}).catch((err) => {
 					console.log("Something happens checking certificate: " + err);
 					//TODO: that.sendResponse(error)
