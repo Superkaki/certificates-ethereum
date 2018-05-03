@@ -225,7 +225,7 @@ function addEntityToWhiteList(data){
 }
 
 ///********************************************************************************************
-//Listener for new entity to white list button
+//Listener for remove certificate button
 ///********************************************************************************************/
 //document.getElementById('btnRemove').addEventListener('click', function(evt){
 //  evt.preventDefault();
@@ -239,7 +239,7 @@ function addEntityToWhiteList(data){
 //})
 //
 ///********************************************************************************************
-//Parse new entity to white list to json and send it
+//Parse remove certificate to json and send it
 ///********************************************************************************************/
 //function removeCertificate(data){
 //  let msg = {

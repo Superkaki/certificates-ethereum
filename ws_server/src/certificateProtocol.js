@@ -83,9 +83,7 @@ class CertificateProtocol extends proto.Protocol {
 
     	if(!this.isValidMessage(jsonData)){
 			let data = jsonData.params;
-			let response = this.responseHolder();
-			response.jsonrpc = "2.0";
-			response.id = data.id;
+			let response = this.responseHolder(data.id);
 		    response.error = {
 				code: "32600",
 				message: "Invalid message"
@@ -133,9 +131,7 @@ class CertificateProtocol extends proto.Protocol {
 						for (var i = 0; i < rslt.length; i++) {
 							that.tokenManager.checkExpiration(rslt[i], {from: data.sender, gas:3000000});
 							that.tokenManager.getCertByHash(rslt[i], {from: data.sender, gas:3000000}).then(function(certInfo) {
-								let response = that.responseHolder();
-								response.jsonrpc = "2.0";
-								response.id = jsonData.id;
+								let response = that.responseHolder(jsonData.id);
 								response.result = {
 									certHash: certInfo[0],
 									issuer: certInfo[1], 
@@ -155,8 +151,6 @@ class CertificateProtocol extends proto.Protocol {
 						//let certList = that.tokenManager.certList({}, {fromBlock: 'latest', toBlock: 'latest'})
 						//certList.get((error, logs) => {
 						//	logs.forEach(log => {
-						//		response.jsonrpc = "2.0";
-						//		response.id = jsonData.id;
 						//		response.result = {
 						//			certificateList: log.args.ownCerts
 						//		}
@@ -183,9 +177,7 @@ class CertificateProtocol extends proto.Protocol {
 					if(rslt != undefined){
 						for (var i = 0; i < rslt.length; i++) {
 							that.tokenManager.getAccessLogByHash(rslt[i], {from: data.sender, gas:3000000}).then(function(accessLogInfo) {
-								let response = that.responseHolder();
-								response.jsonrpc = "2.0";
-								response.id = jsonData.id;
+								let response = that.responseHolder(jsonData.id);
 								response.result = {
 									accessLogHash: accessLogInfo[0],
 									creationDate: accessLogInfo[1],
@@ -219,9 +211,7 @@ class CertificateProtocol extends proto.Protocol {
 					if (rslt) {
 						that.tokenManager.insertHistory(data.certHash, {from: data.sender, gas:3000000});
 						that.tokenManager.getCertByHash(data.certHash, {from: data.sender, gas:3000000}).then(function(certInfo) {
-							let response = that.responseHolder();
-							response.jsonrpc = "2.0";
-							response.id = jsonData.id;
+							let response = that.responseHolder(jsonData.id)
 							response.result = {
 								certHash: certInfo[0],
 								issuer: certInfo[1], 
@@ -234,9 +224,7 @@ class CertificateProtocol extends proto.Protocol {
 							that.sendResponse(response);
 						});
 					} else {
-						let response = that.errorResponse();
-						response.jsonrpc = "2.0";
-						response.id = jsonData.id;
+						let response = that.errorResponse(jsonData.id);
 						response.error = {
 							code: "403",
 							message: "Permission denied or does not exist"
@@ -257,12 +245,10 @@ class CertificateProtocol extends proto.Protocol {
 				this.tokenManager.newCert(data.owner, data.certType, data.certName, data.duration, {from: data.sender, gas:3000000}).then(function(rslt) {
 					printResult(rslt);
 					if(rslt != undefined){
-						let response = that.responseHolder();
+						let response = that.responseHolder(jsonData.id);
 						let newCertEvent = that.tokenManager.newCertCreated({}, {fromBlock: 'latest', toBlock: 'latest'})
 						newCertEvent.get((error, logs) => {
 							logs.forEach(log => {
-								response.jsonrpc = "2.0";
-								response.id = jsonData.id;
 								response.result = {
 									certHash: log.args.certUnique,
 									sender: log.args.sender,
@@ -298,9 +284,7 @@ class CertificateProtocol extends proto.Protocol {
 				this.tokenManager.setEntityToWhiteList(data.whiteList, data.allowed, {from: data.sender, gas:3000000}).then(function(rslt) {
 						printResult(rslt);
 						if(rslt != undefined){
-						let response = that.responseHolder();
-						response.jsonrpc = "2.0";
-						response.id = jsonData.id;
+						let response = that.responseHolder(jsonData.id);
 		    			response.result = {
 							success: rslt						
 						}
@@ -323,9 +307,7 @@ class CertificateProtocol extends proto.Protocol {
 				this.tokenManager.removeCertificate(data.certHash, {from: data.sender, gas:3000000}).then(function(rslt) {
 						printResult(rslt);
 						if(rslt != undefined){
-						let response = that.responseHolder();
-						response.jsonrpc = "2.0";
-						response.id = jsonData.id;
+						let response = that.responseHolder(jsonData.id);
 		    			response.result = {
 							success: rslt						
 						}

@@ -56,19 +56,19 @@ class Protocol {
     	}
     }
 
-    responseHolder(){
+    responseHolder(id){
     	let msg = {
-	        jsonrpc: undefined,
-			id: undefined,
+	        jsonrpc: "2.0",
+			id: id,
 			result: undefined
 	    };
 	    return msg;
 	}
 	
-	errorResponse(){
+	errorResponse(id){
 		let msg = {
-	        jsonrpc: undefined,
-			id: undefined,
+	        jsonrpc: "2.0",
+			id: id,
 			error: undefined
 	    };
 	    return msg;
