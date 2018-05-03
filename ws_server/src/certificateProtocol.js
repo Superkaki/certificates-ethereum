@@ -218,7 +218,7 @@ class CertificateProtocol extends proto.Protocol {
 								certType: certInfo[2], 
 								certName: certInfo[3],
 								creationDate: certInfo[4],
-								sender: data.sender,
+								user: data.sender,
 								isStilValid: certInfo[6]
 							}
 							that.sendResponse(response);
@@ -251,22 +251,16 @@ class CertificateProtocol extends proto.Protocol {
 							logs.forEach(log => {
 								response.result = {
 									certHash: log.args.certUnique,
-									sender: log.args.sender,
+									issuer: log.args.sender,
 									certType: log.args.certType,
 									certName: log.args.certName,
 									creationDate: log.args.creationDate,
-									expirationDate: log.args.expirationDate						
+									expirationDate: log.args.expirationDate,
+									isStilValid: true
 								}
 								that.sendResponse(response);
 							})
 						})
-						
-//						let newCertEvent = that.tokenManager.newCertCreated({}, {fromBlock: 0, toBlock: 'latest'})
-//						// print all logs from event newCertCreated
-//						newCertEvent.get((error, logs) => {
-//							logs.forEach(log => console.log(JSON.stringify(log.args)));
-//						})				
-
 					}
 					else{
 						console.log("Balance error: "+rslt)

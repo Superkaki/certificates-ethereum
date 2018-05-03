@@ -298,35 +298,7 @@ Show all the certificates from a user
 /********************************************************************************************/
 function processCertificatesRecord(data) {
   if(data){
-    //XSS vulnerable
-    let rowdata = undefined;
-    if(data.isStilValid) {
-      iconValid = "<button class='btn btn-success btn-icon btn-round'>\
-                      <i class='now-ui-icons ui-1_check'></i>\
-                  </button>";
-      iconRemove = "<button id='btnRemove' class='btn btn-warning btn-round'>Remove</button>";
-    } else {
-      iconValid = "<button class='btn btn-danger btn-icon btn-round'>\
-                      <i class='now-ui-icons ui-1_simple-remove'></i>\
-                  </button>";
-      iconRemove = "";
-    }
-    rowdata = "<tr>\
-    <td id='toolong'>"+data.certHash+"</td>\
-    <td id='toolong'>"+data.issuer+"</td>\
-    <td>"+data.certType+"</td>\
-    <td>"+data.certName+"</td>\
-    <td>"+epochToDateTime(data.creationDate)+"</td>\
-    <td>"+epochToDateTime(data.expirationDate)+"</td>\
-    <td id='iconValid'>"+iconValid+"</td>\
-    <!--td id='iconRemove'>"+iconRemove+"</td-->\
-    </tr>";
-
-    rowdata = rowdata.replace("\
-    ", "");
-
-    let table = $("#logCert")[0];
-    table.innerHTML = table.innerHTML + rowdata;
+    addNewCertRow(data);
   }
 }
 
@@ -335,29 +307,7 @@ Show all the checkings from a user's certificates
 /********************************************************************************************/
 function processAccessLogRecord(data) {
   if(data){
-    //XSS vulnerable
-    let rowdata = undefined;
-    if(data.hadSuccess) {
-      iconHadSuccess = "<button class='btn btn-success btn-icon btn-round'>\
-                            <i class='now-ui-icons ui-1_check'></i>\
-                        </button>";
-    } else {
-      iconHadSuccess = "<button class='btn btn-danger btn-icon btn-round'>\
-                            <i class='now-ui-icons ui-1_simple-remove'></i>\
-                        </button>";
-    }
-    rowdata = "<tr>\
-    <td>"+epochDate(data.creationDate)+"</td>\
-    <td>"+epochTime(data.creationDate)+"</td>\
-    <td id='toolong'>"+data.certHash+"</td>\
-    <td id='toolong'>"+data.user+"</td>\
-    </tr>";
-
-    rowdata = rowdata.replace("\
-    ", "");
-
-    let table = $("#logHistory")[0];
-    table.innerHTML = table.innerHTML + rowdata;
+    addAccessLogRow(data);
   }
 }
 
@@ -370,6 +320,8 @@ function processCheckCertResponse(json) {
   
   if(json.result){
     let data = json.result;
+    addAccessLogRow(data);
+
     let iconVerify = undefined;
     if(data.isStilValid) {
       iconVerify = "<button class='btn btn-success btn-round' type='button'>\
@@ -380,18 +332,6 @@ function processCheckCertResponse(json) {
                       <i class='now-ui-icons ui-1_simple-remove'></i> Expired certificate\
                   </button>";
     }
-
-    //XSS vulnerable
-    let rowdata = undefined;
-    rowdata = "<tr>\
-    <td>"+epochDate(data.creationDate)+"</td>\
-    <td>"+epochTime(data.creationDate)+"</td>\
-    <td id='toolong'>"+data.certHash+"</td>\
-    <td id='toolong'>"+data.sender+"</td>\
-    </tr>";
-    rowdata = rowdata.replace("", "");
-    let table = $("#logHistory")[0];
-    table.innerHTML = rowdata;
 
     rowdata = "<h6 class='title'>Creation Date: " + epochToDateTime(data.creationDate) + "</h6>\
     <h6 class='title'>Issuer: " + data.issuer + "</h6>\
@@ -429,33 +369,12 @@ function processNewCertResponse(data) {
                       <i class='now-ui-icons ui-1_simple-remove'></i> Error creating certificate!\
                   </button>";
   }
-  iconSended = iconSended.replace("\
-  ", "");
+  iconSended = iconSended.replace("", "");
   let creating = $("#formSend")[0];
   creating.innerHTML = iconSended;
 
   if(data){
-    //XSS vulnerable
-    let rowdata = undefined;
-    iconValid = "<button class='btn btn-success btn-icon btn-round'>\
-                    <i class='now-ui-icons ui-1_check'></i>\
-                </button>";
-
-    rowdata = "<tr>\
-    <td id='toolong'>"+data.certHash+"</td>\
-    <td id='toolong'>"+data.sender+"</td>\
-    <td>"+data.certType+"</td>\
-    <td>"+data.certName+"</td>\
-    <td>"+epochToDateTime(data.creationDate)+"</td>\
-    <td>"+epochToDateTime(data.expirationDate)+"</td>\
-    <td>"+iconValid+"</td>\
-    </tr>";
-
-    rowdata = rowdata.replace("\
-    ", "");
-
-    let table = $("#logCert")[0];
-    table.innerHTML = table.innerHTML + rowdata;
+    addNewCertRow(data);
   }
 }
 
@@ -468,8 +387,7 @@ function processEntityToWhiteListResponse(data) {
   iconAdded = "<button class='btn btn-success btn-round' type='button'>\
                     <i class='now-ui-icons ui-1_check'></i> Added!\
                 </button>";
-  iconAdded = iconAdded.replace("\
-  ", "");
+  iconAdded = iconAdded.replace("", "");
   let creating = $("#formAdd")[0];
   creating.innerHTML = iconAdded;
 
@@ -490,8 +408,7 @@ function processRemoveCertificateResponse(data) {
   creating.innerHTML = iconVerify;
 
   iconRemove = "<button id='btnRemove' class='btn btn-danger btn-round'>Removed!</button>";
-  iconRemove = iconRemove.replace("\
-  ", "");
+  iconRemove = iconRemove.replace("", "");
   let creating = $("#iconRemove")[0];
   creating.innerHTML = iconRemove;
 }
@@ -514,6 +431,50 @@ function epochDate(epoch) {
 function epochTime(epoch) {
   var myDate = new Date( epoch *1000);
   return myDate.toLocaleTimeString();
+}
+
+function addNewCertRow(data) {
+  //XSS vulnerable
+  let rowdata = undefined;
+  if(data.isStilValid) {
+    iconValid = "<button class='btn btn-success btn-icon btn-round'>\
+                    <i class='now-ui-icons ui-1_check'></i>\
+                </button>";
+    iconRemove = "<button id='btnRemove' class='btn btn-warning btn-round'>Remove</button>";
+  } else {
+    iconValid = "<button class='btn btn-danger btn-icon btn-round'>\
+                    <i class='now-ui-icons ui-1_simple-remove'></i>\
+                </button>";
+    iconRemove = "";
+  }
+
+  rowdata = "<tr>\
+  <td id='toolong'>"+data.certHash+"</td>\
+  <td id='toolong'>"+data.issuer+"</td>\
+  <td>"+data.certType+"</td>\
+  <td>"+data.certName+"</td>\
+  <td>"+epochToDateTime(data.creationDate)+"</td>\
+  <td>"+epochToDateTime(data.expirationDate)+"</td>\
+  <td>"+iconValid+"</td>\
+  </tr>";
+
+  rowdata = rowdata.replace("", "");
+  let table = $("#logCert")[0];
+  table.innerHTML = rowdata + table.innerHTML;
+}
+
+function addAccessLogRow(data) {
+  //XSS vulnerable
+  let rowdata = undefined;
+  rowdata = "<tr>\
+  <td>"+epochDate(data.creationDate)+"</td>\
+  <td>"+epochTime(data.creationDate)+"</td>\
+  <td id='toolong'>"+data.certHash+"</td>\
+  <td id='toolong'>"+data.user+"</td>\
+  </tr>";
+  rowdata = rowdata.replace("", "");
+  let table = $("#logHistory")[0];
+  table.innerHTML = rowdata + table.innerHTML;
 }
 
 /*
