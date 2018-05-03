@@ -215,7 +215,7 @@ class CertificateProtocol extends proto.Protocol {
 				let data = jsonData.params;
 				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
 				this.tokenManager.checkExpiration(data.certHash, {from: data.sender, gas:3000000});
-				this.tokenManager.checkCert(data.certHash, {from: data.sender, gas:3000000}).then(function(rslt) {
+				this.tokenManager.isSenderAllowed(data.certHash, {from: data.sender, gas:3000000}).then(function(rslt) {
 					if (rslt) {
 						that.tokenManager.insertHistory(data.certHash, {from: data.sender, gas:3000000});
 						that.tokenManager.getCertByHash(data.certHash, {from: data.sender, gas:3000000}).then(function(certInfo) {
@@ -234,7 +234,14 @@ class CertificateProtocol extends proto.Protocol {
 							that.sendResponse(response);
 						});
 					} else {
-						console.log("Not allowed");
+						let response = that.errorResponse();
+						response.jsonrpc = "2.0";
+						response.id = jsonData.id;
+						response.error = {
+							code: "403",
+							message: "Permission denied or does not exist"
+						}
+						that.sendResponse(response);
 					}
 				}).catch((err) => {
 					console.log("Something happens checking certificate: " + err);

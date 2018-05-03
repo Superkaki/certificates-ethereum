@@ -61,9 +61,18 @@ class Protocol {
 	        jsonrpc: undefined,
 			id: undefined,
 			result: undefined
-	      };
+	    };
 	    return msg;
-    }
+	}
+	
+	errorResponse(){
+		let msg = {
+	        jsonrpc: undefined,
+			id: undefined,
+			error: undefined
+	    };
+	    return msg;
+	}
 
     sendResponse(response){
     	if(this._client && response){

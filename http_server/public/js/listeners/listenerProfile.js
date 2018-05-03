@@ -23,7 +23,7 @@ function onClose(evt) {
 function onMessage(evt) {
   if(evt && evt.data){
     let jsonData = JSON.parse(evt.data);
-    if(jsonData && jsonData.result){
+    if(jsonData){
       processMessageProtocol(jsonData);
     }
     else{
@@ -271,7 +271,7 @@ function processMessageProtocol(json){
         processAccessLogRecord(json.result);
         break; 
       case "1":
-        processCheckCertResponse(json.result);
+        processCheckCertResponse(json);
         break;
       case "2":
         processNewCertResponse(json.result);
@@ -365,11 +365,12 @@ function processAccessLogRecord(data) {
 Show success icon
 Insert a new certificate checking into the record
 /********************************************************************************************/
-function processCheckCertResponse(data) {
+function processCheckCertResponse(json) {
   console.log("Cert checked");
   
-  let iconVerify = undefined;
-  if(data.creationDate != "0"){
+  if(json.result){
+    let data = json.result;
+    let iconVerify = undefined;
     if(data.isStilValid) {
       iconVerify = "<button class='btn btn-success btn-round' type='button'>\
                       <i class='now-ui-icons ui-1_check'></i> Valid certificate\
@@ -402,8 +403,9 @@ function processCheckCertResponse(data) {
     info.innerHTML = rowdata;
   
   } else {
+    let data = json.error;
     iconVerify = "<button class='btn btn-danger btn-round' type='button'>\
-                      <i class='now-ui-icons ui-1_simple-remove'></i> Certificate does not exist!\
+                      <i class='now-ui-icons ui-1_simple-remove'></i>"+data.message+"\
                   </button>";
     iconVerify = iconVerify.replace("", "");
     let checking = $("#certInfo")[0];

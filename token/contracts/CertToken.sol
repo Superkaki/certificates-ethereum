@@ -190,7 +190,7 @@ contract CertToken {
     /********************************************************************************************/
     function checkCert(bytes32 certUnique) public view returns (bool success) {
         // Check if certificate exist
-        if (isSenderAllowed(certUnique) && certs[certUnique].isStilValid) {
+        if (isSenderAllowed(certUnique)) {
             return true;
         }
         return false;
