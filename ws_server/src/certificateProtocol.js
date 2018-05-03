@@ -215,23 +215,27 @@ class CertificateProtocol extends proto.Protocol {
 				let data = jsonData.params;
 				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
 				this.tokenManager.checkExpiration(data.certHash, {from: data.sender, gas:3000000});
-				this.tokenManager.checkCert(data.certHash, {from: data.sender, gas:3000000}).then(function(rslt) {		// TODO: change "from"
-					that.tokenManager.insertHistory(data.certHash, {from: data.sender, gas:3000000});
-					that.tokenManager.getCertByHash(data.certHash, {from: data.sender, gas:3000000}).then(function(certInfo) {
-						let response = that.responseHolder();
-						response.jsonrpc = "2.0";
-						response.id = jsonData.id;
-						response.result = {
-							certHash: certInfo[0],
-							issuer: certInfo[1], 
-							certType: certInfo[2], 
-							certName: certInfo[3],
-							creationDate: certInfo[4],
-							sender: data.sender,
-							isStilValid: certInfo[6]
-						}
-						that.sendResponse(response);
-					});
+				this.tokenManager.checkCert(data.certHash, {from: data.sender, gas:3000000}).then(function(rslt) {
+					if (rslt) {
+						that.tokenManager.insertHistory(data.certHash, {from: data.sender, gas:3000000});
+						that.tokenManager.getCertByHash(data.certHash, {from: data.sender, gas:3000000}).then(function(certInfo) {
+							let response = that.responseHolder();
+							response.jsonrpc = "2.0";
+							response.id = jsonData.id;
+							response.result = {
+								certHash: certInfo[0],
+								issuer: certInfo[1], 
+								certType: certInfo[2], 
+								certName: certInfo[3],
+								creationDate: certInfo[4],
+								sender: data.sender,
+								isStilValid: certInfo[6]
+							}
+							that.sendResponse(response);
+						});
+					} else {
+						console.log("Not allowed");
+					}
 				}).catch((err) => {
 					console.log("Something happens checking certificate: " + err);
 					//TODO: that.sendResponse(error)

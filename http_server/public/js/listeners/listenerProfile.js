@@ -372,11 +372,11 @@ function processCheckCertResponse(data) {
   if(data.creationDate != "0"){
     if(data.isStilValid) {
       iconVerify = "<button class='btn btn-success btn-round' type='button'>\
-                      <i class='now-ui-icons ui-1_check'></i> Valid!\
+                      <i class='now-ui-icons ui-1_check'></i> Valid certificate\
                   </button>";
     } else {
       iconVerify = "<button class='btn btn-danger btn-round' type='button'>\
-                      <i class='now-ui-icons ui-1_simple-remove'></i> Not Valid!\
+                      <i class='now-ui-icons ui-1_simple-remove'></i> Expired certificate\
                   </button>";
     }
 
@@ -396,17 +396,17 @@ function processCheckCertResponse(data) {
     <h6 class='title'>Issuer: " + data.issuer + "</h6>\
     <h6 class='title'>Type: " + data.certType + "</h6>\
     <h6 class='title'>Title: " + data.certName + "</h6>\
-    <h6 class='title'>Valid: " + iconVerify + "</h6>";
+    <h6 class='title'>" + iconVerify + "</h6>";
     rowdata = rowdata.replace("", "");
     let info = $("#certInfo")[0];
     info.innerHTML = rowdata;
   
   } else {
     iconVerify = "<button class='btn btn-danger btn-round' type='button'>\
-                      <i class='now-ui-icons ui-1_simple-remove'></i> Does not exist!\
+                      <i class='now-ui-icons ui-1_simple-remove'></i> Certificate does not exist!\
                   </button>";
     iconVerify = iconVerify.replace("", "");
-    let checking = $("#formCheck")[0];
+    let checking = $("#certInfo")[0];
     checking.innerHTML = iconVerify;
   }
 }
