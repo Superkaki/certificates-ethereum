@@ -182,9 +182,10 @@ contract CertToken {
     }
 
     /********************************************************************************************
-    Check whether a certificate exist
+    Add new owner to a certificate
 
-    certUnique        Address of the certificate is gonna check
+    certUnique          Hash of the certificate is gonna check
+    newOwner            Address of the new owner to be added
     /********************************************************************************************/
     function addOwner(bytes32 certUnique, address newOwner) public returns (bool success) {
         certs[certUnique].ownerList.push(newOwner);         // Adding owner to the certificate
@@ -196,7 +197,7 @@ contract CertToken {
     /********************************************************************************************
     Check whether a certificate exist
 
-    certUnique        Address of the certificate is gonna check
+    certUnique          Address of the certificate is gonna check
     /********************************************************************************************/
     function checkCert(bytes32 certUnique) public view returns (bool success) {
         // Check if certificate exist

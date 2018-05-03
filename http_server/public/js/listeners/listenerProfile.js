@@ -433,6 +433,9 @@ function epochTime(epoch) {
   return myDate.toLocaleTimeString();
 }
 
+/********************************************************************************************
+Add new certificate to the certificates record
+/********************************************************************************************/
 function addNewCertRow(data) {
   //XSS vulnerable
   let rowdata = undefined;
@@ -463,6 +466,9 @@ function addNewCertRow(data) {
   table.innerHTML = rowdata + table.innerHTML;
 }
 
+/********************************************************************************************
+Add new access log to the history record
+/********************************************************************************************/
 function addAccessLogRow(data) {
   //XSS vulnerable
   let rowdata = undefined;
