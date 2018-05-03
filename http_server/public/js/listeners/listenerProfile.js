@@ -132,11 +132,11 @@ Listener for check certificate button
 document.getElementById('btnCheck').addEventListener('click', function(evt){
   evt.preventDefault();
   console.log("Certificate checking request detected!");
-  let certHash = $("#certHash")[0].value;
+  let checkCertHash = $("#checkCertHash")[0].value;
   let sender = $("#sender");
   //read form data
   let data = {
-    "certHash": certHash,
+    "certHash": checkCertHash,
     "sender": sender.text()
   }
   checkCert(data);
@@ -193,18 +193,50 @@ function newCert(data){
 }
 
 /********************************************************************************************
-Listener for new entity to white list button
+Listener for new owner button
 /********************************************************************************************/
-document.getElementById('btnAdd').addEventListener('click', function(evt){
+document.getElementById('btnAddOwner').addEventListener('click', function(evt){
   evt.preventDefault();
-  console.log("Add entity to white list request detected!")
-  let whiteList = $("#whiteList")[0].value;
-  let allowed = $("#allowed")[0].value;
+  console.log("Add new owner request detected!")
+  let manageCertHash = $("#manageCertHash")[0].value;
+  let address = $("#address")[0].value;
   let sender = $("#sender");
   //read form data
   let data = {
-    "whiteList": whiteList,
-    "allowed": allowed,
+    "certHash": manageCertHash,
+    "newOwner": address,
+    "sender": sender.text()
+  }
+  addNewOwner(data);
+})
+
+/********************************************************************************************
+Parse new owner to json and send it
+/********************************************************************************************/
+function addNewOwner(data){
+  let msg = {
+    jsonrpc: '2.0',
+    id: '3',
+    method: 'setNewOwner',
+    params: data,
+  };
+  console.log("Making new owner request" )
+  doSend(msg);  
+}
+
+/********************************************************************************************
+Listener for new entity to white list button
+/********************************************************************************************/
+document.getElementById('btnAllow').addEventListener('click', function(evt){
+  evt.preventDefault();
+  console.log("Add entity to white list request detected!")
+  let manageCertHash = $("#manageCertHash")[0].value;
+  let address = $("#address")[0].value;
+  let sender = $("#sender");
+  //read form data
+  let data = {
+    "certHash": manageCertHash,
+    "address": address,
     "sender": sender.text()
   }
   addEntityToWhiteList(data);
@@ -216,7 +248,7 @@ Parse new entity to white list to json and send it
 function addEntityToWhiteList(data){
   let msg = {
     jsonrpc: '2.0',
-    id: '3',
+    id: '4',
     method: 'setEntityToWhiteList',
     params: data,
   };
@@ -244,7 +276,7 @@ function addEntityToWhiteList(data){
 //function removeCertificate(data){
 //  let msg = {
 //    jsonrpc: '2.0',
-//    id: '4',
+//    id: '5',
 //    method: 'removeCertificate',
 //    params: data,
 //  };
@@ -277,9 +309,12 @@ function processMessageProtocol(json){
         processNewCertResponse(json.result);
         break;
       case "3":
-        processEntityToWhiteListResponse(json.result);
+        processNewOwnerResponse(json);
         break;
       case "4":
+        processEntityToWhiteListResponse(json);
+        break;
+      case "5":
         processRemoveCertificateResponse(json.result);
         break;
       default:
@@ -381,16 +416,44 @@ function processNewCertResponse(data) {
 /********************************************************************************************
 Show success icon
 /********************************************************************************************/
-function processEntityToWhiteListResponse(data) {
-  console.log("New entity allowed");
-
-  iconAdded = "<button class='btn btn-success btn-round' type='button'>\
-                    <i class='now-ui-icons ui-1_check'></i> Added!\
+function processNewOwnerResponse(json) {
+  if(json.result) {;
+    console.log("New owner added");
+    iconAdded = "<button class='btn btn-success btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_check'></i> Added!\
                 </button>";
+  } else {
+    let data = json.error;
+    console.log("Error: " + data.message);
+    iconAdded = "<button class='btn btn-danger btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_simple-remove'></i>"+data.message+"\
+                </button>";
+  }
   iconAdded = iconAdded.replace("", "");
   let creating = $("#formAdd")[0];
   creating.innerHTML = iconAdded;
+}
 
+/********************************************************************************************
+Show success icon
+/********************************************************************************************/
+function processEntityToWhiteListResponse(json) {
+  if(json.result) {
+    console.log("New entity allowed");
+
+    iconAdded = "<button class='btn btn-success btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_check'></i> Allowed!\
+                </button>";
+  } else {
+    let data = json.error;
+    console.log("Error: " + data.message);
+    iconAdded = "<button class='btn btn-danger btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_simple-remove'></i>"+data.message+"\
+                </button>";
+  }
+  iconAdded = iconAdded.replace("", "");
+  let creating = $("#formAdd")[0];
+  creating.innerHTML = iconAdded;
 }
 
 /********************************************************************************************

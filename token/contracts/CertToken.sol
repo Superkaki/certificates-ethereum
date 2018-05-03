@@ -101,9 +101,6 @@ contract CertToken {
     Get a certificate by knowing its hash
     /********************************************************************************************/
     function getCertByHash(bytes32 certUnique) public view returns (bytes32, address, string, string, uint, uint, bool) {
-        if(certs[certUnique].isStilValid) {
-            checkExpiration(certUnique);            // Check if certificate has expired
-        }
         return (certUnique,
         certs[certUnique].issuer, 
         certs[certUnique].certType, 
@@ -164,21 +161,37 @@ contract CertToken {
     duration        Duration of the certificate's validity (seconds)
     /********************************************************************************************/
     function newCert(address _to, string _certType, string _certName, uint duration) public returns (bytes32) {
-        bytes32 certUnique = keccak256(msg.sender, nounce++, _certName);
-        // Addidng information
-        addOwner(certUnique, _to);
-        addOwner(certUnique, msg.sender);
+        if (msg.sender != _to) {
+            bytes32 certUnique = keccak256(msg.sender, nounce++, _certName);
+            // Addidng information
+            addOwner(certUnique, _to);
+            addOwner(certUnique, msg.sender);
 
-        certs[certUnique].issuer = msg.sender;
-        certs[certUnique].certType = _certType;
-        certs[certUnique].certName = _certName;
-        certs[certUnique].creationDate = now;
-        certs[certUnique].expirationDate = certs[certUnique].creationDate + duration;
-        certs[certUnique].isStilValid = true;
-        
-        newCertCreated(certUnique, msg.sender, _certType, _certName, certs[certUnique].creationDate, certs[certUnique].expirationDate);
+            certs[certUnique].issuer = msg.sender;
+            certs[certUnique].certType = _certType;
+            certs[certUnique].certName = _certName;
+            certs[certUnique].creationDate = now;
+            certs[certUnique].expirationDate = certs[certUnique].creationDate + duration;
+            certs[certUnique].isStilValid = true;
 
-        return certUnique;
+            newCertCreated(certUnique, msg.sender, _certType, _certName, certs[certUnique].creationDate, certs[certUnique].expirationDate);
+
+            return certUnique;
+        }
+    }
+
+    /********************************************************************************************
+    Set a new owner in a certificate (only issuer)
+
+    certUnique          Hash of the certificate is gonna check
+    newOwner            Address of the new owner to be added
+    /********************************************************************************************/
+    function setNewOwner(bytes32 certUnique, address newOwner) public returns (bool success) {
+        if(isSenderTheIssuer(certUnique)) {
+            addOwner(certUnique, newOwner);
+            return true;
+        }
+        return false;
     }
 
     /********************************************************************************************
@@ -205,6 +218,18 @@ contract CertToken {
             return true;
         }
         return false;
+    }
+
+    /********************************************************************************************
+    Check whether the sender is an owner of the certificate
+
+    certUnique        Address of the certificate is gonna be checked
+    /********************************************************************************************/
+    function isSenderTheIssuer(bytes32 certUnique) public view returns (bool isTheIssuer) {
+        if (certs[certUnique].issuer == msg.sender) {
+            return(true);
+        }
+        return (false);
     }
 
     /********************************************************************************************
@@ -255,7 +280,7 @@ contract CertToken {
     _newEntity          Address of the entity is gonna be added to the list
     /********************************************************************************************/
     function setEntityToWhiteList(bytes32 certUnique, address _newEntity) public returns (bool success) {
-        if(isSenderAnOwner(certUnique) || msg.sender == certs[certUnique].issuer) {
+        if(isSenderAnOwner(certUnique) && msg.sender != _newEntity) {
             certs[certUnique].whiteList.push(_newEntity);
             return true;
         }

@@ -271,13 +271,41 @@ class CertificateProtocol extends proto.Protocol {
     			break
 			}
 
+			case "setNewOwner":{
+				let that = this;
+				let data = jsonData.params;
+    			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
+				this.tokenManager.setNewOwner(data.certHash, data.newOwner, {from: data.sender, gas:3000000}).then(function(rslt) {
+					printResult(rslt);
+					if(rslt != undefined){
+						let response = that.responseHolder(jsonData.id);
+		    			response.result = {
+							block: rslt						
+						}
+						console.log("Making new owner response")
+						that.sendResponse(response);
+					}
+					else{
+						console.log("Balance error: "+rslt)
+					}
+				}).catch((err) => {
+					console.log("Something happens adding new entity to white list: " + err);
+					let response = that.errorResponse(jsonData.id);
+						response.error = {
+							code: "403",
+							message: "Permission denied"
+						}
+						that.sendResponse(response);
+				});				
+    			break
+			}
+
 			case "setEntityToWhiteList":{
 				let that = this;
 				let data = jsonData.params;
     			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.setEntityToWhiteList(data.whiteList, data.allowed, {from: data.sender, gas:3000000}).then(function(rslt) {
-						printResult(rslt);
-						if(rslt != undefined){
+				this.tokenManager.setEntityToWhiteList(data.certHash, data.address, {from: data.sender, gas:3000000}).then(function(rslt) {
+					if(rslt != undefined){
 						let response = that.responseHolder(jsonData.id);
 		    			response.result = {
 							success: rslt						
@@ -290,6 +318,12 @@ class CertificateProtocol extends proto.Protocol {
 					}
 				}).catch((err) => {
 					console.log("Something happens adding new entity to white list: " + err);
+					let response = that.errorResponse(jsonData.id);
+						response.error = {
+							code: "403",
+							message: "Permission denied"
+						}
+						that.sendResponse(response);
 				});				
     			break
 			}
