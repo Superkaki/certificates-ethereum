@@ -215,7 +215,6 @@ class CertificateProtocol extends proto.Protocol {
 				let data = jsonData.params;
 				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
 				this.tokenManager.newCert(data.owner, data.certType, data.certName, data.duration, {from: data.sender, gas:3000000}).then(function(rslt) {
-					printResult(rslt);
 					if(rslt != undefined){
 						let response = that.responseHolder(jsonData.id);
 						let newCertEvent = that.tokenManager.newCertCreated({}, {fromBlock: 'latest', toBlock: 'latest'})
@@ -254,7 +253,6 @@ class CertificateProtocol extends proto.Protocol {
 				let data = jsonData.params;
     			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
 				this.tokenManager.setNewOwner(data.certHash, data.newOwner, {from: data.sender, gas:3000000}).then(function(rslt) {
-					printResult(rslt);
 					if(rslt != undefined){
 						let response = that.responseHolder(jsonData.id);
 		    			response.result = {
@@ -311,7 +309,6 @@ class CertificateProtocol extends proto.Protocol {
 				let data = jsonData.params;
     			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
 				this.tokenManager.removeCertificate(data.certHash, {from: data.sender, gas:3000000}).then(function(rslt) {
-						printResult(rslt);
 						if(rslt != undefined){
 						let response = that.responseHolder(jsonData.id);
 		    			response.result = {

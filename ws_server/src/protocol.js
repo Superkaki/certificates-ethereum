@@ -78,8 +78,7 @@ class Protocol {
     	if(this._client && response){
 			let serializedData = JSON.stringify(response);
 			console.log("");
-			console.log("###############  Generating a response  ###############");
-			console.log("RESPONSE SENDED: " + serializedData);
+			console.log("----> RESPONSE SENDED: " + serializedData);
 			this._client.send(serializedData);
 		}
     }

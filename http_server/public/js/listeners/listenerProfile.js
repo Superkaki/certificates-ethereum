@@ -42,7 +42,7 @@ Parse message yo json and send it
 /********************************************************************************************/
 function doSend(message) {
   let serializedData = JSON.stringify(message);
-  writeToLog("REQUEST SENDED: " + serializedData);
+  writeToLog("----> REQUEST SENDED: " + serializedData);
   websocket.send(serializedData);
 }
 
@@ -314,7 +314,7 @@ function addEntityToWhiteList(data){
 //message protocol handler
 function processMessageProtocol(json){
   if(debug){
-    console.log("RESPONSE RECEIVED: " + JSON.stringify(json))
+    console.log("<---- RESPONSE RECEIVED: " + JSON.stringify(json))
   }
   if(json){
     switch(json.id){
