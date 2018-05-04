@@ -161,23 +161,22 @@ contract CertToken {
     duration        Duration of the certificate's validity (seconds)
     /********************************************************************************************/
     function newCert(address _to, string _certType, string _certName, uint duration) public returns (bytes32) {
-        if (msg.sender != _to) {
-            bytes32 certUnique = keccak256(msg.sender, nounce++, _certName);
-            // Addidng information
-            addOwner(certUnique, _to);
-            addOwner(certUnique, msg.sender);
+        require(msg.sender != _to);
+        bytes32 certUnique = keccak256(msg.sender, nounce++, _certName);
+        // Addidng information
+        addOwner(certUnique, _to);
+        addOwner(certUnique, msg.sender);
 
-            certs[certUnique].issuer = msg.sender;
-            certs[certUnique].certType = _certType;
-            certs[certUnique].certName = _certName;
-            certs[certUnique].creationDate = now;
-            certs[certUnique].expirationDate = certs[certUnique].creationDate + duration;
-            certs[certUnique].isStilValid = true;
+        certs[certUnique].issuer = msg.sender;
+        certs[certUnique].certType = _certType;
+        certs[certUnique].certName = _certName;
+        certs[certUnique].creationDate = now;
+        certs[certUnique].expirationDate = certs[certUnique].creationDate + duration;
+        certs[certUnique].isStilValid = true;
 
-            newCertCreated(certUnique, msg.sender, _certType, _certName, certs[certUnique].creationDate, certs[certUnique].expirationDate);
+        newCertCreated(certUnique, msg.sender, _certType, _certName, certs[certUnique].creationDate, certs[certUnique].expirationDate);
 
-            return certUnique;
-        }
+        return certUnique;
     }
 
     /********************************************************************************************
@@ -187,11 +186,9 @@ contract CertToken {
     newOwner            Address of the new owner to be added
     /********************************************************************************************/
     function setNewOwner(bytes32 certUnique, address newOwner) public returns (bool success) {
-        if(isSenderTheIssuer(certUnique)) {
-            addOwner(certUnique, newOwner);
-            return true;
-        }
-        return false;
+        require(isSenderTheIssuer(certUnique));
+        addOwner(certUnique, newOwner);
+        return true;
     }
 
     /********************************************************************************************
@@ -280,7 +277,8 @@ contract CertToken {
     _newEntity          Address of the entity is gonna be added to the list
     /********************************************************************************************/
     function setEntityToWhiteList(bytes32 certUnique, address _newEntity) public returns (bool success) {
-        if(isSenderAnOwner(certUnique) && msg.sender != _newEntity) {
+        require(isSenderAnOwner(certUnique));
+        if(msg.sender != _newEntity) {
             certs[certUnique].whiteList.push(_newEntity);
             return true;
         }
@@ -331,7 +329,8 @@ contract CertToken {
     certUnique          Address of the certificate is gonna check
     /********************************************************************************************/
     function removeCertificate(bytes32 certUnique) public returns (bool success) {
-        if(isSenderAnOwner(certUnique) || msg.sender == certs[certUnique].issuer) {
+        require(isSenderAnOwner(certUnique));
+        if(msg.sender == certs[certUnique].issuer) {
             certs[certUnique].isStilValid = false;
             return true;
         }

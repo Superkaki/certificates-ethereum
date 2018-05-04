@@ -239,6 +239,12 @@ class CertificateProtocol extends proto.Protocol {
 					}
 				}).catch((err) => {
 					console.log("Something happens creating new certificate: " + err);
+					let response = that.errorResponse(jsonData.id);
+					response.error = {
+						code: "403",
+						message: "Permission denied, can not autosend a certificate"
+					}
+					that.sendResponse(response);
 				});	
     			break
 			}
@@ -261,13 +267,13 @@ class CertificateProtocol extends proto.Protocol {
 						console.log("Balance error: "+rslt)
 					}
 				}).catch((err) => {
-					console.log("Something happens adding new entity to white list: " + err);
+					console.log("Something happens adding new owner to certificate: " + err);
 					let response = that.errorResponse(jsonData.id);
-						response.error = {
-							code: "403",
-							message: "Permission denied"
-						}
-						that.sendResponse(response);
+					response.error = {
+						code: "403",
+						message: "Permission denied, you are not the issuer"
+					}
+					that.sendResponse(response);
 				});				
     			break
 			}
@@ -291,12 +297,12 @@ class CertificateProtocol extends proto.Protocol {
 				}).catch((err) => {
 					console.log("Something happens adding new entity to white list: " + err);
 					let response = that.errorResponse(jsonData.id);
-						response.error = {
-							code: "403",
-							message: "Permission denied"
-						}
-						that.sendResponse(response);
-				});				
+					response.error = {
+						code: "403",
+						message: "Permission denied, you do not own that certificate"
+					}
+					that.sendResponse(response);
+					});				
     			break
 			}
 
@@ -318,7 +324,13 @@ class CertificateProtocol extends proto.Protocol {
 						console.log("Balance error: "+rslt)
 					}
 				}).catch((err) => {
-					console.log("Something happens adding new entity to white list: " + err);
+					console.log("Something happens removing certificate: " + err);
+					let response = that.errorResponse(jsonData.id);
+					response.error = {
+						code: "403",
+						message: "Permission denied"
+					}
+					that.sendResponse(response);
 				});				
     			break
 			}

@@ -328,7 +328,7 @@ function processMessageProtocol(json){
         processCheckCertResponse(json);
         break;
       case "2":
-        processNewCertResponse(json.result);
+        processNewCertResponse(json);
         break;
       case "3":
         processNewOwnerResponse(json);
@@ -402,7 +402,7 @@ function processCheckCertResponse(json) {
   } else {
     let data = json.error;
     iconVerify = "<button class='btn btn-danger btn-round' type='button'>\
-                      <i class='now-ui-icons ui-1_simple-remove'></i>"+data.message+"\
+                      <i class='now-ui-icons ui-1_simple-remove'></i> "+data.message+"\
                   </button>";
     iconVerify = iconVerify.replace("", "");
     let checking = $("#certInfo")[0];
@@ -414,32 +414,42 @@ function processCheckCertResponse(json) {
 Show success icon
 Insert a new certificate creation into the record
 /********************************************************************************************/
-function processNewCertResponse(data) {
-  console.log("New cert added");
+function processNewCertResponse(json) {
+  if(json.result) {
+    let data = json.result;
+    console.log("New cert added");
 
-  if(data.certHash) {
-    iconSended = "<button class='btn btn-success btn-round' type='button'>\
-                      <i class='now-ui-icons ui-1_check'></i> Created!\
-                  </button>";
+    if(data.certHash) {
+      iconSended = "<button class='btn btn-success btn-round' type='button'>\
+                        <i class='now-ui-icons ui-1_check'></i> Created!\
+                    </button>";
+    } else {
+      iconSended = "<button class='btn btn-danger btn-round' type='button'>\
+                        <i class='now-ui-icons ui-1_simple-remove'></i> Error creating certificate!\
+                    </button>";
+    }
+
+    if(data){
+      addNewCertRow(data);
+    }
   } else {
+    let data = json.error;
+    console.log("Error: " + data.message);
     iconSended = "<button class='btn btn-danger btn-round' type='button'>\
-                      <i class='now-ui-icons ui-1_simple-remove'></i> Error creating certificate!\
+                      <i class='now-ui-icons ui-1_simple-remove'></i> "+data.message+"\
                   </button>";
   }
+
   iconSended = iconSended.replace("", "");
   let creating = $("#formSend")[0];
   creating.innerHTML = iconSended;
-
-  if(data){
-    addNewCertRow(data);
-  }
 }
 
 /********************************************************************************************
 Show success icon
 /********************************************************************************************/
 function processNewOwnerResponse(json) {
-  if(json.result) {;
+  if(json.result) {
     console.log("New owner added");
     iconAdded = "<button class='btn btn-success btn-round' type='button'>\
                       <i class='now-ui-icons ui-1_check'></i> Added!\
@@ -448,7 +458,7 @@ function processNewOwnerResponse(json) {
     let data = json.error;
     console.log("Error: " + data.message);
     iconAdded = "<button class='btn btn-danger btn-round' type='button'>\
-                      <i class='now-ui-icons ui-1_simple-remove'></i>"+data.message+"\
+                      <i class='now-ui-icons ui-1_simple-remove'></i> "+data.message+"\
                 </button>";
   }
   iconAdded = iconAdded.replace("", "");
@@ -470,7 +480,7 @@ function processEntityToWhiteListResponse(json) {
     let data = json.error;
     console.log("Error: " + data.message);
     iconAdded = "<button class='btn btn-danger btn-round' type='button'>\
-                      <i class='now-ui-icons ui-1_simple-remove'></i>"+data.message+"\
+                      <i class='now-ui-icons ui-1_simple-remove'></i> "+data.message+"\
                 </button>";
   }
   iconAdded = iconAdded.replace("", "");
@@ -567,35 +577,3 @@ function addAccessLogRow(data) {
   let table = $("#logHistory")[0];
   table.innerHTML = rowdata + table.innerHTML;
 }
-
-/*
-
-function processChargerResponse(json){
-  if(json.address){
-    $("#pointAddress")[0].innerHTML = json.address;
-  }
-  if(json.available_tokens){
-    $("#pointTokens")[0].innerHTML = json.available_tokens+" TT"+"<small><br />Current Tokens</small>";
-  }
-}
-
-function processCarStatusResponse(json){
-  if(json.address){
-    $("#carAddress")[0].innerHTML = json.address;
-  }
-  if(json.available_tokens){
-    $("#carTokens")[0].innerHTML = json.available_tokens+" TT"+"<small><br />Current Tokens</small>";
-  }
-}
-
-function processArrivalResponse(json){
-  console.log("new car arrival processed!");
-  addLogRow(json);
-}
-
-function processRewardResponse(json){
-  console.log("new car rewarded!");
-  addLogRow(json);
-}
-
-*/
