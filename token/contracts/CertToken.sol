@@ -30,6 +30,7 @@ contract CertToken {
     }
 
     uint public nounce;
+    address creator;
     
     mapping(bytes32 => AccessLog) public accessLogs;  // This creates an array with all the certificates
     mapping(bytes32 => Certificate) public certs;  // This creates an array with all the certificates
@@ -38,13 +39,41 @@ contract CertToken {
     
     
     
-    /********************************************Events******************************************/
-    /********************************************************************************************
+    /********************************************Events******************************************
     Useful for saving information about blocks
     /********************************************************************************************/
+    
     // event certList(bytes32[] certUnique);
     event newCertCreated(bytes32 certUnique,  address sender, string certType, string certName, uint creationDate, uint expirationDate);
     // event checkOk(bytes32 certUnique, address sender, uint creationDate, bool success);
+
+
+
+    /******************************************Modifiers*****************************************
+    Useful for validating inputs
+    /********************************************************************************************/
+    
+    /********************************************************************************************
+    Check whether the sender the creator of the contract*/
+    modifier onlyCreator() {require(msg.sender == creator/*, "Only creator can call this."*/); _;}
+
+    /********************************************************************************************
+    Check whether the sender is the issuer of the certificate*/
+    modifier onlyIssuer(address issuer) {require(msg.sender == issuer/*, "Only issuer can call this."*/); _;}
+
+    /********************************************************************************************
+    Check whether the sender is an owner of the certificate*/
+    modifier onlyOwner(bytes32 certUnique) {
+        bool isOwner = false;
+        for (uint i = 0; i < certs[certUnique].ownerList.length; i++) {
+            if(certs[certUnique].ownerList[i] == msg.sender) {
+                isOwner = true;
+                break;
+            }
+        }
+        require(isOwner);
+        _;
+    }
 
 
 
@@ -52,9 +81,9 @@ contract CertToken {
     /********************************************************************************************
     Initializes contract with initial supply tokens to the creator of the contract
     /********************************************************************************************/
-    function CertToken() public {
+    function ConstructorCertToken() public {
         nounce = 0;
-        
+        creator = msg.sender;
     }
 
 
@@ -63,7 +92,7 @@ contract CertToken {
     /********************************************************************************************
     Get my own address
     /********************************************************************************************/
-    function getMyAddress() constant public returns (address) {
+    function getMyAddress() public view returns (address) {
         return msg.sender;
     }
 
@@ -141,7 +170,7 @@ contract CertToken {
 
     add             Address of the user to be searched
     /********************************************************************************************/
-    function getUserByAddress(address add) constant public returns (bytes32, bytes32) {
+    function getUserByAddress(address add) public view returns (bytes32, bytes32) {
         return (users[add].name, users[add].nid);
     }
 
@@ -185,8 +214,7 @@ contract CertToken {
     certUnique          Hash of the certificate is gonna check
     newOwner            Address of the new owner to be added
     /********************************************************************************************/
-    function setNewOwner(bytes32 certUnique, address newOwner) public returns (bool success) {
-        require(isSenderTheIssuer(certUnique));
+    function setNewOwner(bytes32 certUnique, address newOwner) public onlyIssuer(certs[certUnique].issuer) returns (bool success) {
         addOwner(certUnique, newOwner);
         return true;
     }
@@ -215,32 +243,6 @@ contract CertToken {
             return true;
         }
         return false;
-    }
-
-    /********************************************************************************************
-    Check whether the sender is an owner of the certificate
-
-    certUnique        Address of the certificate is gonna be checked
-    /********************************************************************************************/
-    function isSenderTheIssuer(bytes32 certUnique) public view returns (bool isTheIssuer) {
-        if (certs[certUnique].issuer == msg.sender) {
-            return(true);
-        }
-        return (false);
-    }
-
-    /********************************************************************************************
-    Check whether the sender is an owner of the certificate
-
-    certUnique        Address of the certificate is gonna be checked
-    /********************************************************************************************/
-    function isSenderAnOwner(bytes32 certUnique) public view returns (bool isOwner) {
-        for (uint i = 0; i < certs[certUnique].ownerList.length; i++) {
-            if (certs[certUnique].ownerList[i] == msg.sender) {
-                return(true);
-            }
-        }
-        return (false);
     }
 
     /********************************************************************************************
@@ -276,8 +278,7 @@ contract CertToken {
     certUnique          Address of the certificate is gonna check
     _newEntity          Address of the entity is gonna be added to the list
     /********************************************************************************************/
-    function setEntityToWhiteList(bytes32 certUnique, address _newEntity) public returns (bool success) {
-        require(isSenderAnOwner(certUnique));
+    function setEntityToWhiteList(bytes32 certUnique, address _newEntity) public onlyOwner(certUnique) returns (bool success) {
         if(msg.sender != _newEntity) {
             certs[certUnique].whiteList.push(_newEntity);
             return true;
@@ -302,38 +303,19 @@ contract CertToken {
     }
 
     /********************************************************************************************
-    Remove an entity from the whiteList
-
-    certUnique          Address of the certificate is gonna check
-    entity          Address of the entity is gonna be added to the list
-    /********************************************************************************************
-    function removeEntityFromWhiteList(bytes32 certUnique, address entity) public returns (bool success) {
-        if(msg.sender == certs[certUnique].owner || msg.sender == certs[certUnique].issuer || entity != certs[certUnique].issuer || entity != certs[certUnique].owner) {
-            for (uint256 i = 0; i < certs[certUnique].whiteList.length; i++) {
-                if (certs[certUnique].whiteList[i] == entity) {                     // Check if entity is in the list
-                    for(uint256 j = i; j < certs[certUnique].whiteList.length-1; j++) {     // Remove from the array
-                        certs[certUnique].whiteList[j] == certs[certUnique].whiteList[j+1];     //TODO: falla en esta linea
-                    }
-                    delete certs[certUnique].whiteList[certs[certUnique].whiteList.length-1];
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-    */
-
-    /********************************************************************************************
     Remove a certificate
 
     certUnique          Address of the certificate is gonna check
     /********************************************************************************************/
-    function removeCertificate(bytes32 certUnique) public returns (bool success) {
-        require(isSenderAnOwner(certUnique));
+    function removeCertificate(bytes32 certUnique) public onlyOwner(certUnique) returns (bool success) {
         if(msg.sender == certs[certUnique].issuer) {
             certs[certUnique].isStilValid = false;
             return true;
         }
         return false;
+    }
+
+    function kill() public onlyCreator {
+        selfdestruct(creator);      // kills this contract and sends remaining funds back to creator
     }
 }
