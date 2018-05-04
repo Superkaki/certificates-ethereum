@@ -81,15 +81,37 @@ Listener for testing button
 document.getElementById('btnTest').addEventListener('click', function(evt){
   evt.preventDefault();
   console.log("Testing network");
+
+  console.log("###############  Runing test  ###############");
+
+  let data = {
+    "owner": "0xf17f52151EbEF6C7334FAD080c5704D77216b732",
+    "duration": 300,
+    "certType": "Titulo marítimo",
+    "certName": "Capitán",
+    "sender": "0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef"
+  }
+  newCert(data);
   
-  let msg = {
-    jsonrpc: '2.0',
-    id: '0',
-    method: 'test',
-    params: {}
-  };
-  console.log("Making test request request")
-  doSend(msg); 
+  data = {
+    "owner": "0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef",
+    "duration": 300,
+    "certType": "Titulo nobiliario",
+    "certName": "Barón Rojo",
+    "sender": "0xf17f52151EbEF6C7334FAD080c5704D77216b732"
+  }
+  newCert(data);
+
+  data = {
+    "owner": "0x627306090abaB3A6e1400e9345bC60c78a8BEf57",
+    "duration": 300,
+    "certType": "Convenio Prácticas",
+    "certName": "Tecnalia Junio2017",
+    "sender": "0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef"
+  }
+  newCert(data);
+
+  console.log("TEST OK");
 })
 
 /********************************************************************************************

@@ -93,34 +93,6 @@ class CertificateProtocol extends proto.Protocol {
 		}
 		
     	switch(jsonData.method){
-			case "test": {
-				let that = this;
-				let data = jsonData.params;
-				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				console.log("###############  Runing test  ###############");
-				this.tokenManager.newCert(jackAddress, "Titulo marítimo", "Capitán", 300,
-				{from: deustoAddress, gas:3000000}).then(function(rslt) {
-					console.log("");
-					console.log("Creating new cert");
-					console.log(JSON.stringify(rslt));
-				});
-				this.tokenManager.newCert(deustoAddress, "Titulo nobiliario", "Barón Rojo", 300,
-				{from: jackAddress, gas:3000000}).then(function(rslt) {
-					console.log("");
-					console.log("Creating new cert");
-					console.log(JSON.stringify(rslt));
-				});
-				this.tokenManager.newCert(inakiAddress, "Convenio Prácticas", "Prácticas Tecnalia Junio17", 300,
-				{from: deustoAddress, gas:3000000}).then(function(rslt) {
-					console.log("");
-					console.log("Creating new cert");
-					console.log(JSON.stringify(rslt));
-				});
-
-				console.log("TEST OK");
-				break;
-			}
-
             case "getCertList":{
 				let that = this;
 				let data = jsonData.params;
@@ -359,6 +331,7 @@ class CertificateProtocol extends proto.Protocol {
 }
 
 function printResult(rslt) {
+	console.log("");
 	console.log("###############  Request result  ###############");	
 	if (rslt != "") {
 		console.log(rslt);
