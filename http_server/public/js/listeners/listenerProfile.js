@@ -546,13 +546,20 @@ function addNewCertRow(data) {
     iconRemove = "";
   }
 
+  let expDate;
+  if(data.creationDate != data.expirationDate) {
+    expDate = epochToDateTime(data.expirationDate);
+  } else {
+    expDate = "-";
+  }
+
   rowdata = "<tr>\
   <td id='toolong'>"+data.certHash+"</td>\
   <td id='toolong'>"+data.issuer+"</td>\
   <td>"+data.certType+"</td>\
   <td>"+data.certName+"</td>\
   <td>"+epochToDateTime(data.creationDate)+"</td>\
-  <td>"+epochToDateTime(data.expirationDate)+"</td>\
+  <td>"+expDate+"</td>\
   <td>"+iconValid+"</td>\
   </tr>";
 

@@ -265,7 +265,7 @@ contract CertToken {
     certUnique        Address of the certificate is gonna be checked
     /********************************************************************************************/
     function checkExpiration(bytes32 certUnique) public returns (bool isValid) {
-        if (certs[certUnique].expirationDate < now) {
+        if (certs[certUnique].expirationDate != certs[certUnique].creationDate  && certs[certUnique].expirationDate < now) {
             certs[certUnique].isStilValid = false;
             return false;
         }
