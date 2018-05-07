@@ -220,7 +220,8 @@ Listener for new owner button
 document.getElementById('btnAddOwner').addEventListener('click', function(evt){
   evt.preventDefault();
   console.log("Add new owner request detected!")
-  let manageCertHash = $("#manageCertHash")[0].value;
+  let e = document.getElementById("titleOption");
+  let manageCertHash = e.options[e.selectedIndex].value;
   let address = $("#address")[0].value;
   let sender = $("#sender");
   //read form data
@@ -252,7 +253,8 @@ Listener for new entity to white list button
 document.getElementById('btnAllow').addEventListener('click', function(evt){
   evt.preventDefault();
   console.log("Add entity to white list request detected!")
-  let manageCertHash = $("#manageCertHash")[0].value;
+  let e = document.getElementById("titleOption");
+  let manageCertHash = e.options[e.selectedIndex].value;
   let address = $("#address")[0].value;
   let sender = $("#sender");
   //read form data
@@ -356,6 +358,7 @@ Show all the certificates from a user
 function processCertificatesRecord(data) {
   if(data){
     addNewCertRow(data);
+    addOptionToManager(data.certHash,data.certName);
   }
 }
 
@@ -431,6 +434,7 @@ function processNewCertResponse(json) {
 
     if(data){
       addNewCertRow(data);
+      addOptionToManager(data.certHash, data.certName);
     }
   } else {
     let data = json.error;
@@ -565,6 +569,7 @@ function addNewCertRow(data) {
 
   rowdata = rowdata.replace("", "");
   let table = $("#logCert")[0];
+  console.log(table);
   table.innerHTML = rowdata + table.innerHTML;
 }
 
@@ -583,4 +588,17 @@ function addAccessLogRow(data) {
   rowdata = rowdata.replace("", "");
   let table = $("#logHistory")[0];
   table.innerHTML = rowdata + table.innerHTML;
+}
+
+/********************************************************************************************
+Add new certificate option to the list of certificates in 
+/********************************************************************************************/
+function addOptionToManager(certHash,certName) {
+  let option = undefined;
+  option = "<option id='manageCertHash' value="+certHash+">"+certName+"</option>";
+
+  option = option.replace("", "");
+  let opt = $("#titleOption")[0];
+  console.log(opt);
+  opt.innerHTML = opt.innerHTML + option;
 }
