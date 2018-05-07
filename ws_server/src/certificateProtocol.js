@@ -34,9 +34,10 @@ CertificateContract.currentProvider.sendAsync = function () {
 };
 //END workaround
 
-let inakiAddress = ("0x627306090abaB3A6e1400e9345bC60c78a8BEf57")
-let jackAddress = ("0xf17f52151EbEF6C7334FAD080c5704D77216b732")
-let deustoAddress = ("0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef")
+let inakiAddress = ("0x627306090abaB3A6e1400e9345bC60c78a8BEf57");
+let jackAddress = ("0xf17f52151EbEF6C7334FAD080c5704D77216b732");
+let deustoAddress = ("0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef");
+let tecnaliaAddress = ("0x821aEa9a577a9b44299B9c15c88cf3087F3b5544");
 
 let tokenManager;
 
@@ -71,6 +72,10 @@ class CertificateProtocol extends proto.Protocol {
 			return that.tokenManager.setUser(deustoAddress, "Univeristy of Deusto", "77777777D", {from: deustoAddress, gas:3000000});
 	    }).then(function(result) {
 			console.log("Entity Deusto creation block");
+			console.log(JSON.stringify(result));
+			return that.tokenManager.setUser(tecnaliaAddress, "Tecnalia Research Innovation", "11111111T", {from: tecnaliaAddress, gas:3000000});
+	    }).then(function(result) {
+			console.log("Entity Tecnalia creation block");
 			console.log(JSON.stringify(result));
 		}).catch(function(err) {
 		  	console.log("FULL ERROR! " + err);       	  // Easily catch all errors along the whole execution.
