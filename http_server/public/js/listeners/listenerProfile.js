@@ -161,7 +161,11 @@ document.getElementById('btnCheck').addEventListener('click', function(evt){
     "certHash": checkCertHash,
     "sender": sender.text()
   }
-  checkCert(data);
+  if(data.certHash != "") {
+    checkCert(data);
+  } else {
+    $('#modalSend').modal('show');
+  }
 })
 
 /********************************************************************************************
@@ -234,7 +238,11 @@ document.getElementById('btnAddOwner').addEventListener('click', function(evt){
     "newOwner": address,
     "sender": sender.text()
   }
-  addNewOwner(data);
+  if(data.certHash != "" && data.newOwner != "") {
+    addNewOwner(data);
+  } else {
+    $('#modalSend').modal('show');
+  }
 })
 
 /********************************************************************************************
@@ -267,7 +275,11 @@ document.getElementById('btnAllow').addEventListener('click', function(evt){
     "address": address,
     "sender": sender.text()
   }
-  addEntityToWhiteList(data);
+  if(data.certHash != "" && data.address != "") {
+    addEntityToWhiteList(data);
+  } else {
+    $('#modalSend').modal('show');
+  }
 })
 
 /********************************************************************************************
