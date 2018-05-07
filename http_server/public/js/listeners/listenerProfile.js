@@ -197,7 +197,11 @@ document.getElementById('btnSend').addEventListener('click', function(evt){
     "certName": certName,
     "sender": sender.text()
   }
-  newCert(data);
+  if(data.owner != "" && data.durantion != "" && data.certType != "" && data.certName != "" && data.sender != "") {
+    newCert(data);
+  } else {
+    $('#modalSend').modal('show');
+  }
 })
 
 /********************************************************************************************
