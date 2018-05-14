@@ -8,8 +8,8 @@ contract CertificatesAPI{
     function getEntityByAddress(address add) constant public returns (bytes32);
     function getUserByAddress(address add) constant public returns (bytes32, bytes32);
     function newCert(address _to, bytes32 _certName) public returns (uint256 id);
-    function checkCert(uint256 unique) public view returns (bool success);
-    function setEntityToWhiteList(uint256 unique, address _newEntity) public returns (bool success);
-    function removeCertificate(uint256 unique) public returns (bool success);
+    function checkCert(uint256 certUnique) public view returns (bool success);
+    function setEntityToWhiteList(uint256 certUnique, address _newEntity) public returns (bool success);
+    function removeCertificate(uint256 certUnique) public returns (bool success);
 
 }

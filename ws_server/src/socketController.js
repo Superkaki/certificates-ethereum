@@ -27,7 +27,8 @@ class SocketController {
     }
 
     processMessage(ws, message) {
-        console.log('REQUEST RECEIVED: %s', message);
+        console.log("");
+        console.log('<---- REQUEST RECEIVED: %s', message);
         let jsonData = JSON.parse(message);
         this._protocol.parse(ws, jsonData);
 
@@ -101,6 +102,9 @@ class SocketController {
             ws.on('close', function(ws) {
                 thisSocket.close(ws);
             });
+
+            ws.on('error', () => console.log('Error encountered!!'));
+
         });
 
         //implement heartbeat listener/timer

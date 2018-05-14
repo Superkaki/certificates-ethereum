@@ -23,7 +23,7 @@ function onClose(evt) {
 function onMessage(evt) {
   if(evt && evt.data){
     let jsonData = JSON.parse(evt.data);
-    if(jsonData && jsonData.result){
+    if(jsonData){
       processMessageProtocol(jsonData);
     }
     else{
@@ -42,7 +42,7 @@ Parse message yo json and send it
 /********************************************************************************************/
 function doSend(message) {
   let serializedData = JSON.stringify(message);
-  writeToLog("REQUEST SENDED: " + serializedData);
+  writeToLog("----> REQUEST SENDED: " + serializedData);
   websocket.send(serializedData);
 }
 
@@ -72,8 +72,47 @@ Get status from a user
 function getStatus() {
   console.log("Loading user data");
   getCertificatesRecord();
-//  getCheckingHistory();   // TODO
+  getCheckingHistory();
 }
+
+/********************************************************************************************
+Listener for testing button
+/********************************************************************************************/
+document.getElementById('btnTest').addEventListener('click', function(evt){
+  evt.preventDefault();
+  console.log("Testing network");
+
+  console.log("###############  Runing test  ###############");
+
+  let data = {
+    "owner": "0xf17f52151EbEF6C7334FAD080c5704D77216b732",
+    "duration": 300,
+    "certType": "Titulo marítimo",
+    "certName": "Capitán",
+    "sender": "0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef"
+  }
+  newCert(data);
+  
+  data = {
+    "owner": "0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef",
+    "duration": 300,
+    "certType": "Titulo nobiliario",
+    "certName": "Barón Rojo",
+    "sender": "0xf17f52151EbEF6C7334FAD080c5704D77216b732"
+  }
+  newCert(data);
+
+  data = {
+    "owner": "0x627306090abaB3A6e1400e9345bC60c78a8BEf57",
+    "duration": 300,
+    "certType": "Convenio Prácticas",
+    "certName": "Tecnalia Junio2017",
+    "sender": "0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef"
+  }
+  newCert(data);
+
+  console.log("TEST OK");
+})
 
 /********************************************************************************************
 Get the record of certificates owned by a user
@@ -85,8 +124,25 @@ function getCertificatesRecord() {
   }
   let msg = {
     jsonrpc: '2.0',
-    id: '0.0',
+    id: '0.1',
     method: 'getCertList',
+    params: data
+  };
+  doSend(msg); 
+}
+
+/********************************************************************************************
+Get the record of certificates owned by a user
+/********************************************************************************************/
+function getCheckingHistory() {
+  let sender = $("#sender");
+  let data = {
+    "sender": sender.text()
+  }
+  let msg = {
+    jsonrpc: '2.0',
+    id: '0.2',
+    method: 'getAccessLogList',
     params: data
   };
   doSend(msg); 
@@ -98,14 +154,18 @@ Listener for check certificate button
 document.getElementById('btnCheck').addEventListener('click', function(evt){
   evt.preventDefault();
   console.log("Certificate checking request detected!");
-  let certHash = $("#certHash")[0].value;
+  let checkCertHash = $("#checkCertHash")[0].value;
   let sender = $("#sender");
   //read form data
   let data = {
-    "certHash": certHash,
+    "certHash": checkCertHash,
     "sender": sender.text()
   }
-  checkCert(data);
+  if(data.certHash != "") {
+    checkCert(data);
+  } else {
+    $('#modalSend').modal('show');
+  }
 })
 
 /********************************************************************************************
@@ -141,7 +201,11 @@ document.getElementById('btnSend').addEventListener('click', function(evt){
     "certName": certName,
     "sender": sender.text()
   }
-  newCert(data);
+  if(data.owner != "" && data.durantion != "" && data.certType != "" && data.certName != "" && data.sender != "") {
+    newCert(data);
+  } else {
+    $('#modalSend').modal('show');
+  }
 })
 
 /********************************************************************************************
@@ -159,21 +223,63 @@ function newCert(data){
 }
 
 /********************************************************************************************
-Listener for new entity to white list button
+Listener for new owner button
 /********************************************************************************************/
-document.getElementById('btnAdd').addEventListener('click', function(evt){
+document.getElementById('btnAddOwner').addEventListener('click', function(evt){
   evt.preventDefault();
-  console.log("Add entity to white list request detected!")
-  let whiteList = $("#whiteList")[0].value;
-  let allowed = $("#allowed")[0].value;
+  console.log("Add new owner request detected!")
+  let e = document.getElementById("titleOption");
+  let manageCertHash = e.options[e.selectedIndex].value;
+  let address = $("#address")[0].value;
   let sender = $("#sender");
   //read form data
   let data = {
-    "whiteList": whiteList,
-    "allowed": allowed,
+    "certHash": manageCertHash,
+    "newOwner": address,
     "sender": sender.text()
   }
-  addEntityToWhiteList(data);
+  if(data.certHash != "" && data.newOwner != "") {
+    addNewOwner(data);
+  } else {
+    $('#modalSend').modal('show');
+  }
+})
+
+/********************************************************************************************
+Parse new owner to json and send it
+/********************************************************************************************/
+function addNewOwner(data){
+  let msg = {
+    jsonrpc: '2.0',
+    id: '3',
+    method: 'setNewOwner',
+    params: data,
+  };
+  console.log("Making new owner request" )
+  doSend(msg);  
+}
+
+/********************************************************************************************
+Listener for new entity to white list button
+/********************************************************************************************/
+document.getElementById('btnAllow').addEventListener('click', function(evt){
+  evt.preventDefault();
+  console.log("Add entity to white list request detected!")
+  let e = document.getElementById("titleOption");
+  let manageCertHash = e.options[e.selectedIndex].value;
+  let address = $("#address")[0].value;
+  let sender = $("#sender");
+  //read form data
+  let data = {
+    "certHash": manageCertHash,
+    "address": address,
+    "sender": sender.text()
+  }
+  if(data.certHash != "" && data.address != "") {
+    addEntityToWhiteList(data);
+  } else {
+    $('#modalSend').modal('show');
+  }
 })
 
 /********************************************************************************************
@@ -182,13 +288,41 @@ Parse new entity to white list to json and send it
 function addEntityToWhiteList(data){
   let msg = {
     jsonrpc: '2.0',
-    id: '3',
+    id: '4',
     method: 'setEntityToWhiteList',
     params: data,
   };
   console.log("Making new entity to white list request" )
   doSend(msg);  
 }
+
+///********************************************************************************************
+//Listener for remove certificate button
+///********************************************************************************************/
+//document.getElementById('btnRemove').addEventListener('click', function(evt){
+//  evt.preventDefault();
+//  console.log("Remove certificate request detected!")
+//  let certHash = $("#toolong")[0].value;
+//  //read form data
+//  let data = {
+//    "certHash": certHash
+//  }
+//  removeCertificate(data);
+//})
+//
+///********************************************************************************************
+//Parse remove certificate to json and send it
+///********************************************************************************************/
+//function removeCertificate(data){
+//  let msg = {
+//    jsonrpc: '2.0',
+//    id: '5',
+//    method: 'removeCertificate',
+//    params: data,
+//  };
+//  console.log("Making remove certificate request" )
+//  doSend(msg);  
+//}
 
 
 /********************************************************************************************/
@@ -198,21 +332,30 @@ function addEntityToWhiteList(data){
 //message protocol handler
 function processMessageProtocol(json){
   if(debug){
-    console.log("RESPONSE RECEIVED: " + JSON.stringify(json))
+    console.log("<---- RESPONSE RECEIVED: " + JSON.stringify(json))
   }
   if(json){
     switch(json.id){
       case "0.1":
         processCertificatesRecord(json.result);
         break;
+      case "0.2":
+        processAccessLogRecord(json.result);
+        break; 
       case "1":
-        processCheckCertResponse(json.result);
+        processCheckCertResponse(json);
         break;
       case "2":
-        processNewCertResponse(json.result);
+        processNewCertResponse(json);
         break;
       case "3":
-        processEntityToWhiteListResponse(json.result);
+        processNewOwnerResponse(json);
+        break;
+      case "4":
+        processEntityToWhiteListResponse(json);
+        break;
+      case "5":
+        processRemoveCertificateResponse(json.result);
         break;
       default:
         console.log(json.params);
@@ -225,126 +368,164 @@ function processMessageProtocol(json){
 /***********************************   Response actions   ***********************************/
 /********************************************************************************************/
 
+/********************************************************************************************
+Show all the certificates from a user
+/********************************************************************************************/
 function processCertificatesRecord(data) {
   if(data){
-    //XSS vulnerable
-    let rowdata = undefined;
+    addNewCertRow(data);
+    addOptionToManager(data.certHash,data.certName);
+  }
+}
+
+/********************************************************************************************
+Show all the checkings from a user's certificates
+/********************************************************************************************/
+function processAccessLogRecord(data) {
+  if(data){
+    addAccessLogRow(data);
+  }
+}
+
+/********************************************************************************************
+Show success icon
+Insert a new certificate checking into the record
+/********************************************************************************************/
+function processCheckCertResponse(json) {
+  console.log("Cert checked");
+  
+  if(json.result){
+    let data = json.result;
+    addAccessLogRow(data);
+
+    let iconVerify = undefined;
     if(data.isStilValid) {
-      iconValid = "<button class='btn btn-success btn-icon btn-round'>\
-                      <i class='now-ui-icons ui-1_check'></i>\
+      iconVerify = "<button class='btn btn-success btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_check'></i> Valid certificate\
                   </button>";
     } else {
-      iconValid = "<button class='btn btn-danger btn-icon btn-round'>\
-                      <i class='now-ui-icons ui-1_simple-remove'></i>\
+      iconVerify = "<button class='btn btn-danger btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_simple-remove'></i> Expired certificate\
                   </button>";
     }
-    rowdata = "<tr>\
-    <td id='toolong'>"+data.certHash+"</td>\
-    <td id='toolong'>"+data.issuer+"</td>\
-    <td>"+data.certType+"</td>\
-    <td>"+data.certName+"</td>\
-    <td>"+epochToTime(data.creationDate)+"</td>\
-    <td>"+epochToTime(data.expirationDate)+"</td>\
-    <td>"+iconValid+"</td>\
-    </tr>";
 
-    rowdata = rowdata.replace("\
-    ", "");
-
-    let table = $("#logCert")[0];
-    table.innerHTML = table.innerHTML + rowdata;
+    rowdata = "<h6 class='title'>Creation Date: " + epochToDateTime(data.creationDate) + "</h6>\
+    <h6 class='title'>Issuer: " + data.issuer + "</h6>\
+    <h6 class='title'>Type: " + data.certType + "</h6>\
+    <h6 class='title'>Title: " + data.certName + "</h6>\
+    <h6 class='title'>" + iconVerify + "</h6>";
+    rowdata = rowdata.replace("", "");
+    let info = $("#certInfo")[0];
+    info.innerHTML = rowdata;
+  
+  } else {
+    let data = json.error;
+    iconVerify = "<button class='btn btn-danger btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_simple-remove'></i> "+data.message+"\
+                  </button>";
+    iconVerify = iconVerify.replace("", "");
+    let checking = $("#certInfo")[0];
+    checking.innerHTML = iconVerify;
   }
 }
 
+/********************************************************************************************
+Show success icon
+Insert a new certificate creation into the record
+/********************************************************************************************/
+function processNewCertResponse(json) {
+  if(json.result) {
+    let data = json.result;
+    console.log("New cert added");
 
-function processCheckCertResponse(data) {
-  console.log("Cert checked");
+    if(data.certHash) {
+      iconSended = "<button class='btn btn-success btn-round' type='button'>\
+                        <i class='now-ui-icons ui-1_check'></i> Created!\
+                    </button>";
+    } else {
+      iconSended = "<button class='btn btn-danger btn-round' type='button'>\
+                        <i class='now-ui-icons ui-1_simple-remove'></i> Error creating certificate!\
+                    </button>";
+    }
 
-  //XSS vulnerable
-  let iconVerify = undefined;
-  let info = data.info;
-  if(data.verification) {
-    iconVerify = "<button class='btn btn-success btn-round' type='button'>\
-                      <i class='now-ui-icons ui-1_check'></i> Exist!\
-                  </button>";
+    if(data){
+      addNewCertRow(data);
+      addOptionToManager(data.certHash, data.certName);
+    }
   } else {
-    iconVerify = "<button class='btn btn-danger btn-round' type='button'>\
-                      <i class='now-ui-icons ui-1_simple-remove'></i> Does not exist!\
+    let data = json.error;
+    console.log("Error: " + data.message);
+    iconSended = "<button class='btn btn-danger btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_simple-remove'></i> "+data.message+"\
                   </button>";
   }
 
+  iconSended = iconSended.replace("", "");
+  let creating = $("#formSend")[0];
+  creating.innerHTML = iconSended;
+}
+
+/********************************************************************************************
+Show success icon
+/********************************************************************************************/
+function processNewOwnerResponse(json) {
+  if(json.result) {
+    console.log("New owner added");
+    iconAdded = "<button class='btn btn-success btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_check'></i> Added!\
+                </button>";
+  } else {
+    let data = json.error;
+    console.log("Error: " + data.message);
+    iconAdded = "<button class='btn btn-danger btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_simple-remove'></i> "+data.message+"\
+                </button>";
+  }
+  iconAdded = iconAdded.replace("", "");
+  let creating = $("#formAdd")[0];
+  creating.innerHTML = iconAdded;
+}
+
+/********************************************************************************************
+Show success icon
+/********************************************************************************************/
+function processEntityToWhiteListResponse(json) {
+  if(json.result) {
+    console.log("New entity allowed");
+
+    iconAdded = "<button class='btn btn-success btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_check'></i> Allowed!\
+                </button>";
+  } else {
+    let data = json.error;
+    console.log("Error: " + data.message);
+    iconAdded = "<button class='btn btn-danger btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_simple-remove'></i> "+data.message+"\
+                </button>";
+  }
+  iconAdded = iconAdded.replace("", "");
+  let creating = $("#formAdd")[0];
+  creating.innerHTML = iconAdded;
+}
+
+/********************************************************************************************
+Show success icon
+/********************************************************************************************/
+function processRemoveCertificateResponse(data) {
+  console.log("Certificate removed");
+
+  iconVerify = "<button class='btn btn-danger btn-round' type='button'>\
+                  <i class='now-ui-icons ui-1_simple-remove'></i>\
+              </button>";
   iconVerify = iconVerify.replace("\
   ", "");
+  let creating = $("#iconValid")[0];
+  creating.innerHTML = iconVerify;
 
-  let checking = $("#formCheck")[0];
-  checking.innerHTML = checking.innerHTML + iconVerify;
-
-  if(data){
-    //XSS vulnerable
-    let rowdata = undefined;
-    rowdata = "<tr>\
-    <td>"+epochDate(data.creationDate)+"</td>\
-    <td>"+epochTime(data.creationDate)+"</td>\
-    <td id='toolong'>"+data.certHash+"</td>\
-    <td id='toolong'>"+data.sender+"</td>\
-    </tr>";
-
-    rowdata = rowdata.replace("\
-    ", "");
-
-    let table = $("#logHistory")[0];
-    table.innerHTML = table.innerHTML + rowdata;
-  }
-}
-
-function processNewCertResponse(data) {
-  console.log("New cert added");
-
-  /*
-  if(data.certHash) {
-    iconSended = "<button class='btn btn-success btn-round' type='button'>\
-                      <i class='now-ui-icons ui-1_check'></i> Created!\
-                  </button>";
-  } else {
-    iconSended = "<button class='btn btn-danger btn-round' type='button'>\
-                      <i class='now-ui-icons ui-1_simple-remove'></i> Error creating certificate!\
-                  </button>";
-  }
-
-  iconSended = iconSended.replace("\
-  ", "");
-
-  let checking = $("#formCreate")[0];
-  checking.innerHTML = checking.innerHTML + iconSended;
-*/
-
-  if(data){
-    //XSS vulnerable
-    let rowdata = undefined;
-    iconValid = "<button class='btn btn-success btn-icon btn-round'>\
-        <i class='now-ui-icons ui-1_check'></i>\
-    </button>";
-
-    rowdata = "<tr>\
-    <td id='toolong'>"+data.certHash+"</td>\
-    <td id='toolong'>"+data.sender+"</td>\
-    <td>"+data.certType+"</td>\
-    <td>"+data.certName+"</td>\
-    <td>"+epochToTime(data.creationDate)+"</td>\
-    <td>"+epochToTime(data.expirationDate)+"</td>\
-    <td>"+iconValid+"</td>\
-    </tr>";
-
-    rowdata = rowdata.replace("\
-    ", "");
-
-    let table = $("#logCert")[0];
-    table.innerHTML = table.innerHTML + rowdata;
-  }
-}
-
-function processEntityToWhiteListResponse(data) {
-  console.log("New entity allowed");
+  iconRemove = "<button id='btnRemove' class='btn btn-danger btn-round'>Removed!</button>";
+  iconRemove = iconRemove.replace("", "");
+  let creating = $("#iconRemove")[0];
+  creating.innerHTML = iconRemove;
 }
 
 
@@ -352,7 +533,7 @@ function processEntityToWhiteListResponse(data) {
 /***********************************   Other functions   ************************************/
 /********************************************************************************************/
 
-function epochToTime(epoch) {
+function epochToDateTime(epoch) {
   var myDate = new Date( epoch *1000);
   return(myDate.toLocaleString());
 }
@@ -363,38 +544,77 @@ function epochDate(epoch) {
 }
 
 function epochTime(epoch) {
-  var myDate = new Date( 1524555566 *1000);
+  var myDate = new Date( epoch *1000);
   return myDate.toLocaleTimeString();
 }
 
-/*
+/********************************************************************************************
+Add new certificate to the certificates record
+/********************************************************************************************/
+function addNewCertRow(data) {
+  //XSS vulnerable
+  let rowdata = undefined;
+  if(data.isStilValid) {
+    iconValid = "<button class='btn btn-success btn-icon btn-round'>\
+                    <i class='now-ui-icons ui-1_check'></i>\
+                </button>";
+    iconRemove = "<button id='btnRemove' class='btn btn-warning btn-round'>Remove</button>";
+  } else {
+    iconValid = "<button class='btn btn-danger btn-icon btn-round'>\
+                    <i class='now-ui-icons ui-1_simple-remove'></i>\
+                </button>";
+    iconRemove = "";
+  }
 
-function processChargerResponse(json){
-  if(json.address){
-    $("#pointAddress")[0].innerHTML = json.address;
+  let expDate;
+  if(data.creationDate != data.expirationDate) {
+    expDate = epochToDateTime(data.expirationDate);
+  } else {
+    expDate = "-";
   }
-  if(json.available_tokens){
-    $("#pointTokens")[0].innerHTML = json.available_tokens+" TT"+"<small><br />Current Tokens</small>";
-  }
+
+  rowdata = "<tr>\
+  <td id='toolong'>"+data.certHash+"</td>\
+  <td id='toolong'>"+data.issuer+"</td>\
+  <td>"+data.certType+"</td>\
+  <td>"+data.certName+"</td>\
+  <td>"+epochToDateTime(data.creationDate)+"</td>\
+  <td>"+expDate+"</td>\
+  <td>"+iconValid+"</td>\
+  </tr>";
+
+  rowdata = rowdata.replace("", "");
+  let table = $("#logCert")[0];
+  console.log(table);
+  table.innerHTML = rowdata + table.innerHTML;
 }
 
-function processCarStatusResponse(json){
-  if(json.address){
-    $("#carAddress")[0].innerHTML = json.address;
-  }
-  if(json.available_tokens){
-    $("#carTokens")[0].innerHTML = json.available_tokens+" TT"+"<small><br />Current Tokens</small>";
-  }
+/********************************************************************************************
+Add new access log to the history record
+/********************************************************************************************/
+function addAccessLogRow(data) {
+  //XSS vulnerable
+  let rowdata = undefined;
+  rowdata = "<tr>\
+  <td>"+epochDate(data.creationDate)+"</td>\
+  <td>"+epochTime(data.creationDate)+"</td>\
+  <td id='toolong'>"+data.certHash+"</td>\
+  <td id='toolong'>"+data.user+"</td>\
+  </tr>";
+  rowdata = rowdata.replace("", "");
+  let table = $("#logHistory")[0];
+  table.innerHTML = rowdata + table.innerHTML;
 }
 
-function processArrivalResponse(json){
-  console.log("new car arrival processed!");
-  addLogRow(json);
-}
+/********************************************************************************************
+Add new certificate option to the list of certificates in 
+/********************************************************************************************/
+function addOptionToManager(certHash,certName) {
+  let option = undefined;
+  option = "<option id='manageCertHash' value="+certHash+">"+certName+"</option>";
 
-function processRewardResponse(json){
-  console.log("new car rewarded!");
-  addLogRow(json);
+  option = option.replace("", "");
+  let opt = $("#titleOption")[0];
+  console.log(opt);
+  opt.innerHTML = opt.innerHTML + option;
 }
-
-*/

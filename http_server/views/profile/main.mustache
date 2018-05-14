@@ -1,7 +1,7 @@
 <div class="section">
     <div class="container">
         <div class="button-container">
-            <a href="{{presentation}}" class="btn btn-primary btn-round btn-lg">Follow</a>
+            <button id="btnTest" class="btn btn-primary btn-round btn-lg" type="button">Test</button>
             <a href="{{presentation}}" class="btn btn-default btn-round btn-lg btn-icon" rel="tooltip" title="Follow me on Twitter">
                 <i class="fa fa-twitter"></i>
             </a>
@@ -16,19 +16,19 @@
             <div class="card">
                 <ul class="nav nav-tabs nav-tabs-neutral justify-content-center" role="tablist" data-background-color="green">
                     <li class="nav-item">
-                        <a class="nav-link active" data-toggle="tab" href="#certificatesHistory" role="tab">Registro de Certificados</a>
+                        <a class="nav-link active" data-toggle="tab" href="#certificatesHistory" role="tab">Certificates record</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#accessHistory" role="tab">Registro de accesos</a>
+                        <a class="nav-link" data-toggle="tab" href="#accessHistory" role="tab">Access logs</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#certificateManager" role="tab">Gestionar certificado</a>
+                        <a class="nav-link" data-toggle="tab" href="#certificateManager" role="tab">Manage certificate</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#createCertificate" role="tab">Crear certificado</a>
+                        <a class="nav-link" data-toggle="tab" href="#createCertificate" role="tab">Create certificate</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#checkCertificate" role="tab">Comprobar certificado</a>
+                        <a class="nav-link" data-toggle="tab" href="#checkCertificate" role="tab">Check certificate</a>
                     </li>
                 </ul>
                 <div class="card-body">
@@ -87,20 +87,27 @@
                         <div class="tab-pane" id="certificateManager" role="tabpanel">
                             <p>Add address to white list</p>
                             <div class="row justify-content-center">
-                                <div class="col-sm-6 col-lg-5">
-                                    <div class="form-group">
-                                        <input id="whiteList" type="text" onfocus="this.value=''" value="" placeholder="Tittle Hash" class="form-control" />
-                                    </div>
+                                <div class="col-sm-6 col-lg-3">
+                                    <style type="text/css"> #titleOption {background-color:transparent; border: 1px solid #d1cfcf; color:#2c2c2c; border-radius:30px;} </style>
+                                    <select id="titleOption" class="nav-link dropdown-toggle form-control" >
+                                        <option value="">Select a title</option>
+                                    </select>
                                 </div>
                                 <div class="col-sm-6 col-lg-5">
                                     <div class="form-group">
-                                        <input id="allowed" type="text" onfocus="this.value=''" value="" placeholder="Address" class="form-control" />
+                                        <input id="address" type="text" onfocus="this.value=''" value="" placeholder="Address" class="form-control" />
                                     </div>
                                 </div>
                             </div>
                             <div class="row justify-content-center">
-                                <button id="btnAdd" class="btn btn-primary btn-round" type="button">Add</button>    
+                                <div class="col-sm-6 col-lg-3">
+                                    <button id="btnAllow" class="btn btn-primary btn-round" type="button">Allow</button>
+                                </div>
+                                <div class="col-sm-6 col-lg-5">    
+                                    <button id="btnAddOwner" class="btn btn-primary btn-round" type="button">Add Owner</button>
+                                </div>
                             </div>
+                            <div id="formAdd"></div>
                         </div>
 
                         <div class="tab-pane" id="createCertificate" role="tabpanel">
@@ -113,7 +120,7 @@
                                 </div>
                                 <div class="col-sm-6 col-lg-5">
                                     <div class="form-group">
-                                        <input id="duration" type="text" onfocus="this.value=''" value="120" placeholder="Duration (seconds)" class="form-control" />
+                                        <input id="duration" type="text" value="120" placeholder="Duration (seconds)" class="form-control" />
                                     </div>
                                 </div>
                             </div>
@@ -134,21 +141,22 @@
                             <div class="row justify-content-center">
                                 <button id="btnSend" class="btn btn-primary btn-round" type="button">Send</button>    
                             </div>
+                            <div id="formSend"></div>
                         </div>
 
-                        <div id="checkCertificate" class="tab-pane" role="tabpanel">
+                        <div class="tab-pane" id="checkCertificate" role="tabpanel">
                             </br>
                             <div class="row justify-content-center">
                                 <div class="col-sm-6 col-lg-6">
                                     <div class="form-group">
-                                        <input id="certHash" type="text" onfocus="this.value=''" value="" placeholder="Certificate Hash" class="form-control" />
+                                        <input id="checkCertHash" type="text" onfocus="this.value=''" value="" placeholder="Certificate Hash" class="form-control" />
                                     </div>
                                 </div>
                             </div>
                             <div class="row justify-content-center">
                                 <button id="btnCheck" class="btn btn-primary btn-round" type="button">Check</button>    
                             </div> 
-                            <div id="formCheck"/>
+                            <div id="certInfo"></div>
                         </div>
                     </div>
                 </div>
@@ -156,3 +164,5 @@
         </div>
     </div>
 </div>
+
+{{> profile/modal}}

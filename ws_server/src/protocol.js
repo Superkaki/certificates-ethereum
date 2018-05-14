@@ -56,22 +56,30 @@ class Protocol {
     	}
     }
 
-    responseHolder(){
+    responseHolder(id){
     	let msg = {
-	        jsonrpc: undefined,
-			id: undefined,
+	        jsonrpc: "2.0",
+			id: id,
 			result: undefined
-	      };
+	    };
 	    return msg;
-    }
+	}
+	
+	errorResponse(id){
+		let msg = {
+	        jsonrpc: "2.0",
+			id: id,
+			error: undefined
+	    };
+	    return msg;
+	}
 
     sendResponse(response){
     	if(this._client && response){
 			let serializedData = JSON.stringify(response);
-			console.log("###############  Generating a response  ###############");
-			console.log("RESPONSE SENDED: " + serializedData);
-			this._client.send(serializedData);
 			console.log("");
+			console.log("----> RESPONSE SENDED: " + serializedData);
+			this._client.send(serializedData);
 		}
     }
 
