@@ -1,4 +1,4 @@
 token/build/contracts/*
 node_modules/
 package-lock.json
-http_server/yarn.lock
+**/yarn.lock
