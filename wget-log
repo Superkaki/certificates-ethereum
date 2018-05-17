@@ -1,21 +1,0 @@
---2018-04-13 13:41:55--  https://github.com/trufflesuite/ganache/releases/download/v1.0.1/ganache-1.0.1-x86_64.AppImage
-Resolving github.com (github.com)... 192.30.253.113, 192.30.253.112
-Connecting to github.com (github.com)|192.30.253.113|:443... connected.
-HTTP request sent, awaiting response... 302 Found
-Location: https://github-production-release-asset-2e65be.s3.amazonaws.com/79269625/95a2111a-cb8d-11e7-8df3-32f0d25993f9?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20180413%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20180413T114152Z&X-Amz-Expires=300&X-Amz-Signature=3789cd8fc65559b13b69d7feabf1ce08efd97ddbe456e626344dac3413e63da6&X-Amz-SignedHeaders=host&actor_id=0&response-content-disposition=attachment%3B%20filename%3Dganache-1.0.1-x86_64.AppImage&response-content-type=application%2Foctet-stream [following]
---2018-04-13 13:41:57--  https://github-production-release-asset-2e65be.s3.amazonaws.com/79269625/95a2111a-cb8d-11e7-8df3-32f0d25993f9?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20180413%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20180413T114152Z&X-Amz-Expires=300&X-Amz-Signature=3789cd8fc65559b13b69d7feabf1ce08efd97ddbe456e626344dac3413e63da6&X-Amz-SignedHeaders=host&actor_id=0&response-content-disposition=attachment%3B%20filename%3Dganache-1.0.1-x86_64.AppImage&response-content-type=application%2Foctet-stream
-Resolving github-production-release-asset-2e65be.s3.amazonaws.com (github-production-release-asset-2e65be.s3.amazonaws.com)... 52.216.160.27
-Connecting to github-production-release-asset-2e65be.s3.amazonaws.com (github-production-release-asset-2e65be.s3.amazonaws.com)|52.216.160.27|:443... connected.
-HTTP request sent, awaiting response... 200 OK
-Length: 85033997 (81M) [application/octet-stream]
-Saving to: ‘ganache-1.0.1-x86_64.AppImage’
-
-ganache-1.0.1-x86_64.AppImage                 5%[====>                                                                                       ]   4,71M  1,25KB/s    eta 2h 36m ganache-1.0.1-x86_64.AppImage                 6%[====>                                                                                       ]   5,10M  2,00KB/s    in 9m 37s  
-
-2018-04-13 13:51:35 (9,04 KB/s) - Read error at byte 5343807/85033997 (Connection reset by peer). Retrying.
-
---2018-04-13 13:51:36--  (try: 2)  https://github-production-release-asset-2e65be.s3.amazonaws.com/79269625/95a2111a-cb8d-11e7-8df3-32f0d25993f9?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20180413%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20180413T114152Z&X-Amz-Expires=300&X-Amz-Signature=3789cd8fc65559b13b69d7feabf1ce08efd97ddbe456e626344dac3413e63da6&X-Amz-SignedHeaders=host&actor_id=0&response-content-disposition=attachment%3B%20filename%3Dganache-1.0.1-x86_64.AppImage&response-content-type=application%2Foctet-stream
-Connecting to github-production-release-asset-2e65be.s3.amazonaws.com (github-production-release-asset-2e65be.s3.amazonaws.com)|52.216.160.27|:443... connected.
-HTTP request sent, awaiting response... 403 Forbidden
-2018-04-13 13:51:36 ERROR 403: Forbidden.
-
