@@ -19,3 +19,6 @@ The project is divided in three parts. The first one and more important is the *
 The second part is web socket which is used to link the user and the EVM using JSONRC 2.0. There many ways to reach the websocket API, that's for what it's supposedly been implemented JSONRPC standard, so that everyone can access to the it, for example using a web server or metamask tool.
 
 The third and last part is a web server that will help the user to send and get information from the blockchain with an easy interface. This server is the mandated for connecting with the web socket using JSONRPC 2.0 by a own designed protocol.
+
+### Use Certifikate
+![Fases](img/Fases.jpg)
