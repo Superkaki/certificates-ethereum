@@ -179,6 +179,33 @@ class CertificateProtocol extends proto.Protocol {
     			break
 			}
 
+			case "setUser":{
+				let that = this;
+				let data = jsonData.params;
+				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
+				this.tokenManager.setUser(data.sender, data.userName, data.userNID, {from: data.sender, gas:3000000}).then(function(rslt) {
+					printResult(rslt);
+					if(rslt != undefined){
+						let response = that.responseHolder(jsonData.id);
+		    			response.result = {
+							block: rslt						
+						}
+						console.log("Making new user response")
+						that.sendResponse(response);
+					}
+				}).catch((err) => {
+					let response = that.errorResponse(jsonData.id);
+					let msg = "Something happens creating new user";
+					response.error = {
+						code: "400",
+						message: msg
+					}
+					that.sendResponse(response);
+					console.log(msg + ": " + err);
+				});				
+    			break
+			}
+
             case "checkCert":{
 				let that = this;
 				let data = jsonData.params;
@@ -238,8 +265,7 @@ class CertificateProtocol extends proto.Protocol {
 								that.sendResponse(response);
 							})
 						})
-					}
-					else{
+					} else {
 						console.log("Balance error: "+rslt)
 					}
 				}).catch((err) => {
