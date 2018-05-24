@@ -75,6 +75,13 @@ contract CertToken {
         _;
     }
 
+    /********************************************************************************************
+    Check whether the certificate has expired*/
+    modifier afterExpirationDate(bytes32 certUnique) {
+        if (now >= certs[certUnique].expirationDate && certs[certUnique].expirationDate != certs[certUnique].creationDate)
+        _;
+    }
+
 
 
     /***************************************Initializations**************************************/
@@ -89,6 +96,13 @@ contract CertToken {
 
 
     /************************************Getters and Setters*************************************/
+    /********************************************************************************************
+    Get creator address
+    /********************************************************************************************/
+    function getCreator() public view returns (address) {
+        return creator;
+    }
+
     /********************************************************************************************
     Get my own address
     /********************************************************************************************/
@@ -113,9 +127,9 @@ contract CertToken {
     userName        Name of the new user
     userNid         New user's National Identity Card number
     /********************************************************************************************/
-    function setUser(address add, bytes15 userName, bytes9 userNid) public returns (bool success) {
-        users[add].name = userName;
-        users[add].nid = userNid;
+    function setUser(address _add, bytes15 _userName, bytes9 _userNid) public returns (bool success) {
+        users[_add].name = _userName;
+        users[_add].nid = _userNid;
         return (true);
     }
 
@@ -189,7 +203,7 @@ contract CertToken {
     certType        NType of the new certificate
     duration        Duration of the certificate's validity (seconds)
     /********************************************************************************************/
-    function newCert(address _to, string _certType, string _certName, uint duration) public returns (bytes32) {
+    function newCert(address _to, string _certType, string _certName, uint _duration) public returns (bytes32) {
         require(msg.sender != _to);
         bytes32 certUnique = keccak256(msg.sender, nounce++, _certName);
         // Addidng information
@@ -200,7 +214,7 @@ contract CertToken {
         certs[certUnique].certType = _certType;
         certs[certUnique].certName = _certName;
         certs[certUnique].creationDate = now;
-        certs[certUnique].expirationDate = certs[certUnique].creationDate + duration;
+        certs[certUnique].expirationDate = certs[certUnique].creationDate + _duration;
         certs[certUnique].isStilValid = true;
 
         newCertCreated(certUnique, msg.sender, _certType, _certName, certs[certUnique].creationDate, certs[certUnique].expirationDate);
@@ -214,8 +228,8 @@ contract CertToken {
     certUnique          Hash of the certificate is gonna check
     newOwner            Address of the new owner to be added
     /********************************************************************************************/
-    function setNewOwner(bytes32 certUnique, address newOwner) public onlyIssuer(certs[certUnique].issuer) returns (bool success) {
-        addOwner(certUnique, newOwner);
+    function setNewOwner(bytes32 _certUnique, address _newOwner) public onlyIssuer(certs[_certUnique].issuer) returns (bool success) {
+        addOwner(_certUnique, _newOwner);
         return true;
     }
 
@@ -225,10 +239,10 @@ contract CertToken {
     certUnique          Hash of the certificate is gonna check
     newOwner            Address of the new owner to be added
     /********************************************************************************************/
-    function addOwner(bytes32 certUnique, address newOwner) public returns (bool success) {
-        certs[certUnique].ownerList.push(newOwner);         // Adding owner to the certificate
-        users[newOwner].ownCertsList.push(certUnique);      // Adding certificates to the owner list
-        certs[certUnique].whiteList.push(newOwner);         // The owner is allowed to check his own certificate
+    function addOwner(bytes32 _certUnique, address _newOwner) public returns (bool success) {
+        certs[_certUnique].ownerList.push(_newOwner);         // Adding owner to the certificate
+        users[_newOwner].ownCertsList.push(_certUnique);      // Adding certificates to the owner list
+        certs[_certUnique].whiteList.push(_newOwner);         // The owner is allowed to check his own certificate
         return true;
     }
 
@@ -264,12 +278,9 @@ contract CertToken {
 
     certUnique        Address of the certificate is gonna be checked
     /********************************************************************************************/
-    function checkExpiration(bytes32 certUnique) public returns (bool isValid) {
-        if (certs[certUnique].expirationDate != certs[certUnique].creationDate  && certs[certUnique].expirationDate < now) {
-            certs[certUnique].isStilValid = false;
-            return false;
-        }
-        return true;
+    function checkExpiration(bytes32 _certUnique) public afterExpirationDate(_certUnique) returns (bool isValid) {
+        certs[_certUnique].isStilValid = false;
+        return false;
     }
     
     /********************************************************************************************
@@ -278,9 +289,9 @@ contract CertToken {
     certUnique          Address of the certificate is gonna check
     _newEntity          Address of the entity is gonna be added to the list
     /********************************************************************************************/
-    function setEntityToWhiteList(bytes32 certUnique, address _newEntity) public onlyOwner(certUnique) returns (bool success) {
+    function setEntityToWhiteList(bytes32 _certUnique, address _newEntity) public onlyOwner(_certUnique) returns (bool success) {
         if(msg.sender != _newEntity) {
-            certs[certUnique].whiteList.push(_newEntity);
+            certs[_certUnique].whiteList.push(_newEntity);
             return true;
         }
         return false;
@@ -291,13 +302,13 @@ contract CertToken {
 
     certUnique          Address of the certificate is gonna regist
     /********************************************************************************************/
-    function insertHistory(bytes32 certUnique) public returns (bool success) {
-        bytes32 accessLogUnique = keccak256(msg.sender, certUnique);
+    function insertHistory(bytes32 _certUnique) public returns (bool success) {
+        bytes32 accessLogUnique = keccak256(msg.sender, _certUnique);
         accessLogs[accessLogUnique].date = now;
         accessLogs[accessLogUnique].user = msg.sender;
-        accessLogs[accessLogUnique].certificate = certUnique;
-        for (uint i = 0; i < certs[certUnique].ownerList.length; i++) {
-            users[certs[certUnique].ownerList[i]].accessLogList.push(accessLogUnique);
+        accessLogs[accessLogUnique].certificate = _certUnique;
+        for (uint i = 0; i < certs[_certUnique].ownerList.length; i++) {
+            users[certs[_certUnique].ownerList[i]].accessLogList.push(accessLogUnique);
         }
         return true;
     }
@@ -307,9 +318,9 @@ contract CertToken {
 
     certUnique          Address of the certificate is gonna check
     /********************************************************************************************/
-    function removeCertificate(bytes32 certUnique) public onlyOwner(certUnique) returns (bool success) {
-        if(msg.sender == certs[certUnique].issuer) {
-            certs[certUnique].isStilValid = false;
+    function removeCertificate(bytes32 _certUnique) public onlyOwner(_certUnique) returns (bool success) {
+        if(msg.sender == certs[_certUnique].issuer) {
+            certs[_certUnique].isStilValid = false;
             return true;
         }
         return false;
