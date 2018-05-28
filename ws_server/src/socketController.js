@@ -22,8 +22,8 @@ class SocketController {
     }
 
     processNewConnection(ws) {
-        console.log('client connected');
-        this.send(ws, '{"params":"client connected"}');
+        console.log('Client connected');
+        this.send(ws, '{"params":"Client connected"}');
     }
 
     processMessage(ws, message) {

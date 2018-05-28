@@ -85,29 +85,29 @@ document.getElementById('btnTest').addEventListener('click', function(evt){
   console.log("###############  Runing test  ###############");
 
   let data = {
-    "owner": "0xf17f52151EbEF6C7334FAD080c5704D77216b732",
+    "owner": "0x4eab0f78821612c0528f29fe1193c5d825616a74",
     "duration": 300,
     "certType": "Titulo marítimo",
     "certName": "Capitán",
-    "sender": "0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef"
+    "sender": "0x86b53fd08baef3202ad2c4cb0b5d04384d2c8850"
   }
   newCert(data);
   
   data = {
-    "owner": "0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef",
+    "owner": "0x86b53fd08baef3202ad2c4cb0b5d04384d2c8850",
     "duration": 300,
     "certType": "Titulo nobiliario",
     "certName": "Barón Rojo",
-    "sender": "0xf17f52151EbEF6C7334FAD080c5704D77216b732"
+    "sender": "0x4eab0f78821612c0528f29fe1193c5d825616a74"
   }
   newCert(data);
 
   data = {
-    "owner": "0x627306090abaB3A6e1400e9345bC60c78a8BEf57",
+    "owner": "0xa416ea7ab365c38e5c39b6f06ae779bebe918328",
     "duration": 300,
     "certType": "Convenio Prácticas",
     "certName": "Tecnalia Junio2017",
-    "sender": "0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef"
+    "sender": "0x86b53fd08baef3202ad2c4cb0b5d04384d2c8850"
   }
   newCert(data);
 

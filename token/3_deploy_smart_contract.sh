@@ -9,7 +9,7 @@ truffle compile
 echo "Once the compile has completed, deploy the contract to the blockchain"
 truffle migrate ---reset
 
-echo "Configure METAMASK to listen at: http://127.0.0.1:9545"
+echo "Configure METAMASK to listen at: http://172.17.0.2:8546"
 
 #echo "...."
 #echo "Running default web application..."

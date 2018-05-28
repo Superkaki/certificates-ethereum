@@ -2,7 +2,8 @@
 
 const proto = require('./protocol');
 
-const gethURL = "http://127.0.0.1:9545";
+//const gethURL = "http://127.0.0.1:9545";
+const gethURL = "http://172.17.0.2:8546";
 
 //BEGIN: prepare tools needed to connect to ethereum 
 const Web3 = require('web3');
@@ -13,18 +14,33 @@ var provider = new Web3.providers.HttpProvider(gethURL);
 const web3 = new Web3(provider);
 const accounts = new Accounts(gethURL);
 
+let inakiAddress = ("0xa416ea7ab365c38e5c39b6f06ae779bebe918328");
+let jackAddress = ("0x4eab0f78821612c0528f29fe1193c5d825616a74");
+let deustoAddress = ("0x86b53fd08baef3202ad2c4cb0b5d04384d2c8850");
+let tecnaliaAddress = ("0x7afc3bb694c30717c6999428cf38734cf39ebeff");
+
 console.log("Running web3 version: "+Web3.version);
 console.log("Active  Web3 modules: "+JSON.stringify(Web3.modules));
 
 const eth = web3.eth;
 const personal = eth.personal;
 
+
+const abi = [{"constant":false,"inputs":[{"name":"_certUnique","type":"bytes32"}],"name":"removeCertificate","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"getCreator","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"bytes32"}],"name":"accessLogs","outputs":[{"name":"date","type":"uint256"},{"name":"user","type":"address"},{"name":"certificate","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_certUnique","type":"bytes32"},{"name":"_newOwner","type":"address"}],"name":"addOwner","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_certUnique","type":"bytes32"},{"name":"_newOwner","type":"address"}],"name":"setNewOwner","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"certUnique","type":"bytes32"}],"name":"getCertByHash","outputs":[{"name":"","type":"bytes32"},{"name":"","type":"address"},{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_certUnique","type":"bytes32"}],"name":"insertHistory","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"bytes32"}],"name":"certs","outputs":[{"name":"issuer","type":"address"},{"name":"certName","type":"string"},{"name":"certType","type":"string"},{"name":"creationDate","type":"uint256"},{"name":"expirationDate","type":"uint256"},{"name":"isStilValid","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"kill","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_add","type":"address"},{"name":"_userName","type":"bytes15"},{"name":"_userNid","type":"bytes9"}],"name":"setUser","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"ConstructorCertToken","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"nounce","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"add","type":"address"}],"name":"getUserByAddress","outputs":[{"name":"","type":"bytes32"},{"name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_certUnique","type":"bytes32"},{"name":"_newEntity","type":"address"}],"name":"setEntityToWhiteList","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"add","type":"address"}],"name":"getAccessLogList","outputs":[{"name":"accessLogList","type":"bytes32[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getMyAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"users","outputs":[{"name":"name","type":"bytes15"},{"name":"nid","type":"bytes9"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"certUnique","type":"bytes32"}],"name":"checkCert","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"accessLogUnique","type":"bytes32"}],"name":"getAccessLogByHash","outputs":[{"name":"","type":"bytes32"},{"name":"","type":"uint256"},{"name":"","type":"address"},{"name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_certUnique","type":"bytes32"}],"name":"checkExpiration","outputs":[{"name":"isValid","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"add","type":"address"}],"name":"getCertList","outputs":[{"name":"ownCertsList","type":"bytes32[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_certType","type":"string"},{"name":"_certName","type":"string"},{"name":"_duration","type":"uint256"}],"name":"newCert","outputs":[{"name":"","type":"bytes32"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"certUnique","type":"bytes32"}],"name":"isSenderAllowed","outputs":[{"name":"isAllowed","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"certUnique","type":"bytes32"},{"indexed":false,"name":"sender","type":"address"},{"indexed":false,"name":"certType","type":"string"},{"indexed":false,"name":"certName","type":"string"},{"indexed":false,"name":"creationDate","type":"uint256"},{"indexed":false,"name":"expirationDate","type":"uint256"}],"name":"newCertCreated","type":"event"}];
+const myContract = new web3.eth.Contract(abi, '0xc676dd57e4fb4c800188c353c79f84bdecf1b191');
+const transactionObject = {
+	from: jackAddress,
+	gas: 3000000
+};
+
+userCreationTest();
+
 const CertificateContract = contract(
-  require("../../token/build/contracts/CertToken.json")
+	require("../../token/build/contracts/CertToken.json")
 );
 
-console.log("Provider: "+provider)
-console.log("Current provider: "+Web3.currentProvider)
+console.log("Provider: "+JSON.stringify(provider));
+console.log("Current provider: "+Web3.currentProvider);
 // Remember to set the Web3 provider (see above).
 CertificateContract.setProvider(provider);
 
@@ -33,11 +49,6 @@ CertificateContract.currentProvider.sendAsync = function () {
     return CertificateContract.currentProvider.send.apply(CertificateContract.currentProvider, arguments);
 };
 //END workaround
-
-let inakiAddress = ("0x627306090abaB3A6e1400e9345bC60c78a8BEf57");
-let jackAddress = ("0xf17f52151EbEF6C7334FAD080c5704D77216b732");
-let deustoAddress = ("0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef");
-let tecnaliaAddress = ("0x821aEa9a577a9b44299B9c15c88cf3087F3b5544");
 
 let tokenManager;
 
@@ -55,31 +66,32 @@ class CertificateProtocol extends proto.Protocol {
 
     deploy(){
     	let that = this;
-    	console.log("Deploy CertificateContract!");
-    	CertificateContract.deployed().then(function(instance) {
-			console.log("Contract deployed!");
-			that.tokenManager = instance;
-			console.log("Creating instance")
-			console.log("###############  Generating users  ###############");
-			return that.tokenManager.setUser(inakiAddress, "Inaki Seco", "22222222A", {from: inakiAddress, gas:3000000});
-		}).then(function(result) {
-			console.log("User Inaki creation block");
-			console.log(JSON.stringify(result));
-	    	return that.tokenManager.setUser(jackAddress, "Jack Sparrow", "66666666B", {from: jackAddress, gas:3000000});
-	    }).then(function(result) {
-			console.log("User Jack creation block");
-			console.log(JSON.stringify(result));
-			return that.tokenManager.setUser(deustoAddress, "Univeristy of Deusto", "77777777D", {from: deustoAddress, gas:3000000});
-	    }).then(function(result) {
-			console.log("Entity Deusto creation block");
-			console.log(JSON.stringify(result));
-			return that.tokenManager.setUser(tecnaliaAddress, "Tecnalia Research Innovation", "11111111T", {from: tecnaliaAddress, gas:3000000});
-	    }).then(function(result) {
-			console.log("Entity Tecnalia creation block");
-			console.log(JSON.stringify(result));
-		}).catch(function(err) {
-		  	console.log("FULL ERROR! " + err);       	  // Easily catch all errors along the whole execution.
-		});
+//		console.log("Deploy CertificateContract!");
+//		CertificateContract.deployed().then(function(instance) {
+//		CertificateContract.
+//			console.log("Contract deployed!");
+//			that.tokenManager = instance;
+//			console.log("Creating instance")
+//			console.log("###############  Generating users  ###############");
+//			return that.tokenManager.setUser(inakiAddress, "Inaki Seco", "22222222A", {from: inakiAddress, gas:3000000});
+//		}).then(function(result) {
+//			console.log("User Inaki creation block");
+//			console.log(JSON.stringify(result));
+//	    	return that.tokenManager.setUser(jackAddress, "Jack Sparrow", "66666666B", {from: jackAddress, gas:3000000});
+//	    }).then(function(result) {
+//			console.log("User Jack creation block");
+//			console.log(JSON.stringify(result));
+//			return that.tokenManager.setUser(deustoAddress, "Univeristy of Deusto", "77777777D", {from: deustoAddress, gas:3000000});
+//	    }).then(function(result) {
+//			console.log("Entity Deusto creation block");
+//			console.log(JSON.stringify(result));
+//			return that.tokenManager.setUser(tecnaliaAddress, "Tecnalia Research Innovation", "11111111T", {from: tecnaliaAddress, gas:3000000});
+//	    }).then(function(result) {
+//			console.log("Entity Tecnalia creation block");
+//			console.log(JSON.stringify(result));
+//		}).catch(function(err) {
+//		  	console.log("FULL ERROR! " + err);       	  // Easily catch all errors along the whole execution.
+//		});
 	}
 
     parse(wsClient, jsonData){
@@ -380,5 +392,35 @@ function printResult(rslt) {
 		console.log("There isn't results to the request");		
 	}
 }
+
+function userCreationTest() {
+
+	myContract.methods.setUser(jackAddress, web3.utils.utf8ToHex('Jack Sparrow'), web3.utils.utf8ToHex('66666666J')).send({from: jackAddress})
+	.on('transactionHash', function(hash){
+		console.log(hash);      	  // Easily catch all errors along the whole execution.
+	});
+
+	myContract.methods.setUser(inakiAddress, web3.utils.utf8ToHex('Inaki Seco'), web3.utils.utf8ToHex('22222222A')).send({from: jackAddress})
+	.on('transactionHash', function(hash){
+		console.log(hash);      	  // Easily catch all errors along the whole execution.
+	});
+
+	myContract.methods.newCert(inakiAddress, web3.utils.utf8ToHex('Grado'), web3.utils.utf8ToHex('Teleco'), 120).send({from: jackAddress})
+	.on('receipt', function(receipt){
+		console.log(receipt);
+	})
+	.on('transactionHash', function(hash){
+		console.log(hash);
+		myContract.methods.getCertList(inakiAddress).send({from: inakiAddress})
+		.on('transactionHash', function(hash){
+			console.log(hash);
+		})
+		.on('receipt', function(receipt){
+			console.log(receipt);
+		});
+	});
+
+}
+
 
 exports.CertificateProtocol = CertificateProtocol;
