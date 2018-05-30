@@ -2,7 +2,6 @@
 
 const proto = require('./protocol');
 
-//const gethURL = "http://127.0.0.1:9545";
 const gethURL = "http://172.17.0.2:8546";
 
 //BEGIN: prepare tools needed to connect to ethereum 
@@ -24,16 +23,10 @@ console.log("Active  Web3 modules: "+JSON.stringify(Web3.modules));
 
 const eth = web3.eth;
 const personal = eth.personal;
-
+const toHex = web3.utils.utf8ToHex;
 
 const abi = [{"constant":false,"inputs":[{"name":"_certUnique","type":"bytes32"}],"name":"removeCertificate","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"getCreator","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"bytes32"}],"name":"accessLogs","outputs":[{"name":"date","type":"uint256"},{"name":"user","type":"address"},{"name":"certificate","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_certUnique","type":"bytes32"},{"name":"_newOwner","type":"address"}],"name":"addOwner","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_certUnique","type":"bytes32"},{"name":"_newOwner","type":"address"}],"name":"setNewOwner","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"certUnique","type":"bytes32"}],"name":"getCertByHash","outputs":[{"name":"","type":"bytes32"},{"name":"","type":"address"},{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_certUnique","type":"bytes32"}],"name":"insertHistory","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"bytes32"}],"name":"certs","outputs":[{"name":"issuer","type":"address"},{"name":"certName","type":"string"},{"name":"certType","type":"string"},{"name":"creationDate","type":"uint256"},{"name":"expirationDate","type":"uint256"},{"name":"isStilValid","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"kill","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_add","type":"address"},{"name":"_userName","type":"bytes15"},{"name":"_userNid","type":"bytes9"}],"name":"setUser","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"ConstructorCertToken","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"nounce","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"add","type":"address"}],"name":"getUserByAddress","outputs":[{"name":"","type":"bytes32"},{"name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_certUnique","type":"bytes32"},{"name":"_newEntity","type":"address"}],"name":"setEntityToWhiteList","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"add","type":"address"}],"name":"getAccessLogList","outputs":[{"name":"accessLogList","type":"bytes32[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getMyAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"users","outputs":[{"name":"name","type":"bytes15"},{"name":"nid","type":"bytes9"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"certUnique","type":"bytes32"}],"name":"checkCert","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"accessLogUnique","type":"bytes32"}],"name":"getAccessLogByHash","outputs":[{"name":"","type":"bytes32"},{"name":"","type":"uint256"},{"name":"","type":"address"},{"name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_certUnique","type":"bytes32"}],"name":"checkExpiration","outputs":[{"name":"isValid","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"add","type":"address"}],"name":"getCertList","outputs":[{"name":"ownCertsList","type":"bytes32[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_certType","type":"string"},{"name":"_certName","type":"string"},{"name":"_duration","type":"uint256"}],"name":"newCert","outputs":[{"name":"","type":"bytes32"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"certUnique","type":"bytes32"}],"name":"isSenderAllowed","outputs":[{"name":"isAllowed","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"certUnique","type":"bytes32"},{"indexed":false,"name":"sender","type":"address"},{"indexed":false,"name":"certType","type":"string"},{"indexed":false,"name":"certName","type":"string"},{"indexed":false,"name":"creationDate","type":"uint256"},{"indexed":false,"name":"expirationDate","type":"uint256"}],"name":"newCertCreated","type":"event"}];
 const myContract = new web3.eth.Contract(abi, '0xc676dd57e4fb4c800188c353c79f84bdecf1b191');
-const transactionObject = {
-	from: jackAddress,
-	gas: 3000000
-};
-
-userCreationTest();
 
 const CertificateContract = contract(
 	require("../../token/build/contracts/CertToken.json")
@@ -60,38 +53,8 @@ class CertificateProtocol extends proto.Protocol {
 
 	constructor() {
 		super();
-		this.deploy();
 		this.tokenManager = undefined;
-    }
-
-    deploy(){
-    	let that = this;
-//		console.log("Deploy CertificateContract!");
-//		CertificateContract.deployed().then(function(instance) {
-//		CertificateContract.
-//			console.log("Contract deployed!");
-//			that.tokenManager = instance;
-//			console.log("Creating instance")
-//			console.log("###############  Generating users  ###############");
-//			return that.tokenManager.setUser(inakiAddress, "Inaki Seco", "22222222A", {from: inakiAddress, gas:3000000});
-//		}).then(function(result) {
-//			console.log("User Inaki creation block");
-//			console.log(JSON.stringify(result));
-//	    	return that.tokenManager.setUser(jackAddress, "Jack Sparrow", "66666666B", {from: jackAddress, gas:3000000});
-//	    }).then(function(result) {
-//			console.log("User Jack creation block");
-//			console.log(JSON.stringify(result));
-//			return that.tokenManager.setUser(deustoAddress, "Univeristy of Deusto", "77777777D", {from: deustoAddress, gas:3000000});
-//	    }).then(function(result) {
-//			console.log("Entity Deusto creation block");
-//			console.log(JSON.stringify(result));
-//			return that.tokenManager.setUser(tecnaliaAddress, "Tecnalia Research Innovation", "11111111T", {from: tecnaliaAddress, gas:3000000});
-//	    }).then(function(result) {
-//			console.log("Entity Tecnalia creation block");
-//			console.log(JSON.stringify(result));
-//		}).catch(function(err) {
-//		  	console.log("FULL ERROR! " + err);       	  // Easily catch all errors along the whole execution.
-//		});
+		//userCreationTest();
 	}
 
     parse(wsClient, jsonData){
@@ -113,43 +76,38 @@ class CertificateProtocol extends proto.Protocol {
             case "getCertList":{
 				let that = this;
 				let data = jsonData.params;
-				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.getCertList(data.sender, {from: data.sender, gas:3000000}).then(function(rslt) {
-					printResult(rslt);
-					if(rslt != undefined){
-						for (var i = 0; i < rslt.length; i++) {
-							that.tokenManager.checkExpiration(rslt[i], {from: data.sender, gas:3000000});
-							that.tokenManager.getCertByHash(rslt[i], {from: data.sender, gas:3000000}).then(function(certInfo) {
-								let response = that.responseHolder(jsonData.id);
-								response.result = {
-									certHash: certInfo[0],
-									issuer: certInfo[1], 
-									certType: certInfo[2], 
-									certName: certInfo[3],
-									creationDate: certInfo[4],
-									expirationDate: certInfo[5],
-									isStilValid: certInfo[6]
-								}
-								that.sendResponse(response);
-							}).catch((err) => {
-								console.log("Something happens getting a certificate: " + err);
-								//TODO: that.sendResponse(error)
-							});
-						}
-																																				
-						//let certList = that.tokenManager.certList({}, {fromBlock: 'latest', toBlock: 'latest'})
-						//certList.get((error, logs) => {
-						//	logs.forEach(log => {
-						//		response.result = {
-						//			certificateList: log.args.ownCerts
-						//		}
-						//		that.sendResponse(response);
-						//	})
-						//})
-					}
-					else{
-						console.log("Balance error: "+rslt)
-					}
+				let transactionObject = {from: data.sender, gas: 3000000}
+
+				myContract.methods.getCertList(data.sender).send(transactionObject)
+				.on('receipt', function(receipt){
+					printResult("getCertList block: "+JSON.stringify(receipt));
+				
+			//		printResult(rslt);
+			//		if(rslt != undefined){
+			//			for (var i = 0; i < rslt.length; i++) {
+			//				myContract.methods.checkExpiration(rslt[i]).send(transactionObject);
+			//				myContract.methods.getCertByHash(rslt[i]).send(transactionObject)
+			//				.on('transactionHash', function(hash){
+			//					let response = that.responseHolder(jsonData.id);
+			//					response.result = {
+			//						certHash: certInfo[0],
+			//						issuer: certInfo[1], 
+			//						certType: certInfo[2], 
+			//						certName: certInfo[3],
+			//						creationDate: certInfo[4],
+			//						expirationDate: certInfo[5],
+			//						isStilValid: certInfo[6]
+			//					}
+			//					that.sendResponse(response);
+			//				}).catch((err) => {
+			//					console.log("Something happens getting a certificate: " + err);
+			//					//TODO: that.sendResponse(error)
+			//				});
+			//			}
+			//		}
+			//		else{
+			//			console.log("Balance error: "+rslt)
+			//		}
 				}).catch((err) => {
 					console.log("Something happens getting certificate list: " + err);
 					//TODO: that.sendResponse(error)
@@ -160,30 +118,35 @@ class CertificateProtocol extends proto.Protocol {
 			case "getAccessLogList":{
 				let that = this;
 				let data = jsonData.params;
-				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.getAccessLogList(data.sender, {from: data.sender, gas:3000000}).then(function(rslt) {
-					printResult(rslt);
-					if(rslt != undefined){
-						for (var i = 0; i < rslt.length; i++) {
-							that.tokenManager.getAccessLogByHash(rslt[i], {from: data.sender, gas:3000000}).then(function(accessLogInfo) {
-								let response = that.responseHolder(jsonData.id);
-								response.result = {
-									accessLogHash: accessLogInfo[0],
-									creationDate: accessLogInfo[1],
-									user: accessLogInfo[2],
-									certHash: accessLogInfo[3],
-									hadSuccess: true
-								}
-								that.sendResponse(response);
-							}).catch((err) => {
-								console.log("Something happens getting a certificate: " + err);
-								//TODO: that.sendResponse(error)
-							});
-						}
-					}
-					else{
-						console.log("Balance error: "+rslt)
-					}
+				let transactionObject = {from: data.sender, gas: 3000000}
+				
+				myContract.methods.getAccessLogList(data.sender).send(transactionObject)
+				.on('receipt', function(receipt){
+					printResult("getAccessLogList block: "+JSON.stringify(receipt));
+
+			//		printResult(rslt);
+			//		if(rslt != undefined){
+			//			for (var i = 0; i < rslt.length; i++) {
+			//				myContract.methods.getAccessLogByHash(rslt[i]).send(transactionObject)
+			//				.on('transactionHash', function(hash){
+			//					let response = that.responseHolder(jsonData.id);
+			//					response.result = {
+			//						accessLogHash: accessLogInfo[0],
+			//						creationDate: accessLogInfo[1],
+			//						user: accessLogInfo[2],
+			//						certHash: accessLogInfo[3],
+			//						hadSuccess: true
+			//					}
+			//					that.sendResponse(response);
+			//				}).catch((err) => {
+			//					console.log("Something happens getting a certificate: " + err);
+			//					//TODO: that.sendResponse(error)
+			//				});
+			//			}
+			//		}
+			//		else{
+			//			console.log("Balance error: "+rslt)
+			//		}
 				}).catch((err) => {
 					console.log("Something happens getting certificate list: " + err);
 					//TODO: that.sendResponse(error)
@@ -194,17 +157,21 @@ class CertificateProtocol extends proto.Protocol {
 			case "setUser":{
 				let that = this;
 				let data = jsonData.params;
-				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.setUser(data.sender, data.userName, data.userNID, {from: data.sender, gas:3000000}).then(function(rslt) {
-					printResult(rslt);
-					if(rslt != undefined){
-						let response = that.responseHolder(jsonData.id);
-		    			response.result = {
-							block: rslt						
-						}
-						console.log("Making new user response")
-						that.sendResponse(response);
-					}
+				let transactionObject = {from: data.sender, gas: 3000000}
+
+				myContract.methods.setUser(data.sender, toHex(data.userName), toHex(data.userNID)).send(transactionObject)
+				.on('receipt', function(receipt){
+					printResult("setUser block: "+JSON.stringify(receipt));
+
+			//		printResult(rslt);
+			//		if(rslt != undefined){
+			//			let response = that.responseHolder(jsonData.id);
+		    //			response.result = {
+			//				block: rslt						
+			//			}
+			//			console.log("Making new user response")
+			//			that.sendResponse(response);
+			//		}
 				}).catch((err) => {
 					let response = that.errorResponse(jsonData.id);
 					let msg = "Something happens creating new user";
@@ -221,23 +188,36 @@ class CertificateProtocol extends proto.Protocol {
             case "checkCert":{
 				let that = this;
 				let data = jsonData.params;
-				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.checkExpiration(data.certHash, {from: data.sender, gas:3000000});
-				this.tokenManager.isSenderAllowed(data.certHash, {from: data.sender, gas:3000000}).then(function(rslt) {
-					if (rslt) {
-						that.tokenManager.insertHistory(data.certHash, {from: data.sender, gas:3000000});
-						that.tokenManager.getCertByHash(data.certHash, {from: data.sender, gas:3000000}).then(function(certInfo) {
-							let response = that.responseHolder(jsonData.id)
-							response.result = {
-								certHash: certInfo[0],
-								issuer: certInfo[1], 
-								certType: certInfo[2], 
-								certName: certInfo[3],
-								creationDate: certInfo[4],
-								user: data.sender,
-								isStilValid: certInfo[6]
-							}
-							that.sendResponse(response);
+				let transactionObject = {from: data.sender, gas: 3000000}
+
+				myContract.methods.checkExpiration(data.certHash).send(transactionObject)
+				.on('receipt', function(receipt){
+					printResult("checkExpiration block: "+JSON.stringify(receipt));
+				});
+				myContract.methods.isSenderAllowed(data.certHash).send(transactionObject)
+				.on('receipt', function(receipt){
+					printResult("isSenderAllowed block: "+JSON.stringify(receipt));
+
+					if (receipt) {
+						myContract.methods.insertHistory(data.certHash).send(transactionObject)
+						.on('receipt', function(receipt){
+							printResult("insertHistory block: "+JSON.stringify(receipt));
+						});
+						myContract.methods.getCertByHash(data.certHash).send(transactionObject)
+						.on('receipt', function(receipt){
+							printResult("getCertByHash block: "+JSON.stringify(receipt));
+
+			//				let response = that.responseHolder(jsonData.id)
+			//				response.result = {
+			//					certHash: certInfo[0],
+			//					issuer: certInfo[1], 
+			//					certType: certInfo[2], 
+			//					certName: certInfo[3],
+			//					creationDate: certInfo[4],
+			//					user: data.sender,
+			//					isStilValid: certInfo[6]
+			//				}
+			//				that.sendResponse(response);
 						});
 					} else {
 						let response = that.errorResponse(jsonData.id);
@@ -257,26 +237,30 @@ class CertificateProtocol extends proto.Protocol {
 			case "newCert":{
 				let that = this;
 				let data = jsonData.params;
-				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.newCert(data.owner, data.certType, data.certName, data.duration, {from: data.sender, gas:3000000}).then(function(rslt) {
-					printResult(rslt);
-					if(rslt != undefined){
+				let transactionObject = {from: data.sender, gas: 3000000}
+
+				myContract.methods.newCert(data.owner, toHex(data.certType), toHex(data.certName), data.duration).send(transactionObject)
+				.on('receipt', function(receipt){
+					printResult("newCert block: "+JSON.stringify(receipt));
+
+			//		printResult(rslt);
+					if(receipt != undefined){
 						let response = that.responseHolder(jsonData.id);
-						let newCertEvent = that.tokenManager.newCertCreated({}, {fromBlock: 'latest', toBlock: 'latest'})
-						newCertEvent.get((error, logs) => {
-							logs.forEach(log => {
+			//			let newCertEvent = that.tokenManager.newCertCreated({}, {fromBlock: 'latest', toBlock: 'latest'})
+			//			newCertEvent.get((error, logs) => {
+			//				logs.forEach(log => {
 								response.result = {
-									certHash: log.args.certUnique,
-									issuer: log.args.sender,
-									certType: log.args.certType,
-									certName: log.args.certName,
-									creationDate: log.args.creationDate,
-									expirationDate: log.args.expirationDate,
+									certHash: "0xe582642af6d6971f00054e81b3c953f573147ab073aa741e90cbedbee9cf508e",
+									issuer: data.sender,
+									certType: "Grado",
+									certName: "Teleco",
+									creationDate: 1527669655,
+									expirationDate: 1527669955,
 									isStilValid: true
 								}
 								that.sendResponse(response);
-							})
-						})
+			//				})
+			//			})
 					} else {
 						console.log("Balance error: "+rslt)
 					}
@@ -295,15 +279,19 @@ class CertificateProtocol extends proto.Protocol {
 			case "setNewOwner":{
 				let that = this;
 				let data = jsonData.params;
-    			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.setNewOwner(data.certHash, data.newOwner, {from: data.sender, gas:3000000}).then(function(rslt) {
-					if(rslt != undefined){
-						let response = that.responseHolder(jsonData.id);
-		    			response.result = {
-							block: rslt						
-						}
-						console.log("Making new owner response")
-						that.sendResponse(response);
+    			let transactionObject = {from: data.sender, gas: 3000000}
+
+				myContract.methods.setNewOwner(data.certHash, data.newOwner).send(transactionObject)
+				.on('receipt', function(receipt){
+					printResult("setNewOwner block: "+JSON.stringify(receipt));
+
+					if(receipt != undefined){
+			//			let response = that.responseHolder(jsonData.id);
+		    //			response.result = {
+			//				block: rslt						
+			//			}
+			//			console.log("Making new owner response")
+			//			that.sendResponse(response);
 					}
 					else{
 						console.log("Balance error: "+rslt)
@@ -323,15 +311,19 @@ class CertificateProtocol extends proto.Protocol {
 			case "setEntityToWhiteList":{
 				let that = this;
 				let data = jsonData.params;
-    			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.setEntityToWhiteList(data.certHash, data.address, {from: data.sender, gas:3000000}).then(function(rslt) {
-					if(rslt != undefined){
-						let response = that.responseHolder(jsonData.id);
-		    			response.result = {
-							success: rslt						
-						}
-						console.log("Making entity to white list response")
-						that.sendResponse(response);
+    			let transactionObject = {from: data.sender, gas: 3000000}
+
+				myContract.methods.setEntityToWhiteList(data.certHash, data.address).send(transactionObject)
+				.on('receipt', function(receipt){
+					printResult("setEntityToWhiteList block: "+JSON.stringify(receipt));
+
+					if(receipt != undefined){
+			//			let response = that.responseHolder(jsonData.id);
+		    //			response.result = {
+			//				success: rslt						
+			//			}
+			//			console.log("Making entity to white list response")
+			//			that.sendResponse(response);
 					}
 					else{
 						console.log("Balance error: "+rslt)
@@ -351,15 +343,19 @@ class CertificateProtocol extends proto.Protocol {
 			case "removeCertificate":{
 				let that = this;
 				let data = jsonData.params;
-    			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.removeCertificate(data.certHash, {from: data.sender, gas:3000000}).then(function(rslt) {
-						if(rslt != undefined){
-						let response = that.responseHolder(jsonData.id);
-		    			response.result = {
-							success: rslt						
-						}
-						console.log("Making entity to white list response")
-						that.sendResponse(response);
+    			let transactionObject = {from: data.sender, gas: 3000000}
+
+				myContract.methods.removeCertificate(data.certHash).send(transactionObject)
+				.on('receipt', function(receipt){
+					printResult("removeCertificate block: "+JSON.stringify(receipt));
+
+					if(receipt != undefined){
+			//			let response = that.responseHolder(jsonData.id);
+		    //			response.result = {
+			//				success: rslt						
+			//			}
+			//			console.log("Making entity to white list response")
+			//			that.sendResponse(response);
 					}
 					else{
 						console.log("Balance error: "+rslt)
@@ -395,31 +391,35 @@ function printResult(rslt) {
 
 function userCreationTest() {
 
-	myContract.methods.setUser(jackAddress, web3.utils.utf8ToHex('Jack Sparrow'), web3.utils.utf8ToHex('66666666J')).send({from: jackAddress})
-	.on('transactionHash', function(hash){
-		console.log(hash);      	  // Easily catch all errors along the whole execution.
-	});
-
-	myContract.methods.setUser(inakiAddress, web3.utils.utf8ToHex('Inaki Seco'), web3.utils.utf8ToHex('22222222A')).send({from: jackAddress})
-	.on('transactionHash', function(hash){
-		console.log(hash);      	  // Easily catch all errors along the whole execution.
-	});
-
-	myContract.methods.newCert(inakiAddress, web3.utils.utf8ToHex('Grado'), web3.utils.utf8ToHex('Teleco'), 120).send({from: jackAddress})
-	.on('receipt', function(receipt){
-		console.log(receipt);
-	})
+	console.log("###############  Generating users  ###############");
+	var ok = myContract.methods.setUser(inakiAddress, toHex('Inaki Seco'), toHex('22222222I')).send({from: inakiAddress, gas: 3000000})
 	.on('transactionHash', function(hash){
 		console.log(hash);
-		myContract.methods.getCertList(inakiAddress).send({from: inakiAddress})
+	}).then(myContract.methods.setUser(jackAddress, toHex('Jack Sparrow'), toHex('66666666J')).send({from: jackAddress, gas: 3000000})
+	.on('transactionHash', function(hash){
+		console.log(hash);
+	}).then(myContract.methods.setUser(deustoAddress, toHex('Univeristy of Deusto'), toHex('77777777D')).send({from: deustoAddress, gas: 3000000})
+	.on('transactionHash', function(hash){
+		console.log(hash);
+	}).then(myContract.methods.setUser(tecnaliaAddress, toHex('Tecnalia Research Innovation'), toHex('11111111T')).send({from: tecnaliaAddress, gas: 3000000})
+	.on('transactionHash', function(hash){
+		console.log(hash);
+	}))));
+
+	console.log("###############  Creating new certificate  ###############");
+	myContract.methods.newCert(inakiAddress, toHex('Título de grado'), toHex('Ingeniería de Telecomunicaciones'), 120).send({from: deustoAddress, gas: 3000000})
+	.on('transactionHash', function(hash){
+		console.log(hash);
+		myContract.methods.getCertList(inakiAddress).send({from: inakiAddress, gas: 3000000})
 		.on('transactionHash', function(hash){
 			console.log(hash);
-		})
-		.on('receipt', function(receipt){
-			console.log(receipt);
 		});
 	});
 
+	var success = myContract.methods.getCertList(inakiAddress).send({from: inakiAddress, gas: 3000000})
+	.on('receipt', function(receipt){
+		console.log("getCertList block: "+JSON.stringify(receipt));
+	});
 }
 
 

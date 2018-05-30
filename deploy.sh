@@ -65,10 +65,10 @@ function main(){
 	cd ./token
 	#deleteJSONs
 
-	log "Deploying ganache..."
-	bash ./2_deploy_explorer.sh &
-	log "Deploying smart contract"
-	bash ./3_deploy_smart_contract.sh
+	#log "Deploying ganache..."
+	#bash ./2_deploy_explorer.sh &
+	#log "Deploying smart contract"
+	#bash ./3_deploy_smart_contract.sh
 	
 	#log "Running log window"
 	#gnome-terminal -x truffle develop --log
