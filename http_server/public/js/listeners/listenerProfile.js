@@ -1,4 +1,4 @@
-let wsUri = "ws://localhost:8080/";
+let wsUri = "ws://172.24.3.166:8080/";
 let debug = true;
 
 function init() {
@@ -342,11 +342,17 @@ function processMessageProtocol(json){
       case "0.2":
         processAccessLogRecord(json.result);
         break; 
-      case "1":
+      case "1.0":
+        showWaitingIcon(json,"#certInfo");
+        break;
+      case "1.1":
         processCheckCertResponse(json);
         break;
-      case "2":
-        processNewCertResponse(json);
+      case "2.0":
+        showWaitingIcon(json,"#formSend");
+        break;
+      case "2.1":
+        processNewCertCreatedResponse(json);
         break;
       case "3":
         processNewOwnerResponse(json);
@@ -396,7 +402,7 @@ function processCheckCertResponse(json) {
   
   if(json.result){
     let data = json.result;
-    addAccessLogRow(data);
+    //addAccessLogRow(data);
 
     let iconVerify = undefined;
     if(data.isStilValid) {
@@ -409,6 +415,7 @@ function processCheckCertResponse(json) {
                   </button>";
     }
 
+    
     rowdata = "<h6 class='title'>Creation Date: " + epochToDateTime(data.creationDate) + "</h6>\
     <h6 class='title'>Issuer: " + data.issuer + "</h6>\
     <h6 class='title'>Type: " + data.certType + "</h6>\
@@ -417,6 +424,7 @@ function processCheckCertResponse(json) {
     rowdata = rowdata.replace("", "");
     let info = $("#certInfo")[0];
     info.innerHTML = rowdata;
+    
   
   } else {
     let data = json.error;
@@ -433,7 +441,7 @@ function processCheckCertResponse(json) {
 Show success icon
 Insert a new certificate creation into the record
 /********************************************************************************************/
-function processNewCertResponse(json) {
+function processNewCertCreatedResponse(json) {
   if(json.result) {
     let data = json.result;
     console.log("New cert added");
@@ -524,7 +532,7 @@ function processRemoveCertificateResponse(data) {
 
   iconRemove = "<button id='btnRemove' class='btn btn-danger btn-round'>Removed!</button>";
   iconRemove = iconRemove.replace("", "");
-  let creating = $("#iconRemove")[0];
+  creating = $("#iconRemove")[0];
   creating.innerHTML = iconRemove;
 }
 
@@ -603,7 +611,7 @@ function addAccessLogRow(data) {
   </tr>";
   rowdata = rowdata.replace("", "");
   let table = $("#logHistory")[0];
-  table.innerHTML = rowdata + table.innerHTML;
+  table.innerHTML = table.innerHTML + rowdata;
 }
 
 /********************************************************************************************
@@ -617,4 +625,25 @@ function addOptionToManager(certHash,certName) {
   let opt = $("#titleOption")[0];
   console.log(opt);
   opt.innerHTML = opt.innerHTML + option;
+}
+
+/********************************************************************************************
+Show waiting icon
+/********************************************************************************************/
+function showWaitingIcon(json, place) {
+  if(json.result) {
+    console.log("Waiting block");
+    if(json.result.success) {
+      iconSended = "</br><i class='now-ui-icons loader_refresh spin'></i>";
+    }
+  } else {
+    let data = json.error;
+    console.log("Error: " + data.message);
+    iconSended = "<button class='btn btn-danger btn-round' type='button'>\
+                      <i class='now-ui-icons ui-1_simple-remove'></i> "+data.message+"\
+                  </button>";
+  }
+  iconSended = iconSended.replace("", "");
+  let creating = $(place)[0];
+  creating.innerHTML = iconSended;
 }
