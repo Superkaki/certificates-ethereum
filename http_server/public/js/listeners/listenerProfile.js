@@ -354,11 +354,14 @@ function processMessageProtocol(json){
       case "2.1":
         processNewCertCreatedResponse(json);
         break;
-      case "3":
-        processNewOwnerResponse(json);
+      case "3.0":
+        showWaitingIcon(json,"#formAdd");
         break;
-      case "4":
+      case "3.1":
         processEntityToWhiteListResponse(json);
+        break;
+      case "3.2":
+        processNewOwnerResponse(json);
         break;
       case "5":
         processRemoveCertificateResponse(json.result);

@@ -274,42 +274,28 @@ class CertificateProtocol extends proto.Protocol {
     			break
 			}
 
-			case "setNewOwner":{
-				let that = this;
-				let data = jsonData.params;
-    			let transactionObject = {from: data.sender, gas: 3000000}
-
-				certifikate.setNewOwner(data.certHash, data.newOwner).send(transactionObject)
-				.on('receipt', function(receipt){
-					printResult("setNewOwner block",JSON.stringify(receipt));
-					if(receipt != undefined){
-						let response = that.responseHolder(jsonData.id);
-		    			response.result = {
-							block: receipt						
-						}
-						console.log("Making new owner response")
-						that.sendResponse(response);
-					}
-					else{
-						console.log("Balance error: "+receipt)
-					}
-				}).catch((err) => {
-					this.errorResponse(jsonData.id,"403","Permission denied, you are not the issuer");
-					console.log("Something happens adding new owner to certificate: " + err);
-				});				
-    			break
-			}
-
 			case "setEntityToWhiteList":{
 				let that = this;
 				let data = jsonData.params;
     			let transactionObject = {from: data.sender, gas: 3000000}
 
 				certifikate.setEntityToWhiteList(data.certHash, data.address).send(transactionObject)
-				.on('receipt', function(receipt){
+				.on('transactionHash', function(hash){
+					printResult("setEntityToWhiteList transaction hash sended",hash);
+					if(hash != undefined){
+						let response = that.responseHolder("3.0");
+						response.result = {
+							success: true,
+						}
+						that.sendResponse(response);
+					} else {
+						errorResponse("3.0","410","Error sending setEntityToWhiteList transaction");
+					}
+					console.log("Waiting block creation...");
+				}).on('receipt', function(receipt){
 					printResult("setEntityToWhiteList block",JSON.stringify(receipt));
 					if(receipt != undefined){
-						let response = that.responseHolder(jsonData.id);
+						let response = that.responseHolder("3.1");
 		    			response.result = {
 							block: receipt						
 						}
@@ -320,9 +306,48 @@ class CertificateProtocol extends proto.Protocol {
 						console.log("Balance error: "+receipt)
 					}
 				}).catch((err) => {
-					this.errorResponse(jsonData.id,"403","Permission denied, you do not own that certificate");
+					this.errorResponse("3.1","403","Permission denied, you do not own that certificate");
 					console.log("Something happens adding new entity to white list: " + err);
 					});				
+    			break
+			}
+
+
+			case "setNewOwner":{
+				let that = this;
+				let data = jsonData.params;
+    			let transactionObject = {from: data.sender, gas: 3000000}
+
+				certifikate.setNewOwner(data.certHash, data.newOwner).send(transactionObject)
+				.on('transactionHash', function(hash){
+					printResult("setNewOwner transaction hash sended",hash);
+					if(hash != undefined){
+						let response = that.responseHolder("3.0");
+						response.result = {
+							success: true,
+						}
+						that.sendResponse(response);
+					} else {
+						errorResponse("3.0","410","Error sending setNewOwner transaction");
+					}
+					console.log("Waiting block creation...");
+				}).on('receipt', function(receipt){
+					printResult("setNewOwner block",JSON.stringify(receipt));
+					if(receipt != undefined){
+						let response = that.responseHolder("3.2");
+		    			response.result = {
+							block: receipt						
+						}
+						console.log("Making new owner response")
+						that.sendResponse(response);
+					}
+					else{
+						console.log("Balance error: "+receipt)
+					}
+				}).catch((err) => {
+					this.errorResponse("3.2","403","Permission denied, you are not the issuer");
+					console.log("Something happens adding new owner to certificate: " + err);
+				});				
     			break
 			}
 
