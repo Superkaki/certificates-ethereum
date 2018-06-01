@@ -65,13 +65,18 @@ class Protocol {
 	    return msg;
 	}
 	
-	errorResponse(id){
+	errorResponse(id,errCode,errMsg){
+		let response = {
+			code: errCode,
+			message: errMsg
+		};
 		let msg = {
 	        jsonrpc: "2.0",
 			id: id,
-			error: undefined
-	    };
-	    return msg;
+			error: response
+		};
+		
+	    this.sendResponse(msg);
 	}
 
     sendResponse(response){
