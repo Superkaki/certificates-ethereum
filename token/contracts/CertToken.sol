@@ -44,7 +44,7 @@ contract CertToken {
     /********************************************************************************************/
     
     // event certList(bytes32[] certUnique);
-    event newCertCreated(bytes32 certUnique,  address sender, string certType, string certName, uint creationDate, uint expirationDate);
+    // event newCertCreated(bytes32 certUnique,  address sender, string certType, string certName, uint creationDate, uint expirationDate);
     // event checkOk(bytes32 certUnique, address sender, uint creationDate, bool success);
 
 
@@ -171,6 +171,13 @@ contract CertToken {
     }
 
     /********************************************************************************************
+    Get a user's last certificate
+    /********************************************************************************************/
+    function getLastCert(address add) public view returns (bytes32) {
+        return (users[add].ownCertsList[users[add].ownCertsList.length-1]);
+    }
+
+    /********************************************************************************************
     Get the name of an entity by its address
 
     add             Address of the entity to be searched
@@ -203,7 +210,7 @@ contract CertToken {
     certType        NType of the new certificate
     duration        Duration of the certificate's validity (seconds)
     /********************************************************************************************/
-    function newCert(address _to, string _certType, string _certName, uint _duration) public returns (bytes32) {
+    function newCert(address _to, string _certType, string _certName, uint _duration) public returns (bool success) {
         require(msg.sender != _to);
         bytes32 certUnique = keccak256(msg.sender, nounce++, _certName);
         // Addidng information
@@ -216,10 +223,8 @@ contract CertToken {
         certs[certUnique].creationDate = now;
         certs[certUnique].expirationDate = certs[certUnique].creationDate + _duration;
         certs[certUnique].isStilValid = true;
-
-        newCertCreated(certUnique, msg.sender, _certType, _certName, certs[certUnique].creationDate, certs[certUnique].expirationDate);
-
-        return certUnique;
+        
+        return true;
     }
 
     /********************************************************************************************
