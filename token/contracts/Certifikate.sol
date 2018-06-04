@@ -15,7 +15,7 @@ contract Certifikate {
 
     struct User {
         //bytes10 type;           // Type of user: Entity or Individual
-        bytes15 name;               // Owner's name
+        bytes32 name;               // Owner's name
         //bytes32 surnames;       // Owner's surnames
         bytes9 nid;                 // Owner's national identity document
         bytes32[] ownCertsList;     // List of certificates owned by that user
@@ -131,7 +131,7 @@ contract Certifikate {
     userName        Name of the new user
     userNid         New user's National Identity Card number
     /********************************************************************************************/
-    function setUser(address _add, bytes15 _userName, bytes9 _userNid) public returns (bool success) {
+    function setUser(address _add, bytes32 _userName, bytes9 _userNid) public returns (bool success) {
         users[_add].name = _userName;
         users[_add].nid = _userNid;
         return (true);
