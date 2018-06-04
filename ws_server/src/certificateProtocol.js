@@ -318,34 +318,39 @@ class CertificateProtocol extends proto.Protocol {
 				let data = jsonData.params;
     			let transactionObject = {from: data.sender, gas: 3000000}
 
-				certifikate.addOwner(data.certHash, data.newOwner).send(transactionObject)
-				.on('transactionHash', function(hash){
-					printResult("addOwner transaction hash sended",hash);
-					if(hash != undefined){
-						let response = that.responseHolder("3.0");
-						response.result = {
-							success: true,
-						}
-						that.sendResponse(response);
+				certifikate.getCertByHash(data.certHash).call(transactionObject).then(function(certInfo) {
+					if(certInfo[1].toUpperCase() == data.sender.toUpperCase()) {
+						certifikate.addOwner(data.certHash, data.newOwner).send(transactionObject)
+						.on('transactionHash', function(hash){
+							printResult("addOwner transaction hash sended",hash);
+							if(hash != undefined){
+								let response = that.responseHolder("3.0");
+								response.result = {
+									success: true,
+								}
+								that.sendResponse(response);
+							} else {
+								errorResponse("3.0","410","Error sending addOwner transaction");
+							}
+							console.log("Waiting block creation...");
+						}).on('receipt', function(receipt){
+							printResult("addOwner block",JSON.stringify(receipt));
+							if(receipt != undefined){
+								let response = that.responseHolder("3.2");
+		    					response.result = {
+									block: receipt						
+								}
+								console.log("Making new owner response")
+								that.sendResponse(response);
+							}
+							else{
+								console.log("Balance error: "+receipt)
+							}
+						});
 					} else {
-						errorResponse("3.0","410","Error sending addOwner transaction");
-					}
-					console.log("Waiting block creation...");
-				}).on('receipt', function(receipt){
-					printResult("addOwner block",JSON.stringify(receipt));
-					if(receipt != undefined){
-						let response = that.responseHolder("3.2");
-		    			response.result = {
-							block: receipt						
-						}
-						console.log("Making new owner response")
-						that.sendResponse(response);
-					}
-					else{
-						console.log("Balance error: "+receipt)
+						that.errorResponse("3.2","403","Permission denied, you are not the issuer");
 					}
 				}).catch((err) => {
-					this.errorResponse("3.2","403","Permission denied, you are not the issuer");
 					console.log("Something happens adding new owner to certificate: " + err);
 				});				
     			break
