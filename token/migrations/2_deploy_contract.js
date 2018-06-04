@@ -1,4 +1,4 @@
-const CertToken = artifacts.require("CertToken")
+const Certifikate = artifacts.require("Certifikate")
 
 module.exports = function(deployer, network, accounts) {
   const startTime = web3.eth.getBlock(web3.eth.blockNumber).timestamp + 1 // one second in the future
@@ -6,5 +6,5 @@ module.exports = function(deployer, network, accounts) {
   const rate = new web3.BigNumber(1000000) //converion rate to/from ETH; 1000 fuel = 1 ETH
   const wallet = accounts[0]
 
-  deployer.deploy(CertToken)
+  deployer.deploy(Certifikate)
 };

@@ -25,7 +25,7 @@ const eth = web3.eth;
 const personal = eth.personal;
 
 const CertificateContract = contract(
-	require("../../token/build/contracts/CertToken.json")
+	require("../../token/build/contracts/Certifikate.json")
 );
 
 console.log("Provider: "+JSON.stringify(provider));
@@ -212,7 +212,7 @@ class CertificateProtocol extends proto.Protocol {
 				let data = jsonData.params;
 				console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
 				this.tokenManager.checkExpiration(data.certHash, {from: data.sender, gas:3000000});
-				this.tokenManager.isSenderAllowed(data.certHash, {from: data.sender, gas:3000000}).then(function(rslt) {
+				this.tokenManager.isSenderInTheWhiteList(data.certHash, {from: data.sender, gas:3000000}).then(function(rslt) {
 					if (rslt) {
 						that.tokenManager.insertHistory(data.certHash, {from: data.sender, gas:3000000});
 						that.tokenManager.getCertByHash(data.certHash, {from: data.sender, gas:3000000}).then(function(certInfo) {
@@ -281,11 +281,11 @@ class CertificateProtocol extends proto.Protocol {
     			break
 			}
 
-			case "setNewOwner":{
+			case "addOwner":{
 				let that = this;
 				let data = jsonData.params;
     			console.log("this.tokenManager != undefined --> "+(this.tokenManager != undefined));
-				this.tokenManager.setNewOwner(data.certHash, data.newOwner, {from: data.sender, gas:3000000}).then(function(rslt) {
+				this.tokenManager.addOwner(data.certHash, data.newOwner, {from: data.sender, gas:3000000}).then(function(rslt) {
 					if(rslt != undefined){
 						let response = that.responseHolder(jsonData.id);
 		    			response.result = {

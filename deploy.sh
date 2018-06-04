@@ -56,7 +56,7 @@ function command_exists() {
 
 function deleteJSONs() {
 	rm build/contracts/Migrations.json
-	rm build/contracts/CertToken.json	
+	rm build/contracts/Certifikate.json	
 }
 
 function main(){
@@ -74,7 +74,7 @@ function main(){
 	#gnome-terminal -x truffle develop --log
 	#log "Running console"
 	#truffle develop
-	###### Prueba: CertToken.deployed().then(function(instance){return instance.setCert();});
+	###### Prueba: Certifikate.deployed().then(function(instance){return instance.setCert();});
 	
 	subtitle "Deploying http server..."
 	cd ../http_server

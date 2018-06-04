@@ -1,6 +1,6 @@
 pragma solidity ^0.4.13;
 
-contract CertToken {
+contract Certifikate {
     
     struct Certificate {
         address[] ownerList;    // Public address of the certificate's owner (user or entity)
@@ -54,7 +54,11 @@ contract CertToken {
     /********************************************************************************************/
     
     /********************************************************************************************
-    Check whether the sender the creator of the contract*/
+    Check whether the sender is the really him*/
+    modifier onlyUser(address add) {require(msg.sender == add/*, "Only creator can call this."*/); _;}
+
+    /********************************************************************************************
+    Check whether the sender is the creator of the contract*/
     modifier onlyCreator() {require(msg.sender == creator/*, "Only creator can call this."*/); _;}
 
     /********************************************************************************************
@@ -88,7 +92,7 @@ contract CertToken {
     /********************************************************************************************
     Initializes contract with initial supply tokens to the creator of the contract
     /********************************************************************************************/
-    function ConstructorCertToken() public {
+    function ConstructorCertifikate() public {
         nounce = 0;
         creator = msg.sender;
     }
@@ -136,7 +140,7 @@ contract CertToken {
     /********************************************************************************************
     Get the list of certificates owned by a user
     /********************************************************************************************/
-    function getCertList(address add) public view returns (bytes32[] ownCertsList) {
+    function getCertList(address add) public onlyUser(add) view returns (bytes32[] ownCertsList) {
         return (users[add].ownCertsList);
     }
 
@@ -156,7 +160,7 @@ contract CertToken {
     /********************************************************************************************
     Get the access log list of certificates
     /********************************************************************************************/
-    function getAccessLogList(address add) public view returns (bytes32[] accessLogList) {
+    function getAccessLogList(address add) public onlyUser(add) view returns (bytes32[] accessLogList) {
         return (users[add].accessLogList);
     }
 
@@ -214,8 +218,6 @@ contract CertToken {
         require(msg.sender != _to);
         bytes32 certUnique = keccak256(msg.sender, nounce++, _certName);
         // Addidng information
-        addOwner(certUnique, _to);
-        addOwner(certUnique, msg.sender);
 
         certs[certUnique].issuer = msg.sender;
         certs[certUnique].certType = _certType;
@@ -223,18 +225,10 @@ contract CertToken {
         certs[certUnique].creationDate = now;
         certs[certUnique].expirationDate = certs[certUnique].creationDate + _duration;
         certs[certUnique].isStilValid = true;
+
+        addOwner(certUnique, _to);
+        addOwner(certUnique, msg.sender);
         
-        return true;
-    }
-
-    /********************************************************************************************
-    Set a new owner in a certificate (only issuer)
-
-    certUnique          Hash of the certificate is gonna check
-    newOwner            Address of the new owner to be added
-    /********************************************************************************************/
-    function setNewOwner(bytes32 _certUnique, address _newOwner) public onlyIssuer(certs[_certUnique].issuer) returns (bool success) {
-        addOwner(_certUnique, _newOwner);
         return true;
     }
 
@@ -244,7 +238,7 @@ contract CertToken {
     certUnique          Hash of the certificate is gonna check
     newOwner            Address of the new owner to be added
     /********************************************************************************************/
-    function addOwner(bytes32 _certUnique, address _newOwner) public returns (bool success) {
+    function addOwner(bytes32 _certUnique, address _newOwner) public onlyIssuer(certs[_certUnique].issuer) returns (bool success) {
         certs[_certUnique].ownerList.push(_newOwner);         // Adding owner to the certificate
         users[_newOwner].ownCertsList.push(_certUnique);      // Adding certificates to the owner list
         certs[_certUnique].whiteList.push(_newOwner);         // The owner is allowed to check his own certificate
@@ -258,7 +252,7 @@ contract CertToken {
     /********************************************************************************************/
     function checkCert(bytes32 certUnique) public view returns (bool success) {
         // Check if certificate exist
-        if (isSenderAllowed(certUnique)) {
+        if (isSenderInTheWhiteList(certUnique)) {
             return true;
         }
         return false;
@@ -269,7 +263,7 @@ contract CertToken {
 
     certUnique        Address of the certificate is gonna be checked
     /********************************************************************************************/
-    function isSenderAllowed(bytes32 certUnique) public view returns (bool isAllowed) {
+    function isSenderInTheWhiteList(bytes32 certUnique) public view returns (bool isAllowed) {
         for (uint i = 0; i < certs[certUnique].whiteList.length; i++) {
             if (certs[certUnique].whiteList[i] == msg.sender) {
                 return(true);
