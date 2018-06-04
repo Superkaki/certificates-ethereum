@@ -162,24 +162,24 @@ class CertificateProtocol extends proto.Protocol {
 				let data = jsonData.params;
 				let transactionObject = {from: data.sender, gas: 3000000}
 
-				certifikate.checkExpiration(data.certHash).send(transactionObject)
-				.on('transactionHash', function(hash){
-					printResult("Check certificate transaction hash sended",hash);
-					if(hash != undefined){
-						let response = that.responseHolder("1.0");
-						response.result = {
-							success: true,
-						}
-						that.sendResponse(response);
-					} else {
-						errorResponse("1.0","410","Error sending check certificate transaction");
-					}
-					console.log("Waiting block creation...");
-				}).on('receipt', function(receipt){
-					printResult("checkExpiration block",JSON.stringify(receipt));
-					certifikate.isSenderInTheWhiteList(data.certHash).call(transactionObject).then(function(rslt) {
-						printResult("isSenderInTheWhiteList result",rslt);
-						if (rslt) {
+				certifikate.isSenderInTheWhiteList(data.certHash).call(transactionObject).then(function(rslt) {
+					printResult("isSenderInTheWhiteList result",rslt);
+					if (rslt) {
+						certifikate.checkExpiration(data.certHash).send(transactionObject)
+						.on('transactionHash', function(hash){
+							printResult("Check certificate transaction hash sended",hash);
+							if(hash != undefined){
+								let response = that.responseHolder("1.0");
+								response.result = {
+									success: true,
+								}
+								that.sendResponse(response);
+							} else {
+								errorResponse("1.0","410","Error sending check certificate transaction");
+							}
+							console.log("Waiting block creation...");
+						}).on('receipt', function(receipt){
+							//printResult("checkExpiration block",JSON.stringify(receipt));
 							certifikate.insertHistory(data.certHash).send(transactionObject)
 							.on('receipt', function(receipt){
 								printResult("insertHistory block",JSON.stringify(receipt));
@@ -198,14 +198,14 @@ class CertificateProtocol extends proto.Protocol {
 								}
 								that.sendResponse(response);
 							});
-						} else {
-							that.errorResponse("1.1","403","Permission denied or does not exist");
-						}
-					}).catch((err) => {
-						console.log("Something happens checking certificate: " + err);
-						//TODO: that.sendResponse(error)
-					});
-				});			
+						}).catch((err) => {
+							console.log("Something happens checking certificate: " + err);
+							//TODO: that.sendResponse(error)
+						});
+					}  else {
+						that.errorResponse("1.1","403","Permission denied or does not exist");
+					}
+				});		
     			break
 			}
 
