@@ -252,7 +252,7 @@ function addNewOwner(data){
   let msg = {
     jsonrpc: '2.0',
     id: '3',
-    method: 'setNewOwner',
+    method: 'addOwner',
     params: data,
   };
   console.log("Making new owner request" )
