@@ -1,4 +1,4 @@
-let wsUri = "ws://172.24.3.166:8080/";
+let wsUri = "ws://localhost:8080/";
 let debug = true;
 
 function init() {
@@ -13,7 +13,6 @@ function onOpen(evt) {
 
   writeToLog("Websocket opened!");
   getStatus();
-  //startTimerDemo();
 }
 
 function onClose(evt) {
@@ -53,24 +52,13 @@ function writeToLog(message) {
 window.addEventListener("load", init, false);
 
 
-///domain specific functions
-
-function startTimerDemo(){
-  //start test timer por ping/pong
-  setInterval(function(){
-    let test = {
-      method: 'ping',
-      action: undefined
-    };
-    doSend(test);
-  }, 3000);
-}
 
 /********************************************************************************************
 Get status from a user
 /********************************************************************************************/
 function getStatus() {
   console.log("Loading user data");
+  unlockingAccount();
   getCertificatesRecord();
   getCheckingHistory();
 }
@@ -85,34 +73,54 @@ document.getElementById('btnTest').addEventListener('click', function(evt){
   console.log("###############  Runing test  ###############");
 
   let data = {
-    "owner": "0x4eab0f78821612c0528f29fe1193c5d825616a74",
+    "owner": "0x032483c305c6cf0c9c11fdbd0acd42952396e36f",
     "duration": 300,
     "certType": "Titulo marítimo",
     "certName": "Capitán",
-    "sender": "0x86b53fd08baef3202ad2c4cb0b5d04384d2c8850"
+    "sender": "0xd63ceec142cb6774a9d331fa6b95e2057e70ab29"
   }
   newCert(data);
   
   data = {
-    "owner": "0x86b53fd08baef3202ad2c4cb0b5d04384d2c8850",
+    "owner": "0xd63ceec142cb6774a9d331fa6b95e2057e70ab29",
     "duration": 300,
     "certType": "Titulo nobiliario",
     "certName": "Barón Rojo",
-    "sender": "0x4eab0f78821612c0528f29fe1193c5d825616a74"
+    "sender": "0x032483c305c6cf0c9c11fdbd0acd42952396e36f"
   }
   newCert(data);
 
   data = {
-    "owner": "0xa416ea7ab365c38e5c39b6f06ae779bebe918328",
+    "owner": "0xf3479ada529346010f2915391febbcfd4f1193a8",
     "duration": 300,
     "certType": "Convenio Prácticas",
     "certName": "Tecnalia Junio2017",
-    "sender": "0x86b53fd08baef3202ad2c4cb0b5d04384d2c8850"
+    "sender": "0xd63ceec142cb6774a9d331fa6b95e2057e70ab29"
   }
   newCert(data);
 
   console.log("TEST OK");
 })
+
+
+/********************************************************************************************
+Unlock account to be able to interact with the blockchain
+/********************************************************************************************/
+function unlockingAccount() {
+  let sender = $("#sender");
+  let data = {
+    "sender": sender.text(),
+    "secret": "certManagement2" // TODO: secret make dynamic
+  }
+  let msg = {
+    jsonrpc: '2.0',
+    id: '0.0',
+    method: 'unlockAccount',
+    params: data
+  };
+  doSend(msg); 
+}
+
 
 /********************************************************************************************
 Get the record of certificates owned by a user

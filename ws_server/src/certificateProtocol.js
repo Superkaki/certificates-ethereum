@@ -2,7 +2,7 @@
 
 const proto = require('./protocol');
 
-const gethURL = "http://172.17.0.3:8546";
+const gethURL = "http://172.26.252.212:22000";
 
 //BEGIN: prepare tools needed to connect to ethereum 
 const Web3 = require('web3');
@@ -17,10 +17,10 @@ console.log("Running web3 version: "+Web3.version);
 console.log("Active  Web3 modules: "+JSON.stringify(Web3.modules));
 console.log("Provider: "+JSON.stringify(provider));
 
-let inakiAddress = ("0xa416ea7ab365c38e5c39b6f06ae779bebe918328");
-let jackAddress = ("0x4eab0f78821612c0528f29fe1193c5d825616a74");
-let deustoAddress = ("0x86b53fd08baef3202ad2c4cb0b5d04384d2c8850");
-let tecnaliaAddress = ("0x7afc3bb694c30717c6999428cf38734cf39ebeff");
+let inakiAddress = ("0xf3479ada529346010f2915391febbcfd4f1193a8");
+//let jackAddress = ("0x4eab0f78821612c0528f29fe1193c5d825616a74");
+let deustoAddress = ("0xd63ceec142cb6774a9d331fa6b95e2057e70ab29");
+let tecnaliaAddress = ("0x032483c305c6cf0c9c11fdbd0acd42952396e36f");
 
 const personal = web3.eth.personal;
 const toHex = web3.utils.utf8ToHex;
@@ -30,7 +30,7 @@ const abi = [{"constant":false,"inputs":[{"name":"_certUnique","type":"bytes32"}
 const ContractAddress = "0xc676dd57e4fb4c800188c353c79f84bdecf1b191";
 var myContract = new web3.eth.Contract(abi, ContractAddress, {
 	from: deustoAddress, // default from address
-	gasPrice: '3000000' // default gas price in wei
+	gasPrice: '0' // default gas price in wei
 });
 const certifikate = myContract.methods;
 
@@ -38,7 +38,7 @@ class CertificateProtocol extends proto.Protocol {
 
 	constructor() {
 		super();
-		userCreation();
+		//userCreation();
 		//test();
 	}
 
@@ -58,6 +58,16 @@ class CertificateProtocol extends proto.Protocol {
 		}
 		
     	switch(jsonData.method){
+			case "unlockAccount": {
+				let data = jsonData.params;
+				
+				web3.eth.personal.unlockAccount(data.sender, data.secret, 600)
+					.then((response) => {
+						console.log("Unlock account: " + response);
+					}).catch((error) => {
+						console.log(error);
+					});
+			}
             case "getCertList":{
 				let that = this;
 				let data = jsonData.params;
@@ -229,8 +239,11 @@ class CertificateProtocol extends proto.Protocol {
 					console.log("Waiting block creation...");
 				}).on('receipt', function(receipt) {
 					console.log("New Certificate created");
-					certifikate.getLastCert(data.owner).call(transactionObject).then(function(certHash){
-						certifikate.getCertByHash(certHash).call(transactionObject).then(function(certInfo) {
+				console.log("1111111");
+				console.log(data.owner);
+					certifikate.getLastCert(data.owner).call(transactionObject).then(function(res){
+						console.log("222222222");
+						certifikate.getCertByHash(res).call(transactionObject).then(function(certInfo) {
 							let response = that.responseHolder("2.1");
 							response.result = {
 								certHash: certInfo[0],
@@ -247,8 +260,8 @@ class CertificateProtocol extends proto.Protocol {
 						});
 					});
 				}).catch((err) => {
-					console.log("Something happens creating a new certificate: " + err);
-					this.errorResponse("2.1","403","Permission denied, can not autosend a certificate");
+					//console.log("Something happens creating a new certificate: " + err);
+					this.errorResponse("2.1","403","" + err);
 				});		
     			break
 			}
@@ -386,41 +399,41 @@ function userCreation() {
 	var ok = certifikate.setUser(inakiAddress, toHex('Inaki Seco'), toHex('22222222I')).send({from: inakiAddress, gas: 3000000})
 	.on('transactionHash', function(hash){
 		console.log("setUser hash: "+hash);
-	}).then(certifikate.setUser(jackAddress, toHex('Jack Sparrow'), toHex('66666666J')).send({from: jackAddress, gas: 3000000})
-	.on('transactionHash', function(hash){
-		console.log("setUser hash: "+hash);
+	//}).then(certifikate.setUser(jackAddress, toHex('Jack Sparrow'), toHex('66666666J')).send({from: jackAddress, gas: 3000000})
+	//.on('transactionHash', function(hash){
+	//	console.log("setUser hash: "+hash);
 	}).then(certifikate.setUser(deustoAddress, toHex('Univeristy of Deusto'), toHex('77777777D')).send({from: deustoAddress, gas: 3000000})
 	.on('transactionHash', function(hash){
 		console.log("setUser hash: "+hash);
 	}).then(certifikate.setUser(tecnaliaAddress, toHex('Tecnalia R.I.'), toHex('11111111T')).send({from: tecnaliaAddress, gas: 3000000})
 	.on('transactionHash', function(hash){
 		console.log("setUser hash: "+hash);
-		certifikate.getUserByAddress(deustoAddress).call({from:jackAddress})
+		certifikate.getUserByAddress(deustoAddress).call({from:inakiAddress})
 		.then(function(result){
 		printResult(deustoAddress+" information",toStr(result[0])+", "+toStr(result[1]));
 		});
-	}))));
+	})));
 }
 
 function test() {
 
-	certifikate.getCreator().call({from:jackAddress})
+	certifikate.getCreator().call({from:inakiAddress})
 		.then(function(result){
 		console.log("Contract ceator: "+result);
 	});
 
-	certifikate.getMyAddress().call({from:jackAddress})
+	certifikate.getMyAddress().call({from:inakiAddress})
 		.then(function(result){
 		console.log("My address: "+result);
 	});
 	
 	console.log("###############  Creating new certificate  ###############");
-	certifikate.newCert(jackAddress, toHex('Título de grado'), toHex('Ingeniería de Telecomunicaciones'), 1200).send({from: deustoAddress, gas: 3000000})
+	certifikate.newCert(inakiAddress, toHex('Título de grado'), toHex('Ingeniería de Telecomunicaciones'), 1200).send({from: deustoAddress, gas: 3000000})
 	.on('transactionHash', function(hash){
 		console.log("newCert hash: "+hash);
 	})
 	.on('receipt', function(receipt){
-		certifikate.getCertList(jackAddress).call({from:inakiAddress})
+		certifikate.getCertList(inakiAddress).call({from:inakiAddress})
 			.then(function(result){
 			console.log("CertList: "+result);
 		});

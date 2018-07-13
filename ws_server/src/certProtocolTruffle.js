@@ -13,10 +13,10 @@ var provider = new Web3.providers.HttpProvider(gethURL);
 const web3 = new Web3(provider);
 const accounts = new Accounts(gethURL);
 
-let inakiAddress = ("0xa416ea7ab365c38e5c39b6f06ae779bebe918328");
-let jackAddress = ("0x4eab0f78821612c0528f29fe1193c5d825616a74");
-let deustoAddress = ("0x86b53fd08baef3202ad2c4cb0b5d04384d2c8850");
-let tecnaliaAddress = ("0x7afc3bb694c30717c6999428cf38734cf39ebeff");
+let inakiAddress = ("0xf3479ada529346010f2915391febbcfd4f1193a8");
+//let jackAddress = ("0x4eab0f78821612c0528f29fe1193c5d825616a74");
+let deustoAddress = ("0xd63ceec142cb6774a9d331fa6b95e2057e70ab29");
+let tecnaliaAddress = ("0x032483c305c6cf0c9c11fdbd0acd42952396e36f");
 
 console.log("Running web3 version: "+Web3.version);
 console.log("Active  Web3 modules: "+JSON.stringify(Web3.modules));
@@ -63,10 +63,10 @@ class CertificateProtocol extends proto.Protocol {
 			console.log("Creating instance")
 			console.log("###############  Generating users  ###############");
 			return that.tokenManager.setUser(inakiAddress, "Inaki Seco", "22222222A", {from: inakiAddress, gas:3000000});
-		}).then(function(result) {
-			console.log("User Inaki creation block");
-			console.log(JSON.stringify(result));
-	    	return that.tokenManager.setUser(jackAddress, "Jack Sparrow", "66666666B", {from: jackAddress, gas:3000000});
+//		}).then(function(result) {
+//			console.log("User Inaki creation block");
+//			console.log(JSON.stringify(result));
+//	    	return that.tokenManager.setUser(jackAddress, "Jack Sparrow", "66666666B", {from: jackAddress, gas:3000000});
 	    }).then(function(result) {
 			console.log("User Jack creation block");
 			console.log(JSON.stringify(result));
